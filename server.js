@@ -32,13 +32,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('Public')); // التعديل هنا: تم تغيير الحرف لـ P كبير ليطابق المجلد الفعلي للمشروع
 
-// ===== 0) المسار الرئيسي: يوجّه حسب حالة تسجيل الدخول =====
+// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة =====
 app.get('/', (req, res) => {
-  if (req.session.user) {
-    res.redirect('/ibra.html');
-  } else {
-    res.redirect('/logintab.html');
-  }
+  res.redirect('/ibra.html');
 });
 
 // ===== دوال مساعدة لـ PKCE =====
