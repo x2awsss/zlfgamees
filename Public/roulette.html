@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الروليت الروسي | عالم زلف</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+
+        html, body { height: 100%; }
+
+        body {
+            background-color: #050816;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 12px 15px;
+            position: relative;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+            z-index: 2;
+            background: linear-gradient(45deg, #ffffff, #f87171);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ===== حالة الاتصال ===== */
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+            z-index: 2;
+        }
+        .status-pill.offline { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+        .status-pill.online { background: rgba(83,252,24,0.1); color: #53fc18; border: 1px solid rgba(83,252,24,0.4); }
+        .status-pill.pending { background: rgba(234,179,8,0.1); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+
+        /* ===== شريط الاتصال: ثابت بالزاوية السفلية اليمنى، صغير وما ياخذ مساحة ===== */
+        .connect-bar {
+            position: fixed;
+            bottom: 14px;
+            right: 14px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            background: rgba(10, 17, 40, 0.75);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            padding: 6px;
+            z-index: 50;
+        }
+        .connect-bar input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 6px 12px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.72rem;
+            outline: none;
+            width: 110px;
+        }
+        .connect-bar input::placeholder { color: #6b7280; }
+        .connect-bar button {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            border: none;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            font-size: 0.72rem;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .connect-bar button:hover { transform: scale(1.05); }
+
+        /* ===================== شاشة الإعداد (بدء اللعبة) ===================== */
+        #setupScreen {
+            width: 100%;
+            max-width: 460px;
+            max-height: calc(100vh - 90px);
+            overflow-y: auto;
+            background: #0f1420;
+            border: 1.5px solid #eab308;
+            border-radius: 22px;
+            padding: 22px 30px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .setup-title { font-size: 1rem; font-weight: 900; color: #eab308; margin-bottom: 16px; }
+
+        .setup-label {
+            font-size: 0.85rem;
+            color: #d4d4d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .setup-label .qmark {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            border: 1px solid #6b7280;
+            color: #6b7280;
+            font-size: 0.65rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .counter-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .counter-btn {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .counter-btn:hover { background: rgba(255,255,255,0.12); }
+        .counter-value {
+            width: 50px; height: 40px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900;
+            font-size: 1.05rem;
+        }
+
+        .chamber-preview { display: flex; justify-content: center; gap: 6px; margin-bottom: 16px; }
+        .chamber-preview .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .chamber-preview .dot.g { background: #53fc18; box-shadow: 0 0 6px rgba(83,252,24,0.5); }
+        .chamber-preview .dot.r { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.5); }
+
+        .join-hint { font-size: 0.8rem; color: #929dae; margin-bottom: 14px; }
+        .join-hint b { color: #53fc18; }
+
+        .pending-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+            max-height: 22vh;
+            overflow-y: auto;
+        }
+        .pending-grid::-webkit-scrollbar { width: 4px; }
+        .pending-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+        .pending-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 9px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .pending-chip .remove-x {
+            background: rgba(248,113,113,0.15);
+            color: #f87171;
+            width: 20px; height: 20px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .pending-chip .k-icon {
+            background: #53fc18;
+            color: #000;
+            width: 16px; height: 16px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .pending-empty { grid-column: 1 / -1; color: #6b7280; font-size: 0.8rem; padding: 10px 0; }
+
+        .start-game-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border: none;
+            color: #fff;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .start-game-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(124,58,237,0.4); }
+
+        /* ===================== شاشة اللعب ===================== */
+        #gameScreen {
+            display: none;
+            width: 100%; max-width: 1000px;
+            max-height: calc(100vh - 90px);
+            overflow-y: auto;
+            z-index: 2;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 10px;
+        }
+        #gameScreen.show { display: flex; }
+
+        .top-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .action-btn {
+            padding: 11px 22px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+        }
+        .action-btn.new-game { background: rgba(234,179,8,0.12); color: #eab308; border: 1px solid rgba(234,179,8,0.4); }
+        .action-btn.manage { background: rgba(59,130,246,0.12); color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
+        .action-btn.spin { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; box-shadow: 0 0 20px rgba(124,58,237,0.4); }
+        .action-btn:hover { transform: translateY(-2px); }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* الشبكة الفخمة للمشاركين */
+        .fancy-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 620px;
+        }
+        .fancy-chip {
+            background: rgba(15, 20, 32, 0.8);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .fancy-chip.dead { opacity: 0.35; }
+        .fancy-chip.chooser { border-color: #eab308; box-shadow: 0 0 12px rgba(234,179,8,0.35); }
+        .fancy-chip.targeted { border-color: #f87171; box-shadow: 0 0 12px rgba(248,113,113,0.4); }
+
+        .fancy-chip .top-row { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 800; }
+        .fancy-chip .k-icon {
+            background: #53fc18; color: #000;
+            width: 16px; height: 16px; border-radius: 4px;
+            font-size: 0.6rem; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .fancy-chip .mini-dots { display: flex; gap: 4px; }
+        .fancy-chip .mini-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+        .fancy-chip .mini-dots span.safe { background: #53fc18; }
+        .fancy-chip .mini-dots span.dead-dot { background: #f87171; }
+
+        /* عجلة الحظ */
+        .wheel-wrapper { position: relative; width: min(300px, 34vh); height: min(300px, 34vh); }
+        .pointer {
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 14px solid transparent; border-right: 14px solid transparent;
+            border-top: 22px solid #eab308;
+            z-index: 5;
+            filter: drop-shadow(0 0 6px rgba(234,179,8,0.6));
+        }
+        #wheelCanvas {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 6px solid #1e293b;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            transition: transform 4s cubic-bezier(0.12, 0.94, 0.2, 1);
+        }
+        .empty-wheel-msg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; color: #6b7280; font-size: 0.8rem; width: 180px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.78rem;
+            color: #929dae;
+            width: 100%;
+            max-width: 280px;
+        }
+        .speed-control input[type="range"] {
+            flex: 1;
+            accent-color: #eab308;
+        }
+        .speed-control .speed-val { color: #eab308; font-weight: 900; min-width: 16px; text-align: center; }
+
+        .log-box {
+            width: 100%; max-width: 400px; max-height: 60px; overflow-y: auto;
+            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 8px 14px;
+            font-size: 0.72rem; color: #929dae;
+            display: flex; flex-direction: column-reverse; gap: 3px;
+        }
+        .log-box::-webkit-scrollbar { width: 4px; }
+        .log-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+        /* ===================== نوافذ منبثقة مشتركة ===================== */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 100; padding: 20px;
+        }
+        .overlay.show { display: flex; }
+
+        .modal-card {
+            background: #0f1420;
+            border: 1.5px solid #eab308;
+            border-radius: 24px;
+            padding: 38px 42px;
+            text-align: center;
+            max-width: 560px; width: 100%;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 40px rgba(234,179,8,0.15);
+            animation: popIn 0.35s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-eyebrow { color: #eab308; font-size: 0.95rem; margin-bottom: 12px; opacity: 0.85; }
+        .modal-big-name { font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 18px; }
+        .modal-instr { color: #929dae; font-size: 0.92rem; margin-bottom: 24px; }
+
+        .picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 26px; }
+        .picker-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 12px 10px; border-radius: 12px;
+            font-family: inherit; font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; transition: 0.25s;
+        }
+        .picker-btn:hover { border-color: #eab308; background: rgba(234,179,8,0.1); transform: translateY(-2px); }
+        .num-badge {
+            background: rgba(83,252,24,0.15); color: #53fc18;
+            font-size: 0.72rem; font-weight: 900;
+            width: 20px; height: 20px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(135deg, #7c3aed, #4c1d95);
+            border: none; color: #fff; padding: 12px 40px; border-radius: 50px;
+            font-family: inherit; font-weight: 700; cursor: pointer; font-size: 0.95rem;
+        }
+
+        /* ===== مشهد الإطلاق (المسدس + الهدف) ===== */
+        .shoot-scene {
+            display: flex; align-items: center; justify-content: center;
+            gap: 30px; height: 110px; margin-bottom: 18px; position: relative;
+        }
+        .gun-icon { font-size: 3.2rem; transform: scaleX(-1); transition: transform 0.12s ease; }
+        .gun-icon.recoil { transform: scaleX(-1) translateX(-8px) rotate(-8deg); }
+        .target-char { font-size: 3.6rem; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .target-char.flinch { animation: flinch 0.35s ease; }
+        .target-char.fallen { transform: rotate(85deg) translateY(10px); opacity: 0.35; }
+        @keyframes flinch {
+            0% { transform: translateX(0); }
+            30% { transform: translateX(6px) rotate(6deg); }
+            60% { transform: translateX(-4px) rotate(-4deg); }
+            100% { transform: translateX(0) rotate(0); }
+        }
+        .bullet-fx {
+            position: absolute; top: 50%; left: 40%;
+            width: 10px; height: 4px; border-radius: 4px;
+            background: #eab308; opacity: 0;
+            box-shadow: 0 0 8px #eab308;
+        }
+        .bullet-fx.fire { animation: bulletFly 0.25s linear forwards; }
+        @keyframes bulletFly {
+            0% { opacity: 1; left: 40%; }
+            100% { opacity: 0; left: 65%; }
+        }
+
+        .chambers { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+        .chamber-dot {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03);
+            transition: 0.3s;
+        }
+        .chamber-dot.used-safe { background: #53fc18; border-color: #53fc18; }
+        .chamber-dot.used-dead { background: #f87171; border-color: #f87171; }
+
+        .result-msg { font-size: 1.25rem; font-weight: 900; min-height: 34px; }
+        .result-msg.dead { color: #f87171; }
+        .result-msg.alive { color: #53fc18; }
+
+        @media (max-width: 560px) {
+            .picker-grid, .pending-grid { grid-template-columns: repeat(2, 1fr); }
+            .fancy-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal-big-name { font-size: 1.5rem; }
+            .wheel-wrapper { width: 260px; height: 260px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <h1>🔫 الروليت الروسي</h1>
+
+    <div class="status-pill offline" id="statusPill">
+        <span class="status-dot"></span>
+        <span id="statusText">غير متصل</span>
+    </div>
+
+    <div class="connect-bar" id="connectBar">
+        <input type="text" id="chatroomInput" placeholder="رقم غرفة الشات (Chatroom ID)">
+        <button onclick="connectToChat()">اتصال بالشات</button>
+    </div>
+
+    <!-- ===================== شاشة بدء اللعبة ===================== -->
+    <div id="setupScreen">
+        <div class="setup-title">بدء اللعبة</div>
+
+        <div class="setup-label">
+            عدد الضربات لكل لاعب (1-5)
+            <span class="qmark">؟</span>
+        </div>
+        <div class="counter-row">
+            <button class="counter-btn" onclick="changeShotsCount(1)">+</button>
+            <div class="counter-value" id="shotsCountDisplay">5</div>
+            <button class="counter-btn" onclick="changeShotsCount(-1)">-</button>
+        </div>
+        <div class="chamber-preview" id="chamberPreview"></div>
+
+        <div class="join-hint">اكتب <b>"join"</b> في الشات للانضمام</div>
+
+        <div class="pending-grid" id="pendingGrid">
+            <div class="pending-empty">بانتظار أول مشارك...</div>
+        </div>
+
+        <button class="start-game-btn" onclick="startGame()">ابدأ الجيم</button>
+    </div>
+
+    <!-- ===================== شاشة اللعب ===================== -->
+    <div id="gameScreen">
+        <div class="top-actions">
+            <button class="action-btn new-game" onclick="newGame()">🆕 جيم جديد</button>
+            <button class="action-btn manage" onclick="openManage()">⚙️ إدارة اللاعبين</button>
+            <button class="action-btn spin" id="spinBtn" onclick="spinWheel()">🎡 لف العجلة</button>
+        </div>
+
+        <div class="fancy-grid" id="fancyGrid"></div>
+
+        <div class="speed-control">
+            <span>🐢 بطيء</span>
+            <input type="range" id="speedSlider" min="1" max="10" value="6" oninput="document.getElementById('speedVal').textContent = this.value">
+            <span>سريع 🐇</span>
+            <span class="speed-val" id="speedVal">6</span>
+        </div>
+
+        <div class="wheel-wrapper">
+            <div class="pointer"></div>
+            <canvas id="wheelCanvas" width="320" height="320"></canvas>
+            <div class="empty-wheel-msg" id="emptyWheelMsg"></div>
+        </div>
+
+        <div class="log-box" id="logBox"></div>
+    </div>
+
+    <!-- ===================== نافذة اختيار الضحية ===================== -->
+    <div class="overlay" id="pickerOverlay">
+        <div class="modal-card">
+            <div class="modal-eyebrow">وقع الاختيار على</div>
+            <div class="modal-big-name" id="pickerChooserName">—</div>
+            <div class="modal-instr">اختر لاعب لضربه، اكتب رقمه أو اسمه بالشات.</div>
+            <div class="picker-grid" id="pickerGrid"></div>
+            <button class="modal-close-btn" onclick="closePicker()">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- ===================== نافذة الإطلاق ===================== -->
+    <div class="overlay" id="shootOverlay">
+        <div class="modal-card">
+            <div class="modal-eyebrow">🎯 الهدف</div>
+            <div class="modal-big-name" id="shootTargetName">—</div>
+            <div class="modal-instr" id="shootSubtitle">المسدس فيه خانات، رصاصة وحدة موزعة عشوائياً</div>
+
+            <div class="shoot-scene">
+                <span class="target-char" id="targetChar">🧍</span>
+                <div class="bullet-fx" id="bulletFx"></div>
+                <span class="gun-icon" id="gunIcon">🔫</span>
+            </div>
+
+            <div class="chambers" id="chambers"></div>
+            <div class="result-msg" id="resultMsg"></div>
+            <button class="modal-close-btn" id="shootCloseBtn" onclick="closeShootOverlay()" style="margin-top:14px; display:none;">متابعة</button>
+        </div>
+    </div>
+
+    <!-- ===================== نافذة إدارة اللاعبين ===================== -->
+    <div class="overlay" id="manageOverlay">
+        <div class="modal-card">
+            <div class="modal-eyebrow">إدارة اللاعبين</div>
+            <div class="pending-grid" id="manageGrid" style="margin-top: 10px;"></div>
+            <button class="modal-close-btn" onclick="closeManage()" style="margin-top: 16px;">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        // ===================== إعداد الخلفية المتحركة =====================
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60 },
+                "color": { "value": "#ffffff" },
+                "opacity": { "value": 0.15 },
+                "size": { "value": 2 },
+                "line_linked": { "enable": true, "distance": 180, "opacity": 0.08 },
+                "move": { "enable": true, "speed": 0.8 }
+            }
+        });
+
+        // ===================== حالة اللعبة =====================
+        let players = [];        // { id, name, number, bulletPosition, shotCount, dead }
+        let chooser = null;
+        let currentTarget = null;
+        let isSpinning = false;
+        let waitingForPick = false;
+        let gameStarted = false;
+        let shotsPerPlayer = 5;  // قابل للتعديل من شاشة الإعداد (1-5)
+        let nextNumber = 1;
+        let testCounter = 1;
+        let totalRotation = 0; // الدوران التراكمي للعجلة (يضمن دوران حقيقي بدون قفزات للخلف)
+
+        let pusher = null;
+        let channel = null;
+
+        // عناصر DOM
+        const pendingGrid = document.getElementById('pendingGrid');
+        const chamberPreview = document.getElementById('chamberPreview');
+        const shotsCountDisplay = document.getElementById('shotsCountDisplay');
+        const setupScreen = document.getElementById('setupScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const fancyGrid = document.getElementById('fancyGrid');
+        const spinBtn = document.getElementById('spinBtn');
+        const logBox = document.getElementById('logBox');
+        const wheelCanvas = document.getElementById('wheelCanvas');
+        const emptyWheelMsg = document.getElementById('emptyWheelMsg');
+        const ctx = wheelCanvas.getContext('2d');
+
+        const pickerOverlay = document.getElementById('pickerOverlay');
+        const pickerChooserName = document.getElementById('pickerChooserName');
+        const pickerGrid = document.getElementById('pickerGrid');
+
+        const shootOverlay = document.getElementById('shootOverlay');
+        const shootTargetName = document.getElementById('shootTargetName');
+        const shootSubtitle = document.getElementById('shootSubtitle');
+        const chambersEl = document.getElementById('chambers');
+        const resultMsg = document.getElementById('resultMsg');
+        const targetChar = document.getElementById('targetChar');
+        const gunIcon = document.getElementById('gunIcon');
+        const bulletFx = document.getElementById('bulletFx');
+        const shootCloseBtn = document.getElementById('shootCloseBtn');
+
+        const manageOverlay = document.getElementById('manageOverlay');
+        const manageGrid = document.getElementById('manageGrid');
+
+        const wheelColors = ['#3b82f6', '#eab308', '#f87171', '#53fc18', '#a855f7', '#06b6d4', '#f97316', '#ec4899'];
+
+        function addLog(text) {
+            const line = document.createElement('div');
+            line.textContent = text;
+            logBox.prepend(line);
+        }
+
+        // ===================== شاشة الإعداد =====================
+        function changeShotsCount(delta) {
+            shotsPerPlayer = Math.min(5, Math.max(1, shotsPerPlayer + delta));
+            shotsCountDisplay.textContent = shotsPerPlayer;
+            renderChamberPreview();
+        }
+
+        function renderChamberPreview() {
+            chamberPreview.innerHTML = '';
+            for (let i = 0; i < shotsPerPlayer; i++) {
+                const d = document.createElement('div');
+                d.className = 'dot g';
+                chamberPreview.appendChild(d);
+            }
+            const bulletDot = document.createElement('div');
+            bulletDot.className = 'dot r';
+            chamberPreview.appendChild(bulletDot);
+        }
+
+        function renderPendingGrid() {
+            if (players.length === 0) {
+                pendingGrid.innerHTML = '<div class="pending-empty">بانتظار أول مشارك...</div>';
+                return;
+            }
+            pendingGrid.innerHTML = '';
+            players.forEach(p => {
+                const chip = document.createElement('div');
+                chip.className = 'pending-chip';
+                chip.innerHTML = `
+                    <span class="remove-x" onclick="removePlayer('${p.id}')">✕</span>
+                    <span class="k-icon">K</span>
+                    <span>${p.name}</span>
+                `;
+                pendingGrid.appendChild(chip);
+            });
+        }
+
+        function removePlayer(id) {
+            players = players.filter(p => p.id !== id);
+            renderPendingGrid();
+            if (gameStarted) { renderFancyGrid(); drawWheel(); }
+        }
+
+        function addPlayer(name, id) {
+            if (players.some(p => p.id === id)) return;
+            const player = { id, name, number: nextNumber++, bulletPosition: null, shotCount: 0, dead: false };
+            players.push(player);
+            addLog(`👋 #${player.number} ${name} انضم للعبة`);
+            renderPendingGrid();
+            if (gameStarted) { renderFancyGrid(); drawWheel(); }
+        }
+
+        function startGame() {
+            if (players.length < 1) {
+                alert('لازم ينضم مشارك واحد على الأقل أول');
+                return;
+            }
+            gameStarted = true;
+            setupScreen.style.display = 'none';
+            gameScreen.classList.add('show');
+            renderFancyGrid();
+            drawWheel();
+        }
+
+        function newGame() {
+            players = [];
+            chooser = null;
+            currentTarget = null;
+            waitingForPick = false;
+            gameStarted = false;
+            nextNumber = 1;
+            totalRotation = 0;
+            wheelCanvas.style.transitionDuration = '0s';
+            wheelCanvas.style.transform = 'rotate(0deg)';
+            gameScreen.classList.remove('show');
+            setupScreen.style.display = 'block';
+            renderPendingGrid();
+            addLog('🆕 بدأت جولة جديدة');
+        }
+
+        // ===================== شبكة اللاعبين الفخمة (شاشة اللعب) =====================
+        function renderFancyGrid() {
+            fancyGrid.innerHTML = '';
+            players.forEach(p => {
+                const chip = document.createElement('div');
+                let cls = 'fancy-chip';
+                if (p.dead) cls += ' dead';
+                if (chooser && p.id === chooser.id) cls += ' chooser';
+                if (currentTarget && p.id === currentTarget.id) cls += ' targeted';
+                chip.className = cls;
+
+                let dotsHtml = '';
+                for (let i = 1; i <= shotsPerPlayer; i++) {
+                    let dotCls = '';
+                    if (i <= p.shotCount) {
+                        dotCls = (i === p.bulletPosition) ? 'dead-dot' : 'safe';
+                    }
+                    dotsHtml += `<span class="${dotCls}"></span>`;
+                }
+
+                chip.innerHTML = `
+                    <div class="top-row"><span class="k-icon">K</span> #${p.number} ${p.dead ? '💀' : p.name}</div>
+                    <div class="mini-dots">${dotsHtml}</div>
+                `;
+                fancyGrid.appendChild(chip);
+            });
+            spinBtn.disabled = players.filter(p => !p.dead).length < 1 || isSpinning || waitingForPick;
+        }
+
+        // ===================== إدارة اللاعبين (نافذة) =====================
+        function openManage() {
+            manageGrid.innerHTML = '';
+            players.forEach(p => {
+                const chip = document.createElement('div');
+                chip.className = 'pending-chip';
+                chip.innerHTML = `
+                    <span class="remove-x" onclick="removePlayer('${p.id}'); openManage();">✕</span>
+                    <span class="k-icon">K</span>
+                    <span>#${p.number} ${p.name}${p.dead ? ' 💀' : ''}</span>
+                `;
+                manageGrid.appendChild(chip);
+            });
+            if (players.length === 0) {
+                manageGrid.innerHTML = '<div class="pending-empty">ما فيه مشاركين</div>';
+            }
+            manageOverlay.classList.add('show');
+        }
+        function closeManage() { manageOverlay.classList.remove('show'); }
+
+        // ===================== رسم عجلة الحظ =====================
+        function drawWheel() {
+            const alive = players.filter(p => !p.dead);
+            ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+
+            if (alive.length === 0) {
+                emptyWheelMsg.textContent = 'لا يوجد مشاركين أحياء';
+                return;
+            }
+            emptyWheelMsg.textContent = '';
+
+            const cx = wheelCanvas.width / 2;
+            const cy = wheelCanvas.height / 2;
+            const radius = wheelCanvas.width / 2 - 8;
+            const sliceAngle = (2 * Math.PI) / alive.length;
+
+            alive.forEach((p, i) => {
+                const startAngle = i * sliceAngle;
+                const endAngle = startAngle + sliceAngle;
+
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = wheelColors[i % wheelColors.length];
+                ctx.fill();
+                ctx.strokeStyle = '#050816';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#050816';
+                ctx.font = 'bold 13px Cairo, sans-serif';
+                const label = `#${p.number} ${p.name}`;
+                const shortLabel = label.length > 14 ? label.slice(0, 13) + '…' : label;
+                ctx.fillText(shortLabel, radius - 12, 5);
+                ctx.restore();
+            });
+        }
+
+        // ===================== لف العجلة =====================
+        function spinWheel() {
+            const alive = players.filter(p => !p.dead);
+            if (alive.length === 0 || isSpinning) return;
+
+            isSpinning = true;
+            spinBtn.disabled = true;
+            currentTarget = null;
+
+            const speedValue = parseInt(document.getElementById('speedSlider').value, 10);
+            // كل ما زادت السرعة، قلّت مدة الدوران (بين 1.8 ثانية أسرع سرعة و7 ثواني أبطأ سرعة)
+            const duration = 7.4 - (speedValue * 0.56);
+
+            const sliceAngle = 360 / alive.length;
+            const randomIndex = Math.floor(Math.random() * alive.length);
+
+            // زاوية الهبوط المطلوبة (نسبة لموقع المؤشر فوق العجلة)
+            const desiredLanding = (360 - (randomIndex * sliceAngle + sliceAngle / 2) + 360) % 360;
+            const currentMod = ((totalRotation % 360) + 360) % 360;
+            const extraTurns = 5 + Math.floor(Math.random() * 3); // 5 إلى 7 لفات كاملة لإحساس دوران حقيقي
+            const delta = (desiredLanding - currentMod + 360) % 360;
+
+            totalRotation += extraTurns * 360 + delta;
+
+            wheelCanvas.style.transitionDuration = duration + 's';
+            wheelCanvas.style.transform = `rotate(${totalRotation}deg)`;
+
+            setTimeout(() => {
+                chooser = alive[randomIndex];
+                isSpinning = false;
+                startPickingPhase();
+                renderFancyGrid();
+            }, duration * 1000 + 150);
+        }
+
+        // ===================== مرحلة اختيار الضحية (نافذة منبثقة) =====================
+        function startPickingPhase() {
+            waitingForPick = true;
+            pickerChooserName.textContent = chooser.name;
+            renderPickerGrid();
+            pickerOverlay.classList.add('show');
+            addLog(`🎡 العجلة اختارت #${chooser.number} ${chooser.name}`);
+            renderFancyGrid();
+        }
+
+        function renderPickerGrid() {
+            pickerGrid.innerHTML = '';
+            players.filter(p => !p.dead).forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = 'picker-btn';
+                btn.innerHTML = `<span class="num-badge">${p.number}</span> ${p.name}`;
+                btn.onclick = () => {
+                    if (!waitingForPick) return;
+                    handleChatPick(chooser.id, chooser.name, String(p.number));
+                };
+                pickerGrid.appendChild(btn);
+            });
+        }
+
+        function closePicker() {
+            pickerOverlay.classList.remove('show');
+            waitingForPick = false;
+            chooser = null;
+            renderFancyGrid();
+        }
+
+        function handleChatPick(senderId, senderName, rawMessage) {
+            if (!waitingForPick || !chooser) return;
+            if (senderId !== chooser.id) return;
+
+            const msg = rawMessage.trim().toLowerCase();
+            let picked = null;
+
+            if (/^\d+$/.test(msg)) {
+                const num = parseInt(msg, 10);
+                picked = players.find(p => p.number === num && !p.dead);
+            }
+            if (!picked) {
+                picked = players.find(p => !p.dead && p.name.toLowerCase() === msg);
+            }
+            if (!picked) return;
+
+            waitingForPick = false;
+            pickerOverlay.classList.remove('show');
+            openShootOverlay(picked);
+        }
+
+        // ===================== نافذة الإطلاق (المسدس + الهدف) =====================
+        function openShootOverlay(target) {
+            currentTarget = target;
+            if (currentTarget.bulletPosition === null) {
+                currentTarget.bulletPosition = Math.floor(Math.random() * shotsPerPlayer) + 1;
+            }
+            renderFancyGrid();
+            addLog(`🔫 #${chooser.number} ${chooser.name} اختار يطلق على #${target.number} ${target.name}`);
+
+            shootTargetName.textContent = `#${target.number} ${target.name}`;
+            shootSubtitle.textContent = `المسدس فيه ${shotsPerPlayer} خانات، رصاصة وحدة موزعة عشوائياً`;
+            targetChar.textContent = '🧍';
+            targetChar.className = 'target-char';
+            resultMsg.textContent = '';
+            resultMsg.className = 'result-msg';
+            shootCloseBtn.style.display = 'none';
+            renderChambers();
+
+            shootOverlay.classList.add('show');
+            setTimeout(() => fireShot(), 1300);
+        }
+
+        function closeShootOverlay() {
+            shootOverlay.classList.remove('show');
+            chooser = null;
+            currentTarget = null;
+            renderFancyGrid();
+            drawWheel();
+        }
+
+        function renderChambers() {
+            chambersEl.innerHTML = '';
+            for (let i = 1; i <= shotsPerPlayer; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'chamber-dot';
+                if (i <= currentTarget.shotCount) {
+                    dot.classList.add(i === currentTarget.bulletPosition ? 'used-dead' : 'used-safe');
+                }
+                chambersEl.appendChild(dot);
+            }
+        }
+
+        // ===== أصوات (Web Audio API، بدون ملفات خارجية) =====
+        function playGunshotSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const bufferSize = audioCtx.sampleRate * 0.3;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 1200;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                noise.start();
+            } catch (e) {}
+        }
+
+        function playClickSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.07);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.07);
+            } catch (e) {}
+        }
+
+        // ===================== الإطلاق الفعلي + الأنيميشن =====================
+        function fireShot() {
+            if (!currentTarget || currentTarget.dead) return;
+
+            currentTarget.shotCount++;
+            const isDead = currentTarget.shotCount === currentTarget.bulletPosition;
+
+            // أنيميشن ارتداد المسدس
+            gunIcon.classList.add('recoil');
+            setTimeout(() => gunIcon.classList.remove('recoil'), 150);
+
+            if (isDead) {
+                // الرصاصة تطير من المسدس للهدف
+                bulletFx.classList.remove('fire');
+                void bulletFx.offsetWidth; // إعادة تشغيل الأنيميشن
+                bulletFx.classList.add('fire');
+
+                setTimeout(() => {
+                    playGunshotSound();
+                    currentTarget.dead = true;
+                    targetChar.textContent = '💀';
+                    targetChar.classList.add('fallen');
+                    resultMsg.className = 'result-msg dead';
+                    resultMsg.textContent = `💀 لقد مات ${currentTarget.name}!`;
+                    addLog(`💀 #${currentTarget.number} ${currentTarget.name} مات بالمحاولة رقم ${currentTarget.shotCount}`);
+                    renderChambers();
+                    renderFancyGrid();
+                    drawWheel();
+                    shootCloseBtn.style.display = 'inline-block';
+                }, 220);
+            } else {
+                playClickSound();
+                targetChar.classList.add('flinch');
+                setTimeout(() => targetChar.classList.remove('flinch'), 350);
+
+                resultMsg.className = 'result-msg alive';
+                resultMsg.textContent = `🎉 لقد نجا ${currentTarget.name}! (محاولة ${currentTarget.shotCount}/${shotsPerPlayer})`;
+                addLog(`🎉 #${currentTarget.number} ${currentTarget.name} نجا بالمحاولة رقم ${currentTarget.shotCount}`);
+                renderChambers();
+                renderFancyGrid();
+                shootCloseBtn.style.display = 'inline-block';
+            }
+        }
+
+        // ===================== الاتصال بشات Kick (يدوي، مع حفظ محلي بالمتصفح) =====================
+        function connectToChat() {
+            const input = document.getElementById('chatroomInput');
+            const chatroomId = input.value.trim();
+            if (!chatroomId) {
+                alert('اكتب رقم غرفة الشات (Chatroom ID) أول');
+                return;
+            }
+            try { localStorage.setItem('zlf_chatroom_id', chatroomId); } catch (e) {}
+            connectPusher(chatroomId);
+        }
+
+        function connectPusher(chatroomId) {
+            const statusPill = document.getElementById('statusPill');
+            const statusText = document.getElementById('statusText');
+
+            statusPill.className = 'status-pill pending';
+            statusText.textContent = 'جاري الاتصال بالشات...';
+
+            if (pusher) pusher.disconnect();
+            pusher = new Pusher('32cbd69e4b950bf97679', { cluster: 'us2' });
+            channel = pusher.subscribe(`chatrooms.${chatroomId}.v2`);
+
+            channel.bind('App\\Events\\ChatMessageEvent', function (data) {
+                const rawMessage = (data.content || '').trim();
+                const username = data.sender ? data.sender.username : 'مجهول';
+                const userId = data.sender ? data.sender.id : username;
+
+                // تسجيل تشخيصي: كل رسالة توصل، حتى لو ما تطابقت مع join أو رقم
+                addLog(`💬 [${username}]: ${rawMessage}`);
+
+                if (rawMessage.toLowerCase() === 'join') {
+                    addPlayer(username, userId);
+                } else {
+                    handleChatPick(userId, username, rawMessage);
+                }
+            });
+
+            pusher.connection.bind('connected', () => {
+                statusPill.className = 'status-pill online';
+                statusText.textContent = `متصل — غرفة #${chatroomId}`;
+                addLog(`✅ تم الاتصال بغرفة الشات رقم ${chatroomId}`);
+            });
+
+            pusher.connection.bind('error', (err) => {
+                statusPill.className = 'status-pill offline';
+                statusText.textContent = 'خطأ بالاتصال';
+                addLog('⚠️ خطأ Pusher: ' + JSON.stringify(err));
+            });
+        }
+
+        // ===================== أدوات اختبار (اختياري، بدون بث حقيقي) =====================
+        function addTestPlayer() {
+            addPlayer(`لاعب_تجريبي_${testCounter}`, `test_${testCounter}`);
+            testCounter++;
+        }
+
+        // ===================== البدء =====================
+        renderChamberPreview();
+        renderPendingGrid();
+
+        // لو فيه رقم شات محفوظ من زيارة سابقة، نعبيه تلقائياً ونتصل به مباشرة
+        try {
+            const savedId = localStorage.getItem('zlf_chatroom_id');
+            if (savedId) {
+                document.getElementById('chatroomInput').value = savedId;
+                connectPusher(savedId);
+            }
+        } catch (e) {}
+    </script>
+</body>
+</html>

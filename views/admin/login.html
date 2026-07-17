@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دخول الأدمن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Cairo',sans-serif; }
+  body { background:#050816; color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  .card { background:rgba(10,17,40,0.8); border:1px solid rgba(255,255,255,0.06); border-radius:20px; padding:40px; width:90%; max-width:360px; text-align:center; }
+  h1 { font-size:1.3rem; margin-bottom:25px; }
+  input { width:100%; padding:14px; border-radius:12px; border:1px solid #333; background:#0a1128; color:#fff; margin-bottom:16px; font-size:1rem; }
+  button { width:100%; padding:14px; border:none; border-radius:12px; background:#53fc18; color:#000; font-weight:900; font-size:1rem; cursor:pointer; }
+  .err { color:#ff5c5c; margin-bottom:14px; font-size:0.9rem; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>لوحة تحكم الأدمن</h1>
+    <form method="POST" action="/admin/login">
+      <input type="password" name="password" placeholder="كلمة السر" required autofocus>
+      <button type="submit">دخول</button>
+    </form>
+  </div>
+</body>
+</html>

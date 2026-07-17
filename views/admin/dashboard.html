@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم الأدمن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Cairo',sans-serif; }
+  body { background:#050816; color:#fff; min-height:100vh; padding:30px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:10px; }
+  h1 { font-size:1.4rem; }
+  a.logout { color:#ff8080; text-decoration:none; font-size:0.9rem; }
+  .stats { color:#929dae; margin-bottom:20px; font-size:0.9rem; }
+  table { width:100%; border-collapse:collapse; background:rgba(10,17,40,0.6); border-radius:16px; overflow:hidden; }
+  th, td { padding:14px; text-align:right; border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.9rem; }
+  th { color:#929dae; font-weight:700; }
+  tr:hover { background:rgba(255,255,255,0.03); }
+  .user-cell { display:flex; align-items:center; gap:10px; }
+  .user-cell img { width:32px; height:32px; border-radius:50%; }
+  button.send-btn { background:#53fc18; color:#000; border:none; padding:8px 16px; border-radius:8px; font-weight:900; cursor:pointer; font-size:0.85rem; }
+  button.send-btn:disabled { opacity:0.5; cursor:wait; }
+  .msg-input { padding:8px 10px; border-radius:8px; border:1px solid #333; background:#0a1128; color:#fff; width:220px; font-size:0.85rem; }
+  .empty { color:#929dae; text-align:center; padding:40px; }
+  .toast { position:fixed; bottom:20px; left:20px; background:#111a35; border:1px solid rgba(255,255,255,0.1); padding:14px 20px; border-radius:12px; font-size:0.9rem; display:none; }
+  .toast.show { display:block; }
+  .toast.err { border-color:#ff5c5c; color:#ff8080; }
+  .toast.ok { border-color:#53fc18; color:#53fc18; }
+
+  .actions-cell { display:flex; flex-direction:column; gap:6px; min-width:260px; }
+  .action-row { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .action-row input { padding:6px 8px; border-radius:6px; border:1px solid #333; background:#0a1128; color:#fff; font-size:0.8rem; }
+  .action-row input.small { width:70px; }
+  .action-row input.med { width:140px; }
+  .action-row input.wide { width:220px; }
+  button.mini-btn { padding:6px 12px; border:none; border-radius:8px; font-weight:900; cursor:pointer; font-size:0.78rem; }
+  button.mini-btn.ban { background:#ff5c5c; color:#fff; }
+  button.mini-btn.unban { background:#333; color:#fff; }
+  button.mini-btn.chan { background:#3b82f6; color:#fff; }
+  button.mini-btn:disabled { opacity:0.5; cursor:wait; }
+  .section-label { color:#929dae; font-size:0.72rem; margin-top:4px; }
+
+  .bot-bar { background:rgba(83,252,24,0.08); border:1px solid rgba(83,252,24,0.25); border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:0.85rem; }
+  .bot-bar img { width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-left:6px; }
+  button.set-bot-btn { background:#53fc18; color:#000; border:none; padding:5px 10px; border-radius:6px; font-weight:900; cursor:pointer; font-size:0.72rem; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>👋 المستخدمين الرابطين حساباتهم</h1>
+    <a class="logout" href="/admin/logout">تسجيل خروج</a>
+  </header>
+  <div class="stats" id="stats">جاري التحميل...</div>
+  <div class="bot-bar" id="botBar">جاري التحقق من بوت الموقع...</div>
+  <table id="usersTable" style="display:none">
+    <thead>
+      <tr>
+        <th>المستخدم</th>
+        <th>تاريخ الربط</th>
+        <th>آخر دخول</th>
+        <th>إرسال رسالة بالشات</th>
+        <th>حظر / فك حظر</th>
+        <th>تعديل القناة</th>
+      </tr>
+    </thead>
+    <tbody id="usersBody"></tbody>
+  </table>
+  <div class="empty" id="emptyState" style="display:none">ولا أحد رابط حسابه لين الحين.</div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('ar-SA');
+}
+
+function showToast(text, ok) {
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.className = 'toast show ' + (ok ? 'ok' : 'err');
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+async function loadUsers() {
+  const res = await fetch('/admin/api/users');
+  if (res.status === 401) { window.location.href = '/admin/login'; return; }
+  const { users } = await res.json();
+
+  document.getElementById('stats').textContent = `إجمالي المرتبطين: ${users.length}`;
+
+  if (users.length === 0) {
+    document.getElementById('emptyState').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('usersTable').style.display = 'table';
+  const body = document.getElementById('usersBody');
+  body.innerHTML = '';
+
+  users.forEach((u) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="user-cell">
+          ${u.profile_picture ? `<img src="${u.profile_picture}" alt="">` : ''}
+          <span>${u.username}</span>
+        </div>
+      </td>
+      <td>${fmtDate(u.linked_at)}</td>
+      <td>${fmtDate(u.last_login_at)}</td>
+      <td>
+        <input class="msg-input" placeholder="اكتب رسالتك هنا..." data-userid="${u.user_id}">
+        <label style="display:flex;align-items:center;gap:5px;font-size:0.75rem;color:#929dae;margin-top:6px;">
+          <input type="checkbox" class="bot-toggle" data-userid="${u.user_id}">
+          إرسال باسم بوت الموقع
+        </label>
+        <button class="send-btn" data-userid="${u.user_id}" style="margin-top:6px;">إرسال</button>
+        <br>
+        <button class="set-bot-btn" data-userid="${u.user_id}" style="margin-top:6px;">🤖 اجعله بوت الموقع</button>
+      </td>
+      <td>
+        <div class="actions-cell">
+          <div class="action-row">
+            <input class="target-user-id med" placeholder="ID المستخدم المستهدف" data-userid="${u.user_id}">
+          </div>
+          <div class="action-row">
+            <input class="ban-reason wide" placeholder="سبب الحظر (اختياري)" data-userid="${u.user_id}">
+          </div>
+          <div class="action-row">
+            <input class="ban-duration small" placeholder="مدة (دقيقة)" data-userid="${u.user_id}">
+            <button class="mini-btn ban" data-userid="${u.user_id}">حظر</button>
+            <button class="mini-btn unban" data-userid="${u.user_id}">فك حظر</button>
+          </div>
+          <div class="section-label">اترك خانة المدة فاضية = حظر دائم</div>
+        </div>
+      </td>
+      <td>
+        <div class="actions-cell">
+          <div class="action-row">
+            <input class="chan-title wide" placeholder="عنوان البث الجديد" data-userid="${u.user_id}">
+          </div>
+          <div class="action-row">
+            <input class="chan-category med" placeholder="Category ID" data-userid="${u.user_id}">
+            <button class="mini-btn chan" data-userid="${u.user_id}">حفظ</button>
+          </div>
+        </div>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll('.send-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const userId = btn.dataset.userid;
+      const input = body.querySelector(`.msg-input[data-userid="${userId}"]`);
+      const botToggle = body.querySelector(`.bot-toggle[data-userid="${userId}"]`);
+      const message = input.value.trim();
+      const asBot = botToggle.checked;
+      if (!message) return;
+
+      btn.disabled = true;
+      btn.textContent = 'جارٍ الإرسال...';
+
+      try {
+        const res = await fetch('/admin/api/send-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, message, asBot })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشل الإرسال');
+        showToast('تم إرسال الرسالة ✅', true);
+        input.value = '';
+      } catch (err) {
+        showToast(err.message, false);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'إرسال';
+      }
+    });
+  });
+
+  // ===== حظر / فك حظر =====
+  body.querySelectorAll('.set-bot-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setBotAccount(btn.dataset.userid));
+  });
+
+  body.querySelectorAll('.mini-btn.ban, .mini-btn.unban').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const broadcasterUserId = btn.dataset.userid;
+      const targetInput = body.querySelector(`.target-user-id[data-userid="${broadcasterUserId}"]`);
+      const targetUserId = targetInput.value.trim();
+
+      if (!targetUserId) { showToast('لازم تكتب ID المستخدم المستهدف', false); return; }
+
+      const isBan = btn.classList.contains('ban');
+      const endpoint = isBan ? '/admin/api/ban' : '/admin/api/unban';
+
+      const payload = { broadcasterUserId, targetUserId };
+      if (isBan) {
+        const reasonInput = body.querySelector(`.ban-reason[data-userid="${broadcasterUserId}"]`);
+        const durationInput = body.querySelector(`.ban-duration[data-userid="${broadcasterUserId}"]`);
+        payload.reason = reasonInput.value.trim();
+        if (durationInput.value.trim()) payload.durationMinutes = durationInput.value.trim();
+      }
+
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = '...';
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشلت العملية');
+        showToast(isBan ? 'تم الحظر ✅' : 'تم فك الحظر ✅', true);
+      } catch (err) {
+        showToast(err.message, false);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  });
+
+  // ===== تعديل القناة =====
+  body.querySelectorAll('.mini-btn.chan').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const broadcasterUserId = btn.dataset.userid;
+      const titleInput = body.querySelector(`.chan-title[data-userid="${broadcasterUserId}"]`);
+      const categoryInput = body.querySelector(`.chan-category[data-userid="${broadcasterUserId}"]`);
+
+      const streamTitle = titleInput.value.trim();
+      const categoryId = categoryInput.value.trim();
+
+      if (!streamTitle && !categoryId) {
+        showToast('لازم تكتب عنوان بث أو Category ID', false);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        const res = await fetch('/admin/api/update-channel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ broadcasterUserId, streamTitle, categoryId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشل التعديل');
+        showToast('تم تعديل القناة ✅', true);
+      } catch (err) {
+        showToast(err.message, false);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'حفظ';
+      }
+    });
+  });
+}
+
+async function loadBotBar() {
+  const bar = document.getElementById('botBar');
+  try {
+    const res = await fetch('/admin/api/bot-account');
+    const { bot } = await res.json();
+    if (bot) {
+      bar.innerHTML = `${bot.profile_picture ? `<img src="${bot.profile_picture}">` : ''}
+        <span>🤖 بوت الموقع الحالي: <b>${bot.username}</b></span>`;
+    } else {
+      bar.innerHTML = `<span>⚠️ ما حددت بوت الموقع بعد. سجّل دخول بأي حساب Kick تبيه يكون البوت (عبر نفس صفحة تسجيل الدخول العادية)، وبعدها اضغط "اجعله بوت الموقع" جنب اسمه بالجدول تحت.</span>`;
+    }
+  } catch (err) {
+    bar.textContent = 'تعذر تحميل حالة بوت الموقع';
+  }
+}
+
+async function setBotAccount(userId) {
+  const res = await fetch('/admin/api/bot-account', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  });
+  const data = await res.json();
+  if (!res.ok) { showToast(data.error || 'فشل التحديد', false); return; }
+  showToast('تم تعيينه كبوت الموقع ✅', true);
+  loadBotBar();
+}
+
+loadBotBar();
+loadUsers();
+</script>
+</body>
+</html>
