@@ -30,7 +30,7 @@ app.use(session({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static('public')); // ضع ibra.html و logintab.html و roulette.html داخل مجلد public
+app.use(express.static('Public')); // التعديل هنا: تم تغيير الحرف لـ P كبير ليطابق المجلد الفعلي للمشروع
 
 // ===== 0) المسار الرئيسي: يوجّه حسب حالة تسجيل الدخول =====
 app.get('/', (req, res) => {
