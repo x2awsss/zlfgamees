@@ -159,12 +159,10 @@
     <a class="logout" href="/admin/logout">تسجيل خروج</a>
   </header>
 
-  <!-- شريط التنبيه الأصفر بستايل Glassmorphism متناسق -->
   <div class="alert-box" id="botAlert">
     <span>⚠️ ما حددت بوت الموقع بعد. سجّل دخول بأي حساب Kick تبي يكون البوت عبر صفحة تسجيل الدخول العادية، وبعدها اضغط "اجعله بوت الموقع" من قائمة الخيارات بالجدول.</span>
   </div>
 
-  <!-- قسم البحث والفلترة الجديد والإحصائيات عليمين -->
   <div class="filter-container">
     <div class="stats" id="stats">جاري التحميل...</div>
     <input type="text" id="userSearch" placeholder="🔍 ابحث عن اسم المستخدم...">
@@ -206,7 +204,6 @@ function showToast(text, ok) {
   setTimeout(() => { t.className = 'toast'; }, 3500);
 }
 
-// دالة إدخال نصوص الشات الجاهزة تلقائياً
 function insertMacro(userId, text) {
   const input = document.querySelector(`.msg-input[data-userid="${userId}"]`);
   if (input) {
@@ -232,9 +229,11 @@ async function loadUsers() {
   body.innerHTML = '';
 
   users.forEach((u) => {
-    // تحديد حالة الاتصال افتراضياً (تقدر تربطها مستقبلاً بحقل حقيقي u.is_online لو حبيت)
     const userStatus = u.is_online || true; 
     const statusClass = userStatus ? 'online' : 'offline';
+    
+    // التحقق هل اليوزر محظور من الموقع أصلاً لتحديد نص ولون الزر
+    const isSiteBanned = u.is_site_banned || false; 
 
     const tr = document.createElement('tr');
     tr.setAttribute('data-username', u.username.toLowerCase());
@@ -253,7 +252,6 @@ async function loadUsers() {
       <td>
         <input class="msg-input" placeholder="اكتب رسالتك هنا..." data-userid="${u.user_id}">
         
-        <!-- أزرار الأوامر السريعة تحت الانبوت مباشرة -->
         <div class="chat-macros">
           <button type="button" class="macro-btn" onclick="insertMacro('${u.user_id}', 'أهلاً وسهلاً بالجميع، منورين البث! 👋✨')">ترحيب 👋</button>
           <button type="button" class="macro-btn" onclick="insertMacro('${u.user_id}', 'اللعبة الحالية هي روليت روسي! 🎮🔥')">اللعبة 🎮</button>
@@ -291,8 +289,13 @@ async function loadUsers() {
             <input class="chan-category med" placeholder="Category ID" data-userid="${u.user_id}">
             <button class="mini-btn chan" data-userid="${u.user_id}">حفظ</button>
           </div>
-          <div class="action-row" style="margin-top: 8px;">
+          <div class="action-row" style="margin-top: 8px; flex-direction: column; gap: 6px;">
              <button class="mini-btn set-bot-btn" data-userid="${u.user_id}" style="background:#22c55e; color:#000; width:100%;">اجعله بوت الموقع 🤖</button>
+             
+             <!-- زر حظر المستخدم من المنصة بالكامل في المساحة الفاضية يسار -->
+             <button class="mini-btn site-ban-btn" data-userid="${u.user_id}" data-banned="${isSiteBanned}" style="background:${isSiteBanned ? '#333333' : '#ff3b30'}; color:#fff; width:100%;">
+               ${isSiteBanned ? 'فك حظر الموقع ✅' : 'حظر من الموقع 🚫'}
+             </button>
           </div>
         </div>
       </td>
@@ -300,7 +303,6 @@ async function loadUsers() {
     body.appendChild(tr);
   });
 
-  // تفعيل إخفاء التنبيه بنعومة عند ضغط زر "اجعله بوت الموقع"
   body.querySelectorAll('.set-bot-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const alertBox = document.getElementById('botAlert');
@@ -312,7 +314,44 @@ async function loadUsers() {
     });
   });
 
-  // ===== البحث والفلترة الحية بالـ JavaScript =====
+  // تفعيل زر حظر/فك حظر الموقع الجديد برمجياً
+  body.querySelectorAll('.site-ban-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const userId = btn.dataset.userid;
+      const isCurrentlyBanned = btn.dataset.banned === 'true';
+      const endpoint = isCurrentlyBanned ? '/admin/api/site-unban' : '/admin/api/site-ban';
+      
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشلت العملية');
+
+        if (isCurrentlyBanned) {
+          btn.dataset.banned = 'false';
+          btn.style.backgroundColor = '#ff3b30';
+          btn.textContent = 'حظر من الموقع 🚫';
+          showToast('تم فك حظر المستخدم من الموقع بنجاح ✅', true);
+        } else {
+          btn.dataset.banned = 'true';
+          btn.style.backgroundColor = '#333333';
+          btn.textContent = 'فك حظر الموقع ✅';
+          showToast('تم حظر المستخدم ومنعه من دخول الموقع 🚫', true);
+        }
+      } catch (err) {
+        showToast(err.message, false);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
   const searchInput = document.getElementById('userSearch');
   const statusFilter = document.getElementById('statusFilter');
 
@@ -338,7 +377,6 @@ async function loadUsers() {
 
   searchInput.addEventListener('input', filterUsers);
   statusFilter.addEventListener('change', filterUsers);
-
 
   body.querySelectorAll('.send-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
@@ -371,7 +409,6 @@ async function loadUsers() {
     });
   });
 
-  // ===== حظر / فك حظر =====
   body.querySelectorAll('.mini-btn.ban, .mini-btn.unban').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const broadcasterUserId = btn.dataset.userid;
@@ -413,7 +450,6 @@ async function loadUsers() {
     });
   });
 
-  // ===== تعديل القناة =====
   body.querySelectorAll('.mini-btn.chan').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const broadcasterUserId = btn.dataset.userid;
