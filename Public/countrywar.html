@@ -6,8 +6,7 @@
     <title>حرب الدول | عالم زلف</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- رابط مكتبة الأعلام الرسمية اللي بالصورة -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+    <!-- الأعلام الحين تُعرض كصور مباشرة من flagcdn.com (أوثق وأضمن من مكتبة CSS) -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <style>
@@ -385,10 +384,11 @@
         .fancy-chip.chooser { border-color: #eab308 !important; box-shadow: 0 0 12px rgba(234,179,8,0.35) !important; }
         .fancy-chip.targeted { border-color: #f87171 !important; box-shadow: 0 0 12px rgba(248,113,113,0.4) !important; }
 
-        /* ضبط حجم أعلام مكتبة flag-icons */
-        .fancy-chip .fi {
-            font-size: 2.5rem !important; /* حجم العلم الفخم والعريض */
-            line-height: 1 !important;
+        /* العلم كصورة داخل الكرت */
+        .fancy-chip .country-flag {
+            width: 100%;
+            height: 42px;
+            object-fit: cover;
             border-radius: 6px !important;
             box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
             display: block !important;
@@ -496,7 +496,7 @@
             cursor: pointer; transition: 0.25s;
         }
         .picker-btn:hover { border-color: #eab308; background: rgba(234,179,8,0.1); transform: translateY(-2px); }
-        .picker-btn .fi { font-size: 1.2rem !important; border-radius: 2px; }
+        .picker-btn .country-flag { width: 26px; height: 18px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
         
         .num-badge {
             background: rgba(83,252,24,0.15); color: #53fc18;
@@ -516,8 +516,8 @@
             gap: 30px; height: 110px; margin-bottom: 18px; position: relative;
         }
         /* العلم الكبير وقت الطرد */
-        .shoot-scene .fi { font-size: 5.5rem !important; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.25) !important; transition: transform 0.4s ease, opacity 0.4s ease; }
-        .shoot-scene .fi.fallen { transform: rotate(85deg) translateY(10px); opacity: 0.35; }
+        .shoot-scene .country-flag-big { width: 180px; height: 120px; object-fit: cover; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.25) !important; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .shoot-scene .country-flag-big.fallen { transform: rotate(85deg) translateY(10px); opacity: 0.35; }
 
         .result-msg { font-size: 1.25rem; font-weight: 900; min-height: 34px; }
         .result-msg.dead { color: #f87171; }
@@ -649,13 +649,13 @@
     <!-- ===================== نافذة الطرد ===================== -->
     <div class="overlay" id="shootOverlay">
         <div class="modal-card">
-            <div class="modal-eyebrow">🌍 الدولة المطرودة</div>
+            <div class="modal-eyebrow" id="shootEyebrow">🌍 الدولة المطرودة</div>
             <div class="modal-big-name" id="shootTargetName">—</div>
             <div class="modal-instr" id="shootSubtitle">جارٍ الكشف عن صاحب الدولة...</div>
 
             <div class="shoot-scene">
                 <!-- مكان كشف العلم المطرود عبر كلاسات المكتبة -->
-                <span id="targetFlagElement"></span>
+                <img id="targetFlagElement" class="country-flag-big" src="" alt="">
             </div>
 
             <div class="result-msg" id="resultMsg"></div>
@@ -847,10 +847,10 @@
                 if (currentEliminatedFlag && f.number === currentEliminatedFlag.number) cls += ' targeted';
                 chip.className = cls;
                 
-                // حقن كلاسات مكتبة flag-icons لعرض العلم
+                // عرض العلم كصورة مباشرة من flagcdn.com (بديل موثوق بدل مكتبة CSS)
                 chip.innerHTML = `
                     <span class="num-badge-mini">#${f.number}</span>
-                    <span class="fi fi-${f.code.toLowerCase()}"></span>
+                    <img class="country-flag" src="https://flagcdn.com/w160/${f.code.toLowerCase()}.png" alt="${f.name}">
                     <span class="chip-name-under">${f.name}</span>
                 `;
                 grid.appendChild(chip);
@@ -973,7 +973,7 @@
             flags.forEach(f => {
                 const btn = document.createElement('button');
                 btn.className = 'picker-btn';
-                btn.innerHTML = `<span class="num-badge">${f.number}</span> <span class="fi fi-${f.code.toLowerCase()}"></span> ${f.name}`;
+                btn.innerHTML = `<span class="num-badge">${f.number}</span> <img class="country-flag" src="https://flagcdn.com/w160/${f.code.toLowerCase()}.png" alt="${f.name}"> ${f.name}`;
                 btn.onclick = () => {
                     if (!waitingForPick) return;
                     handleChatPick(chooser.id, chooser.name, String(f.number));
@@ -1021,7 +1021,9 @@
             shootSubtitle.textContent = 'جارٍ الكشف عن صاحب الدولة...';
             
             // حقن كلاس العلم الكبير التابع للمكتبة
-            targetFlagElement.className = `fi fi-${flagObj.code.toLowerCase()}`;
+            targetFlagElement.className = 'country-flag-big';
+            targetFlagElement.src = `https://flagcdn.com/w320/${flagObj.code.toLowerCase()}.png`;
+            targetFlagElement.alt = flagObj.name;
 
             resultMsg.textContent = '';
             resultMsg.className = 'result-msg';
