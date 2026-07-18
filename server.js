@@ -1,5 +1,6 @@
 require('dotenv').config();
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
 const crypto = require('crypto');
@@ -36,11 +37,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // ===== حماية الصفحات المحمية: تتحقق من تسجيل الدخول + إن الحساب موجود بقائمة المصرح لهم =====
-const PROTECTED_PAGES = ['/ibra.html', '/roulette.html']; // ضيف هنا أي صفحة لعبة ثانية تبي تحميها
+// التعديل هنا: شلنا '/ibra' عشان تفتح الصفحة للجميع بدون تحويل تلقائي، وبقت الحماية لـ '/roulette' فقط
+const PROTECTED_PAGES = ['/roulette']; 
+
+function stripHtmlExt(p) {
+  return p.replace(/\.html$/i, '');
+}
 
 app.use((req, res, next) => {
-  if (!PROTECTED_PAGES.includes(req.path)) {
-    return next(); // صفحات ثانية (زي logintab.html) تفضل مفتوحة للجميع
+  const normalizedPath = stripHtmlExt(req.path);
+
+  if (!PROTECTED_PAGES.includes(normalizedPath)) {
+    return next(); // صفحات ثانية (زي logintab و ibra) تفضل مفتوحة للجميع
   }
 
   if (!req.session.user) {
@@ -68,11 +76,23 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static('Public')); // التعديل هنا: تم تغيير الحرف لـ P كبير ليطابق المجلد الفعلي للمشروع
+// ===== يخلي أي صفحة HTML تشتغل بدون كتابة .html بالرابط =====
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path.includes('.')) {
+    return next(); // فيه امتداد أصلاً (زي .css أو .js) أو الصفحة الرئيسية، تجاهل
+  }
+  const htmlPath = path.join(__dirname, 'Public', req.path + '.html');
+  if (fs.existsSync(htmlPath)) {
+    return res.sendFile(htmlPath);
+  }
+  next();
+});
 
-// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة =====
+app.use(express.static('Public')); // مجلد الملفات العامة
+
+// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة بدون .html ليكون الرابط نظيفاً =====
 app.get('/', (req, res) => {
-  res.redirect('/ibra.html');
+  res.redirect('/ibra');
 });
 
 // ===== دوال مساعدة لـ PKCE =====
@@ -177,7 +197,8 @@ app.get('/callback', async (req, res) => {
       store.upsertUser(profile, tokenData);
     }
 
-    res.redirect('/ibra.html');
+    // التعديل هنا: التوجيه للرابط النظيف بدون .html بعد الدخول بنجاح
+    res.redirect('/ibra');
   } catch (err) {
     console.error(err);
     res.status(500).send('حدث خطأ أثناء تسجيل الدخول.');
@@ -185,7 +206,6 @@ app.get('/callback', async (req, res) => {
 });
 
 // ===== 3) API بسيط يرجع بيانات المستخدم الحالي للواجهة (index.html يستدعيه) =====
-// ===== API: جلب رقم غرفة الشات (Chatroom ID) تلقائياً لحساب المستخدم المسجل دخوله =====
 app.get('/api/chatroom', async (req, res) => {
   if (!req.session.user || !req.session.accessToken) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً' });
