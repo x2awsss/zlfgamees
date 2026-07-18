@@ -485,9 +485,48 @@
             .modal-big-name { font-size: 1.5rem; }
             .wheel-wrapper { width: 260px; height: 260px; }
         }
+    .back-home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background-color: rgba(30, 41, 59, 0.7);
+    color: #ffffff;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+    direction: rtl;
+}
+
+.back-home-btn:hover {
+    background-color: rgba(51, 65, 85, 0.9);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.back-home-btn svg {
+    stroke: #ffffff;
+}
     </style>
 </head>
 <body>
+<a href="/" class="back-home-btn" title="العودة للصفحة الرئيسية">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span>الرئيسية</span>
+</a>
 
     <div id="particles-js"></div>
 
