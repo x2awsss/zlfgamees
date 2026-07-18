@@ -13,7 +13,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
 
-        html, body { height: 100%; overflow: hidden; }
+        html, body { height: 100%; overflow: hidden; overflow-x: hidden !important; max-width: 100vw; }
 
         body {
             background-color: #050816;
@@ -286,12 +286,14 @@
             display: none;
             width: 100%; max-width: 1000px;
             max-height: calc(100vh - 60px);
-            overflow-y: auto;
+            overflow-y: hidden;
             z-index: 2;
             flex-direction: column;
             align-items: center;
             gap: 8px;
             padding-bottom: 10px;
+            flex: 1 1 auto;
+            min-height: 0;
         }
         #gameScreen.show { display: flex; }
 
@@ -319,11 +321,14 @@
 
         .game-columns {
             display: flex;
-            gap: 20px;
+            gap: clamp(16px, 4vw, 80px);
             width: 100%;
             align-items: flex-start;
             justify-content: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            overflow-x: hidden;
+            margin-top: auto;
+            margin-bottom: auto;
         }
 
         .wheel-col {
@@ -331,15 +336,19 @@
             flex-direction: column;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
+        /* صندوق قائمة اللاعبين */
         .players-panel {
             background: rgba(15, 20, 32, 0.5);
             border: 1.5px solid rgba(83,252,24,0.35);
             border-radius: 20px;
             padding: 16px;
-            width: 100%;
-            max-width: 400px;
+            width: auto;
+            flex: 1 1 220px;
+            min-width: 0;
+            max-width: 720px;
             min-height: min(460px, 56vh);
             display: flex;
             flex-direction: column;
@@ -348,7 +357,7 @@
         /* 🎨 شبكة القائمة */
         .fancy-grid {
             display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 10px !important;
             width: 100% !important;
             overflow-y: auto;
@@ -410,7 +419,11 @@
         }
 
         /* عجلة الحظ */
-        .wheel-wrapper { position: relative; width: min(420px, 48vh); height: min(420px, 48vh); }
+.wheel-wrapper { 
+    position: relative; 
+    width: min(440px, 50vh, 40vw); 
+    height: min(440px, 50vh, 40vw); 
+}
         .pointer {
             position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0;
@@ -515,6 +528,20 @@
             .fancy-grid { grid-template-columns: repeat(2, 1fr); }
             .modal-big-name { font-size: 1.5rem; }
             .wheel-wrapper { width: 260px; height: 260px; }
+            .game-columns { flex-wrap: wrap; }
+        }
+        /* ============ قطع جذري: إخفاء أي سكرول بار نهائياً من كل الصفحة ============ */
+        html, body, * {
+            scrollbar-width: none !important;      /* Firefox */
+            -ms-overflow-style: none !important;    /* Edge القديم */
+        }
+        *::-webkit-scrollbar {
+            display: none !important;               /* Chrome / Safari / Edge الجديد */
+            width: 0 !important;
+            height: 0 !important;
+        }
+        html, body {
+            overflow: hidden !important;
         }
    </style>
 </head>
@@ -890,10 +917,10 @@
                 ctx.rotate(startAngle + sliceAngle / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#050816';
-                ctx.font = 'bold 15px Cairo, sans-serif';
+                ctx.font = 'bold 19px Cairo, sans-serif';
                 const label = `#${p.number} ${p.name}`;
-                const shortLabel = label.length > 14 ? label.slice(0, 13) + '…' : label;
-                ctx.fillText(shortLabel, radius - 12, 5);
+                const shortLabel = label.length > 16 ? label.slice(0, 15) + '…' : label;
+                ctx.fillText(shortLabel, radius - 16, 6);
                 ctx.restore();
             });
         }
