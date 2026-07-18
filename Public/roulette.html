@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الروليت الروسي | عالم زلف</title>
-      <link class="favicon-icon" rel="icon" type="image/webp" href="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -1172,6 +1171,15 @@
                 connectPusher(savedId, savedName);
             }
         } catch (e) {}
+        setInterval(async () => {
+  try {
+    const res = await fetch('/api/check-ban-status');
+    const data = await res.json();
+    if (data.banned) {
+      window.location.reload(); 
+    }
+  } catch (e) {}
+}, 3000);
     </script>
 </body>
 </html>
