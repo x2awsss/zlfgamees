@@ -955,7 +955,7 @@
 
                     <div class="stat-box">
                         <a href="https://kick.com/ibrahimlive" target="_blank" class="kick-link">
-                            <img class="kick-logo-img" src="https://cdn.discordapp.com/attachments/1083470929520230522/1527330777560252416/images_1.png?ex=6a5a4521&is=6a58f3a1&hm=01b6ecae8717a306a65745cb51063971c2568e42d21fc537536a74fe029bc244&" alt="Kick">
+                            <img class="kick-logo-img" src="/images/4.png" alt="Kick">
                             <span class="kick-label">البث المباشر</span>
                         </a>
                     </div>
@@ -988,7 +988,7 @@
             <div class="game-card">
                 <div class="game-image-wrapper">
                     <!-- ضع رابط صورة حرب الدول في الـ src بالأسفل -->
-                    <img src="https://cdn.discordapp.com/attachments/1083470929520230522/1527613763031793754/74686ea991cd2664.png?ex=6a5b4cae&is=6a59fb2e&hm=84d4405a27e9e8dd940d0e60b27efe6bf34a8013dc7fa476653fe9a7d1993f1f&" alt="حرب الدول">
+                    <img src="/images/2.png" alt="حرب الدول">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">حرب الدول</h3>
@@ -1010,7 +1010,7 @@
             <div class="game-card">
                 <div class="game-image-wrapper">
                     <!-- ضع رابط صورة السلم والثعبان في الـ src بالأسفل -->
-                    <img src="https://cdn.discordapp.com/attachments/1083470929520230522/1527613763031793754/74686ea991cd2664.png?ex=6a5b4cae&is=6a59fb2e&hm=84d4405a27e9e8dd940d0e60b27efe6bf34a8013dc7fa476653fe9a7d1993f1f&" alt="السلم والثعبان اون ستريم">
+                    <img src="/images/2.png" alt="السلم والثعبان اون ستريم">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">السلم والثعبان اون ستريم</h3>
@@ -1032,7 +1032,7 @@
             <div class="game-card">
                 <div class="game-image-wrapper">
                     <!-- ضع رابط صورة الروليت الروسي في الـ src بالأسفل -->
-                    <img src="https://cdn.discordapp.com/attachments/1083470929520230522/1527362367778848858/image.png?ex=6a5a628d&is=6a59110d&hm=340efce2cba6779ab5bf772e581fa501e0c2c0ce1a1c543d3c8ffc75cfb60c8c&" alt="الروليت الروسي">
+                   <img src="/images/3.png" alt="الروليت الروسي">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">الروليت الروسي</h3>
@@ -1061,7 +1061,7 @@
         <div class="about-row">
             <div class="about-image-side">
                 <div class="about-image-wrapper">
-                    <img src="https://cdn.discordapp.com/attachments/1083470929520230522/1527347465794228304/image.png?ex=6a5a54ac&is=6a59032c&hm=ce8500887a77548338f86f70a09f5d8b64b20b70be3a97389cd671616f707c5d&" alt="ZLF">
+                    <img src="/images/1.png" alt="ZLF">
                 </div>
             </div>
 
@@ -1262,6 +1262,42 @@
       // ضيفه للعبة في واجهة موقعك
     }
   });
+</script>
+<!-- ===== يمنع فتح أي لعبة قبل تسجيل الدخول عبر Kick ===== -->
+<!-- الصق هذا الكود قبل إغلاق وسم </body> مباشرة بملف ibra.html -->
+
+<div id="loginRequiredModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#0f1420; border:1.5px solid #53fc18; border-radius:24px; padding:38px; text-align:center; max-width:380px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.6);">
+    <div style="font-size:1.3rem; font-weight:900; color:#fff; margin-bottom:10px;">🔒 لازم تسجل دخول أول</div>
+    <p style="color:#929dae; font-size:0.9rem; margin-bottom:24px;">لازم تربط حسابك في Kick عشان تقدر تلعب أي لعبة بالموقع.</p>
+    <a href="/logintab.html" style="display:inline-block; width:100%; background:#53fc18; color:#000; font-weight:900; padding:13px; border-radius:14px; text-decoration:none;">تسجيل الدخول عبر Kick</a>
+    <div onclick="document.getElementById('loginRequiredModal').style.display='none'" style="margin-top:14px; color:#6b7280; font-size:0.8rem; cursor:pointer;">إغلاق</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  let isLoggedIn = false;
+
+  // نتحقق من حالة تسجيل الدخول مرة وحدة عند تحميل الصفحة
+  fetch('/api/me')
+    .then(res => res.json())
+    .then(data => { isLoggedIn = !!data.loggedIn; })
+    .catch(() => { isLoggedIn = false; });
+
+  // نعترض أي ضغطة على كرت لعبة (أو رابط بداخله) قبل ما تنفتح اللعبة
+  document.addEventListener('click', function (e) {
+    const card = e.target.closest('.game-card');
+    if (!card) return; // مو كرت لعبة، تجاهل
+
+    if (!isLoggedIn) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('loginRequiredModal').style.display = 'flex';
+    }
+    // لو مسجل دخول، ما نسوي شي والرابط يشتغل عادي
+  }, true);
+})();
 </script>
 </body>
 </html>
