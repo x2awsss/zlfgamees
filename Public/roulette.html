@@ -20,9 +20,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             overflow: hidden;
-            padding: 12px 15px;
+            padding: 18px 15px 12px;
             position: relative;
         }
 
@@ -85,7 +85,7 @@
             font-family: inherit;
             font-size: 0.72rem;
             outline: none;
-            width: 110px;
+            width: 88px;
         }
         .connect-bar input::placeholder { color: #6b7280; }
         .connect-bar button {
@@ -106,15 +106,16 @@
         /* ===================== شاشة الإعداد (بدء اللعبة) ===================== */
         #setupScreen {
             width: 100%;
-            max-width: 460px;
+            max-width: 520px;
             max-height: calc(100vh - 90px);
             overflow-y: auto;
             background: #0f1420;
             border: 1.5px solid #eab308;
             border-radius: 22px;
-            padding: 22px 30px;
+            padding: 24px 30px;
             text-align: center;
             z-index: 2;
+                margin: auto 0; 
         }
 
         .setup-title { font-size: 1rem; font-weight: 900; color: #eab308; margin-bottom: 16px; }
@@ -220,7 +221,7 @@
 
         .start-game-btn {
             width: 100%;
-            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            background: linear-gradient(135deg, #557bf7, #0d29b4);
             border: none;
             color: #fff;
             padding: 14px;
@@ -237,12 +238,12 @@
         #gameScreen {
             display: none;
             width: 100%; max-width: 1000px;
-            max-height: calc(100vh - 90px);
+            max-height: calc(100vh - 60px);
             overflow-y: auto;
             z-index: 2;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
+            gap: 8px;
             padding-bottom: 10px;
         }
         #gameScreen.show { display: flex; }
@@ -269,14 +270,47 @@
         .action-btn:hover { transform: translateY(-2px); }
         .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        /* الشبكة الفخمة للمشاركين */
+        /* تخطيط عمودين: القائمة يمين، العجلة يسار */
+        .game-columns {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            align-items: flex-start;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .wheel-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* صندوق قائمة اللاعبين */
+        .players-panel {
+            background: rgba(15, 20, 32, 0.5);
+            border: 1.5px solid rgba(83,252,24,0.35);
+            border-radius: 20px;
+            padding: 16px;
+            width: 100%;
+            max-width: 400px;
+            min-height: min(460px, 56vh);
+            display: flex;
+            flex-direction: column;
+              margin-top: 55px; 
+        }
+
         .fancy-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             width: 100%;
-            max-width: 620px;
+            overflow-y: auto;
+            align-content: start;
         }
+        .fancy-grid::-webkit-scrollbar { width: 4px; }
+        .fancy-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         .fancy-chip {
             background: rgba(15, 20, 32, 0.8);
             border: 1px solid rgba(255,255,255,0.08);
@@ -291,7 +325,9 @@
         .fancy-chip.chooser { border-color: #eab308; box-shadow: 0 0 12px rgba(234,179,8,0.35); }
         .fancy-chip.targeted { border-color: #f87171; box-shadow: 0 0 12px rgba(248,113,113,0.4); }
 
-        .fancy-chip .top-row { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 800; }
+        .fancy-chip .top-row { display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: 0.85rem; font-weight: 800; }
+        .fancy-chip .chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px; }
+        .fancy-chip .num-badge-mini { color: #6b7280; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; }
         .fancy-chip .k-icon {
             background: #53fc18; color: #000;
             width: 16px; height: 16px; border-radius: 4px;
@@ -305,7 +341,12 @@
         .fancy-chip .mini-dots span.dead-dot { background: #f87171; }
 
         /* عجلة الحظ */
-        .wheel-wrapper { position: relative; width: min(300px, 34vh); height: min(300px, 34vh); }
+.wheel-wrapper { 
+    position: relative; 
+    width: min(360px, 42vh); 
+    height: min(360px, 42vh); 
+    margin-top: 55px; 
+}
         .pointer {
             position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0;
@@ -458,7 +499,8 @@
     </div>
 
     <div class="connect-bar" id="connectBar">
-        <input type="text" id="chatroomInput" placeholder="رقم غرفة الشات (Chatroom ID)">
+        <input type="text" id="channelNameInput" placeholder="اسم القناة">
+        <input type="text" id="chatroomInput" placeholder="رقم غرفة الشات">
         <button onclick="connectToChat()">اتصال بالشات</button>
     </div>
 
@@ -483,34 +525,40 @@
             <div class="pending-empty">بانتظار أول مشارك...</div>
         </div>
 
-        <button class="start-game-btn" onclick="startGame()">ابدأ الجيم</button>
+        <button class="start-game-btn" onclick="startGame()">ابدأ اللعبة</button>
     </div>
 
     <!-- ===================== شاشة اللعب ===================== -->
     <div id="gameScreen">
         <div class="top-actions">
-            <button class="action-btn new-game" onclick="newGame()">🆕 جيم جديد</button>
+            <button class="action-btn new-game" onclick="newGame()">🆕 لعبة جديد</button>
             <button class="action-btn manage" onclick="openManage()">⚙️ إدارة اللاعبين</button>
-            <button class="action-btn spin" id="spinBtn" onclick="spinWheel()">🎡 لف العجلة</button>
         </div>
 
-        <div class="fancy-grid" id="fancyGrid"></div>
+        <div class="game-columns">
+            <div class="players-panel">
+                <div class="fancy-grid" id="fancyGrid"></div>
+            </div>
 
-        <div class="speed-control">
-            <span>🐢 بطيء</span>
-            <input type="range" id="speedSlider" min="1" max="10" value="6" oninput="document.getElementById('speedVal').textContent = this.value">
-            <span>سريع 🐇</span>
-            <span class="speed-val" id="speedVal">6</span>
+            <div class="wheel-col">
+                <div class="speed-control">
+                    <span>🐢 بطيء</span>
+                    <input type="range" id="speedSlider" min="1" max="10" value="6" oninput="document.getElementById('speedVal').textContent = this.value">
+                    <span>سريع 🐇</span>
+                    <span class="speed-val" id="speedVal">6</span>
+                </div>
+
+                <div class="wheel-wrapper">
+                    <div class="pointer"></div>
+                    <canvas id="wheelCanvas" width="320" height="320"></canvas>
+                    <div class="empty-wheel-msg" id="emptyWheelMsg"></div>
+                </div>
+
+                <button class="action-btn spin" id="spinBtn" onclick="spinWheel()">🎡 لف العجلة</button>
+            </div>
         </div>
-
-        <div class="wheel-wrapper">
-            <div class="pointer"></div>
-            <canvas id="wheelCanvas" width="320" height="320"></canvas>
-            <div class="empty-wheel-msg" id="emptyWheelMsg"></div>
-        </div>
-
-        <div class="log-box" id="logBox"></div>
     </div>
+
 
     <!-- ===================== نافذة اختيار الضحية ===================== -->
     <div class="overlay" id="pickerOverlay">
@@ -587,7 +635,6 @@
         const gameScreen = document.getElementById('gameScreen');
         const fancyGrid = document.getElementById('fancyGrid');
         const spinBtn = document.getElementById('spinBtn');
-        const logBox = document.getElementById('logBox');
         const wheelCanvas = document.getElementById('wheelCanvas');
         const emptyWheelMsg = document.getElementById('emptyWheelMsg');
         const ctx = wheelCanvas.getContext('2d');
@@ -612,9 +659,7 @@
         const wheelColors = ['#3b82f6', '#eab308', '#f87171', '#53fc18', '#a855f7', '#06b6d4', '#f97316', '#ec4899'];
 
         function addLog(text) {
-            const line = document.createElement('div');
-            line.textContent = text;
-            logBox.prepend(line);
+            console.log(text);
         }
 
         // ===================== شاشة الإعداد =====================
@@ -655,18 +700,18 @@
         }
 
         function removePlayer(id) {
-            players = players.filter(p => p.id !== id);
+            players = players.filter(p => String(p.id) !== String(id));
             renderPendingGrid();
             if (gameStarted) { renderFancyGrid(); drawWheel(); }
         }
 
         function addPlayer(name, id) {
+            if (gameStarted) return; // مقفول: ما ينضم أحد بعد بدء اللعبة
             if (players.some(p => p.id === id)) return;
             const player = { id, name, number: nextNumber++, bulletPosition: null, shotCount: 0, dead: false };
             players.push(player);
             addLog(`👋 #${player.number} ${name} انضم للعبة`);
             renderPendingGrid();
-            if (gameStarted) { renderFancyGrid(); drawWheel(); }
         }
 
         function startGame() {
@@ -718,7 +763,11 @@
                 }
 
                 chip.innerHTML = `
-                    <div class="top-row"><span class="k-icon">K</span> #${p.number} ${p.dead ? '💀' : p.name}</div>
+                    <div class="top-row">
+                        <span class="chip-name">${p.dead ? '💀 ' + p.name : p.name}</span>
+                        <span class="num-badge-mini">#${p.number}</span>
+                        <span class="k-icon">K</span>
+                    </div>
                     <div class="mini-dots">${dotsHtml}</div>
                 `;
                 fancyGrid.appendChild(chip);
@@ -806,7 +855,7 @@
             const randomIndex = Math.floor(Math.random() * alive.length);
 
             // زاوية الهبوط المطلوبة (نسبة لموقع المؤشر فوق العجلة)
-            const desiredLanding = (360 - (randomIndex * sliceAngle + sliceAngle / 2) + 360) % 360;
+            const desiredLanding = (270 - (randomIndex * sliceAngle + sliceAngle / 2) + 360) % 360;
             const currentMod = ((totalRotation % 360) + 360) % 360;
             const extraTurns = 5 + Math.floor(Math.random() * 3); // 5 إلى 7 لفات كاملة لإحساس دوران حقيقي
             const delta = (desiredLanding - currentMod + 360) % 360;
@@ -942,16 +991,22 @@
         }
 
         function playClickSound() {
+            // صوت نجاة يشبه نغمة "XP" الصاعدة (مركّب بالكامل بالكود، بدون أي ملف صوت خارجي)
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.07);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.07);
+                const notes = [880, 1108, 1318, 1568]; // نغمات صاعدة سريعة
+                notes.forEach((freq, i) => {
+                    const startTime = audioCtx.currentTime + i * 0.045;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    gain.gain.setValueAtTime(0.001, startTime);
+                    gain.gain.linearRampToValueAtTime(0.22, startTime + 0.015);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.13);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(startTime); osc.stop(startTime + 0.14);
+                });
             } catch (e) {}
         }
 
@@ -1001,19 +1056,26 @@
 
         // ===================== الاتصال بشات Kick (يدوي، مع حفظ محلي بالمتصفح) =====================
         function connectToChat() {
-            const input = document.getElementById('chatroomInput');
-            const chatroomId = input.value.trim();
+            const idInput = document.getElementById('chatroomInput');
+            const nameInput = document.getElementById('channelNameInput');
+            const chatroomId = idInput.value.trim();
+            const channelName = nameInput.value.trim() || `غرفة #${chatroomId}`;
+
             if (!chatroomId) {
                 alert('اكتب رقم غرفة الشات (Chatroom ID) أول');
                 return;
             }
-            try { localStorage.setItem('zlf_chatroom_id', chatroomId); } catch (e) {}
-            connectPusher(chatroomId);
+            try {
+                localStorage.setItem('zlf_chatroom_id', chatroomId);
+                localStorage.setItem('zlf_channel_name', channelName);
+            } catch (e) {}
+            connectPusher(chatroomId, channelName);
         }
 
-        function connectPusher(chatroomId) {
+        function connectPusher(chatroomId, channelName) {
             const statusPill = document.getElementById('statusPill');
             const statusText = document.getElementById('statusText');
+            const displayName = channelName || `غرفة #${chatroomId}`;
 
             statusPill.className = 'status-pill pending';
             statusText.textContent = 'جاري الاتصال بالشات...';
@@ -1039,8 +1101,8 @@
 
             pusher.connection.bind('connected', () => {
                 statusPill.className = 'status-pill online';
-                statusText.textContent = `متصل — غرفة #${chatroomId}`;
-                addLog(`✅ تم الاتصال بغرفة الشات رقم ${chatroomId}`);
+                statusText.textContent = `متصل — ${displayName}`;
+                addLog(`✅ تم الاتصال بـ ${displayName}`);
             });
 
             pusher.connection.bind('error', (err) => {
@@ -1063,9 +1125,11 @@
         // لو فيه رقم شات محفوظ من زيارة سابقة، نعبيه تلقائياً ونتصل به مباشرة
         try {
             const savedId = localStorage.getItem('zlf_chatroom_id');
+            const savedName = localStorage.getItem('zlf_channel_name');
             if (savedId) {
                 document.getElementById('chatroomInput').value = savedId;
-                connectPusher(savedId);
+                if (savedName) document.getElementById('channelNameInput').value = savedName;
+                connectPusher(savedId, savedName);
             }
         } catch (e) {}
     </script>
