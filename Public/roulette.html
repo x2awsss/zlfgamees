@@ -11,7 +11,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
 
-        html, body { height: 100%; }
+        html, body { height: 100%; overflow: hidden; overflow-x: hidden !important; max-width: 100vw; }
 
         body {
             background-color: #050816;
@@ -22,7 +22,7 @@
             align-items: center;
             justify-content: flex-start;
             overflow: hidden;
-            padding: 18px 15px 12px;
+            padding: 15px 24px 12px;
             position: relative;
         }
 
@@ -34,14 +34,96 @@
             pointer-events: none;
         }
 
-        h1 {
-            font-size: 1.4rem;
+        /* ===== تصميم البار الموحد (نفس بار حرب الدول) ===== */
+        .navbar {
+            width: 85%;
+            max-width: 1200px;
+            height: 70px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+            background: rgba(10, 17, 40, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            margin-top: 5px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            overflow: hidden;
+            border: 1.5px solid rgba(59, 130, 246, 0.8);
+        }
+
+        .nav-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
             font-weight: 900;
-            margin-bottom: 6px;
-            z-index: 2;
+            background: linear-gradient(45deg, #ffffff, #c3dafe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* زر البيت (الهوم) بجانب اسم عالم زلف يسارًا */
+        .nav-home-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .nav-home-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.08);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        .nav-home-btn svg {
+            stroke: #fff;
+        }
+
+        /* اسم اللعبة بمنتصف البار العلوي */
+        .nav-center-title {
+            font-size: 1.35rem;
+            font-weight: 900;
             background: linear-gradient(45deg, #ffffff, #f87171);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(248, 113, 113, 0.15);
+        }
+
+        /* منطقة الاتصال بالجهة اليسرى للبار */
+        .auth-area {
+            display: flex;
+            align-items: center;
         }
 
         /* ===== حالة الاتصال ===== */
@@ -53,7 +135,6 @@
             font-weight: 700;
             padding: 5px 14px;
             border-radius: 50px;
-            margin-bottom: 10px;
             z-index: 2;
         }
         .status-pill.offline { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
@@ -239,12 +320,14 @@
             display: none;
             width: 100%; max-width: 1000px;
             max-height: calc(100vh - 60px);
-            overflow-y: auto;
+            overflow-y: hidden;
             z-index: 2;
             flex-direction: column;
             align-items: center;
             gap: 8px;
             padding-bottom: 10px;
+            flex: 1 1 auto;
+            min-height: 0;
         }
         #gameScreen.show { display: flex; }
 
@@ -273,11 +356,14 @@
         /* تخطيط عمودين: القائمة يمين، العجلة يسار */
         .game-columns {
             display: flex;
-            gap: 20px;
+            gap: clamp(16px, 4vw, 80px);
             width: 100%;
             align-items: flex-start;
             justify-content: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            overflow-x: hidden;
+            margin-top: auto;
+            margin-bottom: auto;
         }
 
         .wheel-col {
@@ -285,6 +371,7 @@
             flex-direction: column;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         /* صندوق قائمة اللاعبين */
@@ -293,17 +380,18 @@
             border: 1.5px solid rgba(83,252,24,0.35);
             border-radius: 20px;
             padding: 16px;
-            width: 100%;
-            max-width: 400px;
+            width: auto;
+            flex: 1 1 220px;
+            min-width: 0;
+            max-width: 720px;
             min-height: min(460px, 56vh);
             display: flex;
             flex-direction: column;
-              margin-top: 55px; 
         }
 
         .fancy-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             width: 100%;
             overflow-y: auto;
@@ -335,7 +423,7 @@
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
-        .fancy-chip .mini-dots { display: flex; gap: 4px; }
+        .fancy-chip .mini-dots { display: flex; gap: 4px; flex-wrap: wrap; }
         .fancy-chip .mini-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12); }
         .fancy-chip .mini-dots span.safe { background: #53fc18; }
         .fancy-chip .mini-dots span.dead-dot { background: #f87171; }
@@ -343,9 +431,8 @@
         /* عجلة الحظ */
 .wheel-wrapper { 
     position: relative; 
-    width: min(360px, 42vh); 
-    height: min(360px, 42vh); 
-    margin-top: 55px; 
+    width: min(440px, 50vh, 40vw); 
+    height: min(440px, 50vh, 40vw); 
 }
         .pointer {
             position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
@@ -484,58 +571,58 @@
             .fancy-grid { grid-template-columns: repeat(2, 1fr); }
             .modal-big-name { font-size: 1.5rem; }
             .wheel-wrapper { width: 260px; height: 260px; }
+            .game-columns { flex-wrap: wrap; }
         }
-    .back-home-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background-color: rgba(30, 41, 59, 0.7);
-    color: #ffffff;
-    text-decoration: none;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
-    z-index: 9999;
-    direction: rtl;
-}
-
-.back-home-btn:hover {
-    background-color: rgba(51, 65, 85, 0.9);
-    border-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.back-home-btn svg {
-    stroke: #ffffff;
-}
+        /* ============ قطع جذري: إخفاء أي سكرول بار نهائياً من كل الصفحة ============ */
+        html, body, * {
+            scrollbar-width: none !important;      /* Firefox */
+            -ms-overflow-style: none !important;    /* Edge القديم */
+        }
+        *::-webkit-scrollbar {
+            display: none !important;               /* Chrome / Safari / Edge الجديد */
+            width: 0 !important;
+            height: 0 !important;
+        }
+        html, body {
+            overflow: hidden !important;
+        }
     </style>
 </head>
 <body>
-<a href="/" class="back-home-btn" title="العودة للصفحة الرئيسية">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-    <span>الرئيسية</span>
-</a>
 
     <div id="particles-js"></div>
 
-    <h1>🔫 الروليت الروسي</h1>
+    <!-- 🌐 بار المنصة الرئيسي (نفس بار حرب الدول) -->
+    <nav class="navbar">
+        <!-- اليمين: لوجو عالم زلف وجنبه زر الهوم (البيت) مباشرة -->
+        <div class="nav-right">
+            <div class="nav-logo-icon">
+                <img src="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp" alt="ZLF Logo">
+            </div>
+            <span class="nav-brand">عالم زلف</span>
 
-    <div class="status-pill offline" id="statusPill">
-        <span class="status-dot"></span>
-        <span id="statusText">غير متصل</span>
-    </div>
+            <!-- زر بيت الهوم المرجوع للرئيسية يمينًا -->
+            <a href="/" class="nav-home-btn" title="العودة للصفحة الرئيسية">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            </a>
+        </div>
+
+        <!-- المنتصف: اسم اللعبة -->
+        <div class="nav-center-title">
+            الروليت الروسي 🔫
+        </div>
+
+        <!-- اليسار: حالة الاتصال بالشات -->
+        <div class="auth-area">
+            <div class="status-pill offline" id="statusPill">
+                <span class="status-dot"></span>
+                <span id="statusText">غير متصل</span>
+            </div>
+        </div>
+    </nav>
 
     <div class="connect-bar" id="connectBar">
         <input type="text" id="channelNameInput" placeholder="اسم القناة">
@@ -589,7 +676,7 @@
 
                 <div class="wheel-wrapper">
                     <div class="pointer"></div>
-                    <canvas id="wheelCanvas" width="320" height="320"></canvas>
+                    <canvas id="wheelCanvas" width="420" height="420"></canvas>
                     <div class="empty-wheel-msg" id="emptyWheelMsg"></div>
                 </div>
 
@@ -869,10 +956,10 @@
                 ctx.rotate(startAngle + sliceAngle / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#050816';
-                ctx.font = 'bold 13px Cairo, sans-serif';
+                ctx.font = 'bold 19px Cairo, sans-serif';
                 const label = `#${p.number} ${p.name}`;
-                const shortLabel = label.length > 14 ? label.slice(0, 13) + '…' : label;
-                ctx.fillText(shortLabel, radius - 12, 5);
+                const shortLabel = label.length > 16 ? label.slice(0, 15) + '…' : label;
+                ctx.fillText(shortLabel, radius - 16, 6);
                 ctx.restore();
             });
         }
