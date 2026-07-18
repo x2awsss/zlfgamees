@@ -17,8 +17,12 @@ const {
   REDIRECT_URI,
   PORT = 3000,
   SESSION_SECRET = 'change-this-secret',
-  ADMIN_PASSWORD_HASH
+  ADMIN_PASSWORD_HASH,
+  ALLOWED_USERS = '' // أسماء حسابات Kick المسموح لها بدخول الألعاب، مفصولة بفاصلة. اتركها فاضية للسماح للجميع
 } = process.env;
+
+// تحويل قائمة الأسماء المسموحة لأحرف صغيرة عشان المقارنة ما تتأثر بحالة الأحرف
+const allowedUsersList = ALLOWED_USERS.split(',').map(u => u.trim().toLowerCase()).filter(Boolean);
 
 // ===== إعداد الجلسة (Session) لتخزين بيانات المستخدم بعد تسجيل الدخول =====
 app.use(session({
@@ -30,6 +34,40 @@ app.use(session({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// ===== حماية الصفحات المحمية: تتحقق من تسجيل الدخول + إن الحساب موجود بقائمة المصرح لهم =====
+const PROTECTED_PAGES = ['/ibra.html', '/roulette.html']; // ضيف هنا أي صفحة لعبة ثانية تبي تحميها
+
+app.use((req, res, next) => {
+  if (!PROTECTED_PAGES.includes(req.path)) {
+    return next(); // صفحات ثانية (زي logintab.html) تفضل مفتوحة للجميع
+  }
+
+  if (!req.session.user) {
+    return res.redirect('/logintab.html');
+  }
+
+  // لو القائمة فاضية بالكامل، نسمح لأي حد مسجل دخول (وضع مفتوح مؤقت)
+  if (allowedUsersList.length === 0) {
+    return next();
+  }
+
+  const username = (req.session.user.name || '').toString().toLowerCase();
+  if (!allowedUsersList.includes(username)) {
+    return res.status(403).send(`
+      <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
+        <div>
+          <h1 style="color:#f87171;">🚫 غير مصرح لك بالدخول</h1>
+          <p style="color:#929dae;">حسابك (${req.session.user.name}) مو ضمن قائمة الحسابات المسموح لها بهذه اللعبة.</p>
+          <a href="/logout" style="color:#3b82f6;">تسجيل خروج وتجربة حساب ثاني</a>
+        </div>
+      </div>
+    `);
+  }
+
+  next();
+});
+
 app.use(express.static('Public')); // التعديل هنا: تم تغيير الحرف لـ P كبير ليطابق المجلد الفعلي للمشروع
 
 // ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة =====
