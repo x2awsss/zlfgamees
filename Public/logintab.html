@@ -122,6 +122,15 @@
             btn.querySelector('span').textContent = 'جارٍ التوجيه...';
             window.location.href = '/login';
         });
+        setInterval(async () => {
+  try {
+    const res = await fetch('/api/check-ban-status');
+    const data = await res.json();
+    if (data.banned) {
+      window.location.reload(); 
+    }
+  } catch (e) {}
+}, 3000);
     </script>
 </body>
 </html>
