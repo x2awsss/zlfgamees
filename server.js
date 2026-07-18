@@ -12,6 +12,9 @@ const { verifyPassword } = require('./lib/auth');
 
 const app = express();
 
+// قائمة لحفظ مستخدمي الموقع المحظورين (Platform Banned)
+let bannedUsers = new Set();
+
 const {
   CLIENT_ID,
   CLIENT_SECRET,
@@ -36,19 +39,35 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// ===== حماية الصفحات المحمية: تتحقق من تسجيل الدخول + إن الحساب موجود بقائمة المصرح لهم =====
-// التعديل هنا: شلنا '/ibra' و '/zlf' عشان تفتح الصفحة للجميع بدون تحويل تلقائي، وبقت الحماية لـ '/roulette' فقط
+// ===== حماية الصفحات المحمية + التحقق الفوري والشامل من حظر المنصة (Site Ban) =====
 const PROTECTED_PAGES = ['/roulette']; 
 
 function stripHtmlExt(p) {
   return p.replace(/\.html$/i, '');
 }
 
+// تعديل خطاف الفحص الشامل: الحظر يطبق على كل الصفحات بدون استثناء
 app.use((req, res, next) => {
   const normalizedPath = stripHtmlExt(req.path);
 
+  // 1. الفحص الشامل: لو اليوزر مسجل دخول ومحظور، يقفل عليه الموقع كامل فوراً وينطرد من أي صفحة
+  if (req.session.user) {
+    const currentUserId = String(req.session.user.id || req.session.user.user_id || '');
+    if (bannedUsers.has(currentUserId)) {
+      return res.status(403).send(`
+        <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
+          <div>
+            <h1 style="color:#ff5c5c; font-size:2.5rem; margin-bottom:10px;">🚫 تم حظرك من الموقع</h1>
+            <p style="color:#929dae; font-size:1.1rem;">لقد تم إنهاء صلاحية وصول حسابك إلى هذه المنصة بقرار من الإدارة.</p>
+          </div>
+        </div>
+      `);
+    }
+  }
+
+  // 2. حماية الصفحات الخاصة بالألعاب فقط (مثل الروليت) لمنع غير المصرح لهم
   if (!PROTECTED_PAGES.includes(normalizedPath)) {
-    return next(); // صفحات ثانية (زي logintab و zlf) تفضل مفتوحة للجميع
+    return next(); // الصفحات المفتوحة (مثل zlf) تكمل طبيعي لو مو محظور الحساب
   }
 
   if (!req.session.user) {
@@ -76,10 +95,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// ممر خاص بالـ Real-time لطرد المستخدم حياً عند استدعائه
+app.get('/api/check-ban-status', (req, res) => {
+  if (!req.session.user) return res.json({ banned: false });
+  const currentUserId = String(req.session.user.id || req.session.user.user_id || '');
+  res.json({ banned: bannedUsers.has(currentUserId) });
+});
+
 // ===== يخلي أي صفحة HTML تشتغل بدون كتابة .html بالرابط =====
 app.use((req, res, next) => {
   if (req.path === '/' || req.path.includes('.')) {
-    return next(); // فيه امتداد أصلاً (زي .css أو .js) أو الصفحة الرئيسية، تجاهل
+    return next(); // فيه امتداد أصلاً أو الصفحة الرئيسية، تجاهل
   }
   const htmlPath = path.join(__dirname, 'Public', req.path + '.html');
   if (fs.existsSync(htmlPath)) {
@@ -112,13 +138,12 @@ function generateCodeChallenge(verifier) {
   return base64url(hash);
 }
 
-// ===== 1) صفحة تبدأ تسجيل الدخول: توجّه المستخدم لكيك =====
+// ===== 1) صفحة تبدأ تسجيل الدخول =====
 app.get('/login', (req, res) => {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = generateCodeChallenge(codeVerifier);
   const state = base64url(crypto.randomBytes(16));
 
-  // نخزن verifier و state بالجلسة عشان نتحقق منها بعد الرجوع
   req.session.codeVerifier = codeVerifier;
   req.session.oauthState = state;
 
@@ -143,7 +168,7 @@ app.get('/login', (req, res) => {
   res.redirect(authUrl.toString());
 });
 
-// ===== 2) نقطة الرجوع (Callback): كيك يرجّع المستخدم هنا بعد الموافقة =====
+// ===== 2) نقطة الرجوع (Callback) =====
 app.get('/callback', async (req, res) => {
   const { code, state } = req.query;
 
@@ -151,7 +176,6 @@ app.get('/callback', async (req, res) => {
     return res.status(400).send('لم يتم استلام كود التفويض من Kick.');
   }
 
-  // تحقق من الـ state لمنع هجمات CSRF
   if (!state || state !== req.session.oauthState) {
     return res.status(400).send('حالة الطلب (state) غير متطابقة. حاول تسجيل الدخول من جديد.');
   }
@@ -179,12 +203,10 @@ app.get('/callback', async (req, res) => {
       return res.status(400).send('فشل استبدال الكود بتوكن. تحقق من الطرفية للتفاصيل.');
     }
 
-    // نخزن التوكنات بالجلسة (للطلبات الفورية بنفس الجلسة)
     req.session.accessToken = tokenData.access_token;
     req.session.refreshToken = tokenData.refresh_token;
     req.session.expiresIn = tokenData.expires_in;
 
-    // نجيب بيانات المستخدم مباشرة عشان نعرضها بالواجهة
     const userRes = await fetch('https://api.kick.com/public/v1/users', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` }
     });
@@ -192,12 +214,10 @@ app.get('/callback', async (req, res) => {
     const profile = userData?.data?.[0] || null;
     req.session.user = profile;
 
-    // ⭐ نخزن المستخدم وتوكناته بشكل دائم عشان الأدمن يقدر يشوفه ويرسله رسايل لاحقاً
     if (profile) {
       store.upsertUser(profile, tokenData);
     }
 
-    // التعديل هنا: التوجيه لصفحة zlf الجديدة والنظيفة بعد تسجيل الدخول بنجاح
     res.redirect('/zlf');
   } catch (err) {
     console.error(err);
@@ -205,8 +225,7 @@ app.get('/callback', async (req, res) => {
   }
 });
 
-// ===== 3) API بسيط يرجع بيانات المستخدم الحالي للواجهة (index.html يستدعيه) =====
-// ===== API: جلب رقم غرفة الشات (Chatroom ID) تلقائياً لحساب المستخدم المسجل دخوله =====
+// ===== 3) APIs جلب البيانات =====
 app.get('/api/chatroom', async (req, res) => {
   if (!req.session.user || !req.session.accessToken) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً' });
@@ -217,8 +236,6 @@ app.get('/api/chatroom', async (req, res) => {
     });
     const channelsData = await channelsRes.json();
     const slug = channelsData?.data?.[0]?.slug;
-
-    console.log('🔍 [chatroom lookup] slug الصحيح من الـ API الرسمي:', slug);
 
     if (!slug) {
       return res.status(404).json({ error: 'ما قدرنا نحدد اسم القناة (slug)' });
@@ -232,20 +249,14 @@ app.get('/api/chatroom', async (req, res) => {
       }
     });
 
-    console.log('🔍 [chatroom lookup] حالة استجابة الرابط الغير رسمي:', response.status);
-
     if (!response.ok) {
-      const errText = await response.text();
-      console.log('🔍 [chatroom lookup] نص الخطأ:', errText.slice(0, 300));
-      return res.status(502).json({ error: `Kick رفض الطلب (حالة ${response.status}) — راجع الطرفية` });
+      return res.status(502).json({ error: `Kick رفض الطلب (حالة ${response.status})` });
     }
 
     const data = await response.json();
     const chatroomId = data?.chatroom?.id;
-    console.log('🔍 [chatroom lookup] رقم غرفة الشات:', chatroomId);
 
     if (!chatroomId) {
-      console.log('🔍 [chatroom lookup] الاستجابة كاملة:', JSON.stringify(data).slice(0, 500));
       return res.status(404).json({ error: 'ما لقينا رقم غرفة الشات بالاستجابة' });
     }
 
@@ -260,7 +271,11 @@ app.get('/api/me', (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ loggedIn: false });
   }
-  res.json({ loggedIn: true, user: req.session.user });
+  
+  const currentUserId = String(req.session.user.id || req.session.user.user_id || '');
+  const updatedUser = { ...req.session.user, is_site_banned: bannedUsers.has(currentUserId) };
+  
+  res.json({ loggedIn: true, user: updatedUser });
 });
 
 // ===== 4) تسجيل الخروج =====
@@ -269,7 +284,7 @@ app.get('/logout', (req, res) => {
 });
 
 // =====================================================
-// ===============  تاب الأدمن (خاص فيك بس)  ===========
+// ===============  تاب الأدمن وبقية الـ APIs  ===========
 // =====================================================
 
 function requireAdmin(req, res, next) {
@@ -285,7 +300,7 @@ app.post('/admin/login', (req, res) => {
   const { password } = req.body;
 
   if (!ADMIN_PASSWORD_HASH) {
-    return res.status(500).send('السيرفر ما فيه ADMIN_PASSWORD_HASH بملف .env. شغّل: node scripts/hash-password.js "كلمة-سرك"');
+    return res.status(500).send('السيرفر ما فيه ADMIN_PASSWORD_HASH بملف .env.');
   }
 
   if (verifyPassword(password || '', ADMIN_PASSWORD_HASH)) {
@@ -305,89 +320,93 @@ app.get('/admin', requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin', 'dashboard.html'));
 });
 
-// قائمة المستخدمين الرابطين حساباتهم (بدون توكنات — بس بيانات عرض)
 app.get('/admin/api/users', requireAdmin, (req, res) => {
-  res.json({ users: store.listUsers() });
+  const usersList = store.listUsers().map(u => {
+    const uId = String(u.id || u.user_id || '');
+    return { ...u, is_site_banned: bannedUsers.has(uId) };
+  });
+  res.json({ users: usersList });
 });
 
-// إرسال رسالة بشات مستخدم معيّن، باستخدام التوكن اللي وافق عليه وقت الربط
+// ⭐ API تنفيذ حظر المستخدم من المنصة بالكامل
+app.post('/admin/api/site-ban', requireAdmin, (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'لازم تحدد ID المستخدم' });
+  
+  bannedUsers.add(String(userId));
+  console.log(`🚫 [Platform Ban] تم حظر المستخدم ذو الـ ID: ${userId} من دخول الموقع.`);
+  res.json({ ok: true, message: 'تم الحظر من الموقع' });
+});
+
+// ⭐ API فك حظر المستخدم من المنصة
+app.post('/admin/api/site-unban', requireAdmin, (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'لازم تحدد ID المستخدم' });
+  
+  bannedUsers.delete(String(userId));
+  console.log(`✅ [Platform Unban] تم فك حظر المستخدم ذو الـ ID: ${userId}`);
+  res.json({ ok: true, message: 'تم فك الحظر من الموقع' });
+});
+
 app.post('/admin/api/send-message', requireAdmin, async (req, res) => {
   const { userId, message, asBot } = req.body;
-
   if (!userId || !message || !String(message).trim()) {
     return res.status(400).json({ error: 'لازم تحدد المستخدم ونص الرسالة' });
   }
-
   try {
     const result = await sendChatMessage(userId, String(message).trim(), { asBot: !!asBot });
     res.json({ ok: true, result });
   } catch (err) {
-    console.error('send-message error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// حظر / تايم آوت مستخدم من شات أحد البثّاثين الرابطين حسابهم
 app.post('/admin/api/ban', requireAdmin, async (req, res) => {
   const { broadcasterUserId, targetUserId, reason, durationMinutes } = req.body;
-
   if (!broadcasterUserId || !targetUserId) {
     return res.status(400).json({ error: 'لازم تحدد البثّاث والمستخدم المستهدف' });
   }
-
   try {
     const result = await banUser(broadcasterUserId, targetUserId, reason, durationMinutes);
     res.json({ ok: true, result });
   } catch (err) {
-    console.error('ban error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// فك الحظر
 app.post('/admin/api/unban', requireAdmin, async (req, res) => {
   const { broadcasterUserId, targetUserId } = req.body;
-
   if (!broadcasterUserId || !targetUserId) {
     return res.status(400).json({ error: 'لازم تحدد البثّاث والمستخدم المستهدف' });
   }
-
   try {
     const result = await unbanUser(broadcasterUserId, targetUserId);
     res.json({ ok: true, result });
   } catch (err) {
-    console.error('unban error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// تعديل عنوان البث / الكاتيجوري لقناة أحد البثّاثين
 app.post('/admin/api/update-channel', requireAdmin, async (req, res) => {
   const { broadcasterUserId, streamTitle, categoryId } = req.body;
-
   if (!broadcasterUserId) {
     return res.status(400).json({ error: 'لازم تحدد البثّاث' });
   }
-
   try {
     const result = await updateChannel(broadcasterUserId, { streamTitle, categoryId });
     res.json({ ok: true, result });
   } catch (err) {
-    console.error('update-channel error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// عرض حساب بوت الموقع الحالي (لو موجود)
 app.get('/admin/api/bot-account', requireAdmin, (req, res) => {
   res.json({ bot: store.getBotAccountInfo() });
 });
 
-// تحديد أي حساب مرتبط يكون هو بوت الموقع الرسمي (لازم يكون سجل دخول عندك مرة قبل)
 app.post('/admin/api/bot-account', requireAdmin, (req, res) => {
   const { userId } = req.body;
   if (!userId) return res.status(400).json({ error: 'لازم تحدد userId' });
-
   try {
     store.setBotAccount(userId);
     res.json({ ok: true, bot: store.getBotAccountInfo() });
@@ -396,7 +415,6 @@ app.post('/admin/api/bot-account', requireAdmin, (req, res) => {
   }
 });
 
-// إلغاء تحديد بوت الموقع
 app.delete('/admin/api/bot-account', requireAdmin, (req, res) => {
   store.clearBotAccount();
   res.json({ ok: true });
