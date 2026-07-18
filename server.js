@@ -37,7 +37,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // ===== حماية الصفحات المحمية: تتحقق من تسجيل الدخول + إن الحساب موجود بقائمة المصرح لهم =====
-// التعديل هنا: شلنا '/ibra' عشان تفتح الصفحة للجميع بدون تحويل تلقائي، وبقت الحماية لـ '/roulette' فقط
+// التعديل هنا: شلنا '/ibra' و '/zlf' عشان تفتح الصفحة للجميع بدون تحويل تلقائي، وبقت الحماية لـ '/roulette' فقط
 const PROTECTED_PAGES = ['/roulette']; 
 
 function stripHtmlExt(p) {
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
   const normalizedPath = stripHtmlExt(req.path);
 
   if (!PROTECTED_PAGES.includes(normalizedPath)) {
-    return next(); // صفحات ثانية (زي logintab و ibra) تفضل مفتوحة للجميع
+    return next(); // صفحات ثانية (زي logintab و zlf) تفضل مفتوحة للجميع
   }
 
   if (!req.session.user) {
@@ -90,9 +90,9 @@ app.use((req, res, next) => {
 
 app.use(express.static('Public')); // مجلد الملفات العامة
 
-// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة بدون .html ليكون الرابط نظيفاً =====
+// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة الجديدة zلف بدون .html =====
 app.get('/', (req, res) => {
-  res.redirect('/ibra');
+  res.redirect('/zlf');
 });
 
 // ===== دوال مساعدة لـ PKCE =====
@@ -197,8 +197,8 @@ app.get('/callback', async (req, res) => {
       store.upsertUser(profile, tokenData);
     }
 
-    // التعديل هنا: التوجيه للرابط النظيف بدون .html بعد الدخول بنجاح
-    res.redirect('/ibra');
+    // التعديل هنا: التوجيه لصفحة zlf الجديدة والنظيفة بعد تسجيل الدخول بنجاح
+    res.redirect('/zlf');
   } catch (err) {
     console.error(err);
     res.status(500).send('حدث خطأ أثناء تسجيل الدخول.');
@@ -206,6 +206,7 @@ app.get('/callback', async (req, res) => {
 });
 
 // ===== 3) API بسيط يرجع بيانات المستخدم الحالي للواجهة (index.html يستدعيه) =====
+// ===== API: جلب رقم غرفة الشات (Chatroom ID) تلقائياً لحساب المستخدم المسجل دخوله =====
 app.get('/api/chatroom', async (req, res) => {
   if (!req.session.user || !req.session.accessToken) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً' });
