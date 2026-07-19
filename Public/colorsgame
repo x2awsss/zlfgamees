@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link class="favicon-icon" rel="icon" type="image/webp" href="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp">
+    <title>أرضية الألوان | عالم زلف</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        html, body { height: 100%; overflow: hidden; overflow-x: hidden !important; max-width: 100vw; }
+
+        body {
+            background-color: #050816;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow: hidden;
+            padding: 15px 24px 12px;
+            position: relative;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== بار المنصة الموحد ===== */
+        .navbar {
+            width: 85%;
+            max-width: 1200px;
+            height: 70px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+            background: rgba(10, 17, 40, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            margin-top: 5px;
+        }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .nav-logo-icon {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            overflow: hidden; border: 1.5px solid rgba(59, 130, 246, 0.8);
+        }
+        .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .nav-brand {
+            font-size: 1.25rem; font-weight: 900;
+            background: linear-gradient(45deg, #ffffff, #c3dafe);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .nav-home-btn {
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff; width: 36px; height: 36px; border-radius: 50%;
+            cursor: pointer; transition: all 0.3s ease; text-decoration: none;
+        }
+        .nav-home-btn:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.08); box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+        .nav-home-btn svg { stroke: #fff; }
+        .nav-center-title {
+            font-size: 1.35rem; font-weight: 900;
+            background: linear-gradient(45deg, #ffffff, #f2b632);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(242,182,50,0.15);
+        }
+        .auth-area { display: flex; align-items: center; }
+        .status-pill {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.82rem; font-weight: 800; padding: 6px 18px;
+            border-radius: 50px; z-index: 2; transition: all 0.3s ease;
+        }
+        .status-pill.offline { background: rgba(248,113,113,0.06) !important; color: #f87171 !important; border: 1.5px solid #f87171 !important; box-shadow: 0 0 10px rgba(248,113,113,0.2); }
+        .status-pill.online { background: rgba(83,252,24,0.06) !important; color: #53fc18 !important; border: 1.5px solid #53fc18 !important; box-shadow: 0 0 12px rgba(83,252,24,0.3); }
+        .status-pill.pending { background: rgba(234,179,8,0.06) !important; color: #eab308 !important; border: 1.5px solid #eab308 !important; box-shadow: 0 0 10px rgba(234,179,8,0.2); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+
+        .connect-bar {
+            position: fixed; bottom: 14px; right: 14px;
+            display: flex; gap: 6px; align-items: center;
+            background: rgba(10, 17, 40, 0.75);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px; padding: 6px; z-index: 50;
+        }
+        .connect-bar input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px; padding: 6px 12px; color: #fff;
+            font-family: inherit; font-size: 0.72rem; outline: none; width: 88px;
+        }
+        .connect-bar input::placeholder { color: #6b7280; }
+        .connect-bar button {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            border: none; color: #fff; padding: 6px 14px; border-radius: 50px;
+            font-weight: 700; font-family: inherit; cursor: pointer;
+            font-size: 0.72rem; transition: 0.3s; white-space: nowrap;
+        }
+        .connect-bar button:hover { transform: scale(1.05); }
+
+        /* ===================== شاشة الإعداد ===================== */
+        #setupScreen {
+            width: 100%; max-width: 560px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            background: #0f1420;
+            border: 1.5px solid #f2b632;
+            border-radius: 22px;
+            padding: 24px 30px;
+            text-align: center;
+            z-index: 2;
+            margin: auto 0;
+        }
+        .setup-title { font-size: 1.05rem; font-weight: 900; color: #f2b632; margin-bottom: 14px; }
+        .join-hint { font-size: 0.82rem; color: #929dae; margin-bottom: 16px; line-height: 1.7; }
+        .join-hint b { color: #53fc18; }
+
+        .pending-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 8px; margin-bottom: 16px; max-height: 20vh; overflow-y: auto;
+        }
+        .pending-chip {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 9px 12px; font-size: 0.85rem; font-weight: 700;
+        }
+        .pending-chip .remove-x {
+            background: rgba(248,113,113,0.15); color: #f87171;
+            width: 20px; height: 20px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.75rem; flex-shrink: 0;
+        }
+        .pending-chip .k-icon {
+            background: #53fc18; color: #000; width: 16px; height: 16px;
+            border-radius: 4px; font-size: 0.6rem; font-weight: 900;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .pending-empty { grid-column: 1 / -1; color: #6b7280; font-size: 0.8rem; padding: 10px 0; }
+
+        .test-spawn-row {
+            display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .test-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+            color: #cbd5e1; padding: 8px 14px; border-radius: 12px;
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+            transition: 0.2s;
+        }
+        .test-btn:hover { border-color: #3b82f6; color: #fff; }
+
+        .start-game-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #f2b632, #d9932a);
+            border: none; color: #241703; padding: 14px; border-radius: 14px;
+            font-family: inherit; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.3s;
+        }
+        .start-game-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(242,182,50,0.35); }
+        .start-game-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ===================== شاشة اللعب ===================== */
+        #gameScreen {
+            display: none; width: 100%; max-width: 1080px;
+            max-height: calc(100vh - 60px);
+            z-index: 2; flex-direction: column; align-items: center; gap: 10px;
+            padding-bottom: 10px; flex: 1 1 auto; min-height: 0;
+        }
+        #gameScreen.show { display: flex; }
+
+        .top-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .action-btn {
+            padding: 10px 20px; border-radius: 50px; font-family: inherit;
+            font-weight: 900; font-size: 0.85rem; cursor: pointer; border: none; transition: 0.3s;
+        }
+        .action-btn.new-game { background: rgba(234,179,8,0.12); color: #eab308; border: 1px solid rgba(234,179,8,0.4); }
+        .action-btn.manage { background: rgba(59,130,246,0.12); color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
+        .action-btn.next { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; box-shadow: 0 0 20px rgba(124,58,237,0.4); }
+        .action-btn:hover { transform: translateY(-2px); }
+        .action-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+        .round-strip {
+            display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+        }
+        .stat-pill {
+            background: rgba(15,20,32,0.7); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50px; padding: 6px 16px; font-size: 0.78rem; color: #929dae;
+        }
+        .stat-pill b { color: #fff; }
+
+        .game-columns {
+            display: flex; gap: clamp(14px, 3vw, 40px); width: 100%;
+            align-items: flex-start; justify-content: center; flex-wrap: nowrap;
+            overflow-x: hidden; margin-top: 4px;
+        }
+
+        .arena-col { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1 1 620px; min-width: 0; }
+
+        .players-panel {
+            background: rgba(15, 20, 32, 0.5);
+            border: 1.5px solid rgba(83,252,24,0.35);
+            border-radius: 20px; padding: 14px;
+            flex: 0 0 240px; max-width: 260px;
+            min-height: min(420px, 54vh);
+            max-height: min(420px, 54vh);
+            display: flex; flex-direction: column;
+        }
+        .players-panel-title { font-size: 0.8rem; color: #929dae; margin-bottom: 8px; font-weight: 800; text-align: center; }
+        .fancy-grid {
+            display: grid !important; grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important; width: 100% !important; overflow-y: auto; align-content: start;
+        }
+        .fancy-chip {
+            background: rgba(15, 20, 32, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 14px !important; padding: 10px 6px !important;
+            display: flex !important; flex-direction: column !important;
+            align-items: center !important; justify-content: center !important;
+            gap: 6px !important; transition: 0.3s !important; position: relative !important;
+        }
+        .fancy-chip.dead { opacity: 0.32 !important; }
+        .fancy-chip.picked { border-color: #f2b632 !important; box-shadow: 0 0 10px rgba(242,182,50,0.35) !important; }
+        .fancy-chip .persona-row { display: flex; align-items: center; justify-content: center; gap: 6px; direction: ltr; }
+        .fancy-chip .k-icon {
+            background: #53fc18; color: #000; width: 14px; height: 14px; border-radius: 4px;
+            font-size: 0.55rem; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .fancy-chip.dead .k-icon { background: #4b5563; }
+        .fancy-chip .live-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #53fc18;
+            box-shadow: 0 0 8px #53fc18, 0 0 14px rgba(83,252,24,0.6); flex-shrink: 0;
+        }
+        .fancy-chip.dead .live-dot { background: #4b5563; box-shadow: none; }
+        .fancy-chip .chip-name-under {
+            font-size: 0.78rem !important; font-weight: 800 !important; color: #fff !important;
+            text-align: center !important; width: 100% !important; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+        .fancy-chip .num-badge-mini { position: absolute !important; top: 4px !important; right: 6px !important; color: rgba(255,255,255,0.35) !important; font-size: 0.65rem !important; font-weight: 700 !important; }
+        .fancy-chip .pick-badge {
+            position: absolute; top: 4px; left: 6px;
+            background: rgba(242,182,50,0.18); color: #f2b632;
+            font-size: 0.62rem; font-weight: 900; padding: 1px 6px; border-radius: 8px;
+        }
+
+        /* ===================== الأرينا ===================== */
+        .arena {
+            position: relative; width: 100%;
+            background: rgba(15,20,32,0.55);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 18px; padding: 16px 18px 0; overflow: hidden;
+        }
+        .target-row { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 6px 0 14px; }
+        .target-label { font-size: 0.78rem; color: #929dae; }
+        .target-swatch {
+            width: 62px; height: 62px; border-radius: 10px; border: 3px solid #fff;
+            box-shadow: 0 0 0 3px #050816, 0 0 20px rgba(255,255,255,0.25), inset 0 0 10px rgba(0,0,0,0.25);
+        }
+
+        .timer-wrap { width: 100%; height: 8px; background: #050816; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+        .timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #f2b632, #f87171); transition: width .1s linear; }
+
+        .status-line { text-align: center; min-height: 24px; font-size: 0.92rem; font-weight: 800; margin-bottom: 8px; color: #f2b632; }
+
+        .floor-scene { position: relative; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; }
+        .floor { display: grid; grid-template-columns: repeat(var(--n, 20), 1fr); gap: 3px; position: relative; z-index: 1; }
+        .tile {
+            position: relative; aspect-ratio: 1/1.25; border-radius: 5px 5px 2px 2px;
+            cursor: default; border: 2px solid rgba(0,0,0,0.35);
+            display: flex; align-items: flex-end; justify-content: center;
+            transition: transform .1s ease, filter .15s ease, box-shadow .15s ease;
+        }
+        .tile.correct-reveal { box-shadow: 0 0 0 3px #f2b632, 0 0 18px #f2b632; transform: translateY(-3px); }
+        .tile.zapped { filter: brightness(1.9) saturate(0); box-shadow: 0 0 0 3px #f87171, 0 0 20px #f87171; }
+        .tile .num { font-size: 9px; color: rgba(0,0,0,0.55); font-weight: 900; margin-bottom: 3px; user-select: none; }
+        .tile .occupant-count {
+            position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+            background: rgba(5,8,22,0.75); color: #fff; font-size: 9px; font-weight: 900;
+            padding: 1px 5px; border-radius: 8px; min-width: 14px; text-align: center;
+        }
+
+        .laser {
+            position: absolute; top: -40px; left: 0; width: 100%; height: 24px;
+            background: linear-gradient(180deg, rgba(248,113,113,0), rgba(248,113,113,0.95) 60%, rgba(255,255,255,0.9));
+            box-shadow: 0 0 30px 10px rgba(248,113,113,0.8); z-index: 2; opacity: 0; pointer-events: none;
+        }
+        .laser.sweep { animation: sweepDown 0.6s cubic-bezier(.7,0,.9,1) forwards; }
+        @keyframes sweepDown { 0% { top:-40px; opacity:1; } 85% { top:100%; opacity:1; } 100% { top:100%; opacity:0; } }
+
+        .floor-base {
+            height: 14px; margin-top: 4px;
+            background: repeating-linear-gradient(90deg, #0c0f1c, #0c0f1c 8px, #080a14 8px, #080a14 16px);
+            border-radius: 0 0 6px 6px; border: 1px solid rgba(255,255,255,0.08); border-top: none;
+        }
+
+        /* ===================== نوافذ منبثقة ===================== */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+        }
+        .overlay.show { display: flex; }
+        .modal-card {
+            background: #0f1420; border: 1.5px solid #f2b632; border-radius: 24px;
+            padding: 34px 36px; text-align: center; max-width: 560px; width: 100%;
+            max-height: 88vh; overflow-y: auto;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 40px rgba(242,182,50,0.15);
+            animation: popIn 0.35s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-eyebrow { color: #f2b632; font-size: 0.95rem; margin-bottom: 10px; opacity: 0.85; }
+        .modal-big-name { font-size: 1.7rem; font-weight: 900; color: #fff; margin-bottom: 14px; }
+        .modal-instr { color: #929dae; font-size: 0.88rem; margin-bottom: 18px; line-height: 1.7; }
+        .result-summary { display: flex; justify-content: center; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
+        .result-chip { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px 18px; }
+        .result-chip .num { font-size: 1.4rem; font-weight: 900; }
+        .result-chip.ok .num { color: #53fc18; }
+        .result-chip.out .num { color: #f87171; }
+        .result-chip .lbl { font-size: 0.72rem; color: #929dae; }
+
+        .modal-close-btn {
+            background: linear-gradient(135deg, #7c3aed, #4c1d95);
+            border: none; color: #fff; padding: 12px 40px; border-radius: 50px;
+            font-family: inherit; font-weight: 700; cursor: pointer; font-size: 0.92rem;
+        }
+        .modal-close-btn.secondary { background: rgba(255,255,255,0.06); }
+
+        .winner-avatar {
+            width: 130px; height: 130px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 4rem;
+            box-shadow: 0 0 30px rgba(242,182,50,0.5); border: 4px solid rgba(242,182,50,0.4);
+            margin: 6px auto 16px; background: linear-gradient(135deg, #f2b632, #d9932a);
+        }
+
+        .picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .picker-btn {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 10px; border-radius: 12px; font-family: inherit;
+            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.25s;
+        }
+        .picker-btn:hover { border-color: #f2b632; background: rgba(242,182,50,0.1); transform: translateY(-2px); }
+
+        @media (max-width: 860px) {
+            .game-columns { flex-wrap: wrap; }
+            .players-panel { flex: 1 1 100%; max-width: 100%; order: 3; min-height: 160px; max-height: 22vh; }
+            .arena-col { flex: 1 1 100%; }
+        }
+        @media (max-width: 560px) {
+            .picker-grid, .pending-grid { grid-template-columns: repeat(2, 1fr); }
+            .fancy-grid { grid-template-columns: repeat(3, 1fr); }
+            .modal-big-name { font-size: 1.3rem; }
+            .tile .num { font-size: 7px; }
+        }
+
+        html, body, * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+        *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+        html, body { overflow: hidden !important; }
+   </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <nav class="navbar">
+        <div class="nav-right">
+            <div class="nav-logo-icon">
+                <img src="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp" alt="ZLF Logo">
+            </div>
+            <span class="nav-brand">عالم زلف</span>
+            <a href="/" class="nav-home-btn" title="العودة للصفحة الرئيسية">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="nav-center-title">أرضية الألوان 🎨</div>
+
+        <div class="auth-area">
+            <div class="status-pill offline" id="statusPill">
+                <span class="status-dot"></span>
+                <span id="statusText">غير متصل</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="connect-bar" id="connectBar">
+        <input type="text" id="channelNameInput" placeholder="اسم القناة">
+        <input type="text" id="chatroomInput" placeholder="رقم غرفة الشات">
+        <button onclick="connectToChat()">اتصال بالشات</button>
+    </div>
+
+    <!-- ===================== شاشة بدء اللعبة ===================== -->
+    <div id="setupScreen">
+        <div class="setup-title">بدء اللعبة</div>
+
+        <div class="join-hint">
+            🎨 يطلع لون فوق، وتحته أرقام من <b>1</b> إلى <b>20</b> كل رقم على لون مختلف.<br>
+            كل جولة يكتب المشاركين رقم اللون الصح بالشات قبل ما ينزل الليزر — اللي يخطئ أو ما يجاوب يطلع!<br>
+            اكتب <b>"join"</b> في الشات للانضمام.
+        </div>
+
+        <div class="pending-grid" id="pendingGrid">
+            <div class="pending-empty">بانتظار أول مشارك...</div>
+        </div>
+
+        <div class="test-spawn-row">
+            <button class="test-btn" onclick="spawnTestBot(1)">+ بوت تجريبي</button>
+            <button class="test-btn" onclick="spawnTestBot(10)">+10 بوتات</button>
+            <button class="test-btn" onclick="spawnStreamer()">🎥 أضفني كمذيع</button>
+            <button class="test-btn" onclick="clearPlayers()">🗑️ تفريغ القائمة</button>
+        </div>
+
+        <button class="start-game-btn" id="startBtn" onclick="startGame()" disabled>ابدأ اللعبة</button>
+    </div>
+
+    <!-- ===================== شاشة اللعب ===================== -->
+    <div id="gameScreen">
+        <div class="top-actions">
+            <button class="action-btn new-game" onclick="newGame()">🆕 لعبة جديدة</button>
+            <button class="action-btn manage" onclick="openManage()">⚙️ إدارة المشاركين</button>
+        </div>
+
+        <div class="round-strip">
+            <div class="stat-pill">الجولة <b id="roundNum">1</b></div>
+            <div class="stat-pill">الأحياء <b id="aliveCount">0</b>/<span id="totalCount">0</span></div>
+            <div class="stat-pill">أفضل نتيجة <b id="bestScore">0</b></div>
+        </div>
+
+        <div class="game-columns">
+            <div class="arena-col">
+                <div class="arena">
+                    <div class="target-row">
+                        <span class="target-label">اللون المطلوب</span>
+                        <div class="target-swatch" id="targetSwatch"></div>
+                    </div>
+                    <div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div>
+                    <div class="status-line" id="statusLine">استعدوا...</div>
+
+                    <div class="floor-scene">
+                        <div class="laser" id="laser"></div>
+                        <div class="floor" id="floor"></div>
+                        <div class="floor-base"></div>
+                    </div>
+                </div>
+                <button class="action-btn next" id="nextRoundBtn" onclick="beginCountdown()" disabled>▶️ ابدأ الجولة</button>
+            </div>
+
+            <div class="players-panel">
+                <div class="players-panel-title">المشاركون</div>
+                <div class="fancy-grid" id="fancyGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== نافذة نتيجة الجولة ===================== -->
+    <div class="overlay" id="roundResultOverlay">
+        <div class="modal-card">
+            <div class="modal-eyebrow">⚡ نتيجة الجولة</div>
+            <div class="modal-big-name" id="roundResultTitle">—</div>
+            <div class="result-summary">
+                <div class="result-chip ok"><div class="num" id="survivedNum">0</div><div class="lbl">نجوا</div></div>
+                <div class="result-chip out"><div class="num" id="eliminatedNum">0</div><div class="lbl">طاحوا</div></div>
+            </div>
+            <div class="modal-instr" id="roundResultDetail">—</div>
+            <button class="modal-close-btn" id="continueBtn" onclick="closeRoundResult()">متابعة</button>
+        </div>
+    </div>
+
+    <!-- ===================== نافذة الفوز ===================== -->
+    <div class="overlay" id="winnerOverlay">
+        <div class="modal-card">
+            <div class="modal-eyebrow">🏆 انتهت اللعبة</div>
+            <div class="winner-avatar" id="winnerAvatar">🥇</div>
+            <div class="modal-big-name" id="winnerName">—</div>
+            <div class="modal-instr" id="winnerDetail">—</div>
+            <button class="modal-close-btn" onclick="closeWinnerOverlay()">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- ===================== نافذة إدارة المشاركين ===================== -->
+    <div class="overlay" id="manageOverlay">
+        <div class="modal-card">
+            <div class="modal-eyebrow">إدارة المشاركين</div>
+            <div class="pending-grid" id="manageGrid" style="margin-top: 10px;"></div>
+            <button class="modal-close-btn secondary" onclick="closeManage()" style="margin-top: 16px;">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        // ===================== خلفية الجسيمات =====================
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60 },
+                "color": { "value": "#ffffff" },
+                "opacity": { "value": 0.15 },
+                "size": { "value": 2 },
+                "line_linked": { "enable": true, "distance": 180, "opacity": 0.08 },
+                "move": { "enable": true, "speed": 0.8 }
+            }
+        });
+
+        // ===================== ثوابت الألوان =====================
+        const COLOR_POOL = [
+            '#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e84393',
+            '#8e44ad','#16a085','#d35400','#c0392b','#2980b9','#27ae60','#f39c12','#7f8c8d',
+            '#fd79a8','#00b894','#6c5ce7','#0984e3'
+        ];
+
+        // ===================== حالة اللعبة =====================
+        let players = [];          // { id, name, number, alive, isBot, isTest }
+        let nextNumber = 1;
+        let gameStarted = false;
+        let gameOver = false;
+
+        let round = 1;
+        let tileCount = 6;
+        let roundTimeMs = 4200;
+        let correctNumber = null;
+        let waitingForPicks = false;
+        let picks = {};            // playerId -> chosen number
+        let timerInterval = null;
+        let best = Number(localStorage.getItem('cbf_live_best') || 0);
+
+        let pusher = null;
+        let channel = null;
+
+        // ===================== عناصر DOM =====================
+        const pendingGrid = document.getElementById('pendingGrid');
+        const startBtn = document.getElementById('startBtn');
+        const setupScreen = document.getElementById('setupScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const fancyGrid = document.getElementById('fancyGrid');
+        const roundNumEl = document.getElementById('roundNum');
+        const aliveCountEl = document.getElementById('aliveCount');
+        const totalCountEl = document.getElementById('totalCount');
+        const bestScoreEl = document.getElementById('bestScore');
+        const targetSwatch = document.getElementById('targetSwatch');
+        const timerBar = document.getElementById('timerBar');
+        const statusLine = document.getElementById('statusLine');
+        const floorEl = document.getElementById('floor');
+        const laser = document.getElementById('laser');
+        const nextRoundBtn = document.getElementById('nextRoundBtn');
+
+        const roundResultOverlay = document.getElementById('roundResultOverlay');
+        const roundResultTitle = document.getElementById('roundResultTitle');
+        const survivedNum = document.getElementById('survivedNum');
+        const eliminatedNum = document.getElementById('eliminatedNum');
+        const roundResultDetail = document.getElementById('roundResultDetail');
+
+        const winnerOverlay = document.getElementById('winnerOverlay');
+        const winnerName = document.getElementById('winnerName');
+        const winnerDetail = document.getElementById('winnerDetail');
+
+        const manageOverlay = document.getElementById('manageOverlay');
+        const manageGrid = document.getElementById('manageGrid');
+
+        bestScoreEl.textContent = best;
+
+        function addLog(text) { console.log(text); }
+
+        // ===================== شاشة الإعداد =====================
+        function renderPendingGrid() {
+            if (players.length === 0) {
+                pendingGrid.innerHTML = '<div class="pending-empty">بانتظار أول مشارك...</div>';
+            } else {
+                pendingGrid.innerHTML = '';
+                players.forEach(p => {
+                    const chip = document.createElement('div');
+                    chip.className = 'pending-chip';
+                    chip.innerHTML = `
+                        <span class="remove-x" onclick="removePlayer('${p.id}')">✕</span>
+                        <span class="k-icon">K</span>
+                        <span>${p.name}${p.isBot ? ' 🤖' : ''}${p.isTest ? ' 🎥' : ''}</span>
+                    `;
+                    pendingGrid.appendChild(chip);
+                });
+            }
+            startBtn.disabled = players.length < 2;
+        }
+
+        function removePlayer(id) {
+            players = players.filter(p => String(p.id) !== String(id));
+            renderPendingGrid();
+            if (gameStarted) { renderFancyGrid(); updateCounters(); }
+        }
+
+        function clearPlayers() {
+            if (gameStarted) return;
+            players = [];
+            nextNumber = 1;
+            renderPendingGrid();
+        }
+
+        function addPlayer(name, id, opts) {
+            opts = opts || {};
+            if (gameStarted) return;
+            if (players.some(p => String(p.id) === String(id))) return;
+            const player = { id, name, number: nextNumber++, alive: true, isBot: !!opts.isBot, isTest: !!opts.isTest };
+            players.push(player);
+            addLog(`👋 #${player.number} ${name} انضم للعبة`);
+            renderPendingGrid();
+        }
+
+        function spawnTestBot(count) {
+            for (let i = 0; i < count; i++) {
+                const id = 'bot_' + Math.random().toString(36).slice(2, 9);
+                addPlayer('بوت ' + nextNumber, id, { isBot: true });
+            }
+        }
+
+        function spawnStreamer() {
+            if (players.some(p => p.isTest)) return;
+            addPlayer('أنت (اختبار)', 'test_streamer', { isTest: true });
+        }
+
+        // ===================== بدء اللعبة =====================
+        function startGame() {
+            if (players.length < 2) return;
+            gameStarted = true;
+            gameOver = false;
+            round = 1;
+            tileCount = 6;
+            roundTimeMs = 4200;
+            roundNumEl.textContent = round;
+            setupScreen.style.display = 'none';
+            gameScreen.classList.add('show');
+            renderFancyGrid();
+            updateCounters();
+            prepareRound();
+            addLog('🎨 بدأت اللعبة');
+        }
+
+        function newGame() {
+            clearInterval(timerInterval);
+            players = [];
+            nextNumber = 1;
+            gameStarted = false;
+            gameOver = false;
+            waitingForPicks = false;
+            round = 1;
+            tileCount = 6;
+            roundTimeMs = 4200;
+            gameScreen.classList.remove('show');
+            setupScreen.style.display = 'block';
+            renderPendingGrid();
+            addLog('🆕 بدأت جولة جديدة');
+        }
+
+        // ===================== شبكة المشاركين =====================
+        function renderFancyGrid() {
+            fancyGrid.innerHTML = '';
+            players.forEach(p => {
+                const chip = document.createElement('div');
+                let cls = 'fancy-chip';
+                if (!p.alive) cls += ' dead';
+                if (waitingForPicks && picks[p.id] !== undefined) cls += ' picked';
+                chip.className = cls;
+
+                const pickBadge = (waitingForPicks && picks[p.id] !== undefined)
+                    ? `<span class="pick-badge">${picks[p.id]}</span>` : '';
+
+                chip.innerHTML = `
+                    <span class="num-badge-mini">#${p.number}</span>
+                    ${pickBadge}
+                    <div class="persona-row">
+                        <span class="k-icon">${p.isBot ? '🤖' : (p.isTest ? '🎥' : 'K')}</span>
+                        <span class="chip-name-under">${!p.alive ? '💀 ' : ''}${p.name}</span>
+                        <span class="live-dot"></span>
+                    </div>
+                `;
+                fancyGrid.appendChild(chip);
+            });
+            if (players.length === 0) {
+                fancyGrid.innerHTML = '<div class="pending-empty">ما فيه مشاركين</div>';
+            }
+        }
+
+        function updateCounters() {
+            const alive = players.filter(p => p.alive).length;
+            aliveCountEl.textContent = alive;
+            totalCountEl.textContent = players.length;
+        }
+
+        // ===================== إدارة المشاركين =====================
+        function openManage() {
+            manageGrid.innerHTML = '';
+            players.forEach(p => {
+                const chip = document.createElement('div');
+                chip.className = 'pending-chip';
+                chip.innerHTML = `
+                    <span class="remove-x" onclick="removePlayer('${p.id}'); openManage();">✕</span>
+                    <span class="k-icon">K</span>
+                    <span>#${p.number} ${p.name}${!p.alive ? ' 💀' : ''}</span>
+                `;
+                manageGrid.appendChild(chip);
+            });
+            if (players.length === 0) {
+                manageGrid.innerHTML = '<div class="pending-empty">ما فيه مشاركين</div>';
+            }
+            manageOverlay.classList.add('show');
+        }
+        function closeManage() { manageOverlay.classList.remove('show'); }
+
+        // ===================== تجهيز الأرضية =====================
+        function shuffledColors(n) {
+            const arr = COLOR_POOL.slice(0, Math.min(n, COLOR_POOL.length));
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function prepareRound() {
+            floorEl.style.setProperty('--n', tileCount);
+            floorEl.innerHTML = '';
+            const colors = shuffledColors(tileCount);
+            correctNumber = Math.floor(Math.random() * colors.length) + 1; // 1-indexed
+            targetSwatch.style.background = colors[correctNumber - 1];
+
+            colors.forEach((hex, i) => {
+                const num = i + 1;
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.style.background = hex;
+                tile.dataset.num = num;
+                tile.innerHTML = `<span class="occupant-count" id="occ-${num}" style="display:none;">0</span><span class="num">${num}</span>`;
+                floorEl.appendChild(tile);
+            });
+
+            picks = {};
+            waitingForPicks = false;
+            statusLine.textContent = `الجولة ${round} — اكتب رقم اللون الصح بالشات من 1 إلى ${tileCount}`;
+            timerBar.style.width = '100%';
+            nextRoundBtn.disabled = false;
+            nextRoundBtn.textContent = '▶️ ابدأ الجولة';
+        }
+
+        // ===================== بدء العد التنازلي =====================
+        function beginCountdown() {
+            if (gameOver) return;
+            nextRoundBtn.disabled = true;
+            waitingForPicks = true;
+            picks = {};
+            statusLine.textContent = 'اكتبوا رقم اللون الصح الحين!';
+            renderFancyGrid();
+
+            // بوتات الاختبار تختار تلقائياً
+            players.forEach(p => {
+                if (p.isBot && p.alive) {
+                    const willBeCorrect = Math.random() < 0.42;
+                    picks[p.id] = willBeCorrect ? correctNumber : randomWrongNumber();
+                }
+            });
+
+            let elapsed = 0;
+            const step = 50;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                elapsed += step;
+                const pct = Math.max(0, 100 - (elapsed / roundTimeMs) * 100);
+                timerBar.style.width = pct + '%';
+                if (elapsed >= roundTimeMs) {
+                    clearInterval(timerInterval);
+                    resolveRound();
+                }
+            }, step);
+        }
+
+        function randomWrongNumber() {
+            let n;
+            do { n = Math.floor(Math.random() * tileCount) + 1; } while (n === correctNumber);
+            return n;
+        }
+
+        // ===================== استقبال الاختيار من الشات =====================
+        function registerPick(playerId, num) {
+            if (!waitingForPicks) return;
+            const player = players.find(p => String(p.id) === String(playerId));
+            if (!player || !player.alive) return;
+            if (picks[player.id] !== undefined) return; // مسموح باختيار وحد بس بالجولة
+            picks[player.id] = num;
+
+            const occ = document.getElementById('occ-' + num);
+            if (occ) {
+                const current = parseInt(occ.textContent, 10) || 0;
+                occ.textContent = current + 1;
+                occ.style.display = 'inline-block';
+            }
+            renderFancyGrid();
+        }
+
+        // زر يدوي لاختبار "أنت (اختبار)" — النقر على المربع يسجل اختياره
+        floorEl.addEventListener('click', (e) => {
+            const tile = e.target.closest('.tile');
+            if (!tile || !waitingForPicks) return;
+            const testPlayer = players.find(p => p.isTest && p.alive);
+            if (!testPlayer) return;
+            registerPick(testPlayer.id, parseInt(tile.dataset.num, 10));
+        });
+
+        // ===================== حل الجولة =====================
+        function resolveRound() {
+            waitingForPicks = false;
+            statusLine.textContent = 'الليزر ينزل...!';
+
+            laser.classList.remove('sweep');
+            void laser.offsetWidth;
+            laser.classList.add('sweep');
+
+            setTimeout(() => {
+                const tiles = document.querySelectorAll('.tile');
+                tiles.forEach(t => {
+                    const n = parseInt(t.dataset.num, 10);
+                    if (n === correctNumber) t.classList.add('correct-reveal');
+                    else t.classList.add('zapped');
+                });
+
+                let survivedCount = 0, eliminatedCount = 0;
+                players.forEach(p => {
+                    if (!p.alive) return;
+                    if (picks[p.id] === correctNumber) {
+                        survivedCount++;
+                    } else {
+                        p.alive = false;
+                        eliminatedCount++;
+                    }
+                });
+
+                if (eliminatedCount > 0) playEliminationSound();
+                renderFancyGrid();
+                updateCounters();
+
+                const aliveNow = players.filter(p => p.alive);
+
+                if (aliveNow.length <= 1) {
+                    setTimeout(() => finishGame(aliveNow[0] || null), 500);
+                    return;
+                }
+
+                roundResultTitle.textContent = `نهاية الجولة ${round}`;
+                survivedNum.textContent = survivedCount;
+                eliminatedNum.textContent = eliminatedCount;
+                roundResultDetail.textContent = `باقي ${aliveNow.length} مشارك من أصل ${players.length}. استعدوا للجولة الجاية!`;
+                roundResultOverlay.classList.add('show');
+            }, 650);
+        }
+
+        function closeRoundResult() {
+            roundResultOverlay.classList.remove('show');
+            round += 1;
+            roundNumEl.textContent = round;
+            tileCount = Math.min(20, 6 + round);
+            roundTimeMs = Math.max(1700, 4200 - round * 220);
+            prepareRound();
+        }
+
+        // ===================== نهاية اللعبة =====================
+        function finishGame(winner) {
+            gameOver = true;
+            clearInterval(timerInterval);
+            if (round > best) {
+                best = round;
+                localStorage.setItem('cbf_live_best', best);
+                bestScoreEl.textContent = best;
+            }
+            playFanfareSound();
+            launchConfetti();
+
+            if (winner) {
+                winnerName.textContent = winner.name;
+                winnerDetail.textContent = `فاز بعد ${round} جولة من أصل ${players.length} مشارك!`;
+            } else {
+                winnerName.textContent = 'ما فيه فائز';
+                winnerDetail.textContent = 'الكل طاح بنفس الجولة!';
+            }
+            winnerOverlay.classList.add('show');
+        }
+
+        function closeWinnerOverlay() {
+            winnerOverlay.classList.remove('show');
+        }
+
+        // ===== تأثيرات الصوت =====
+        function playEliminationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const bufferSize = audioCtx.sampleRate * 0.3;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 900;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                noise.start();
+            } catch (e) {}
+        }
+
+        function playFanfareSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [660, 880, 990, 1320, 1760];
+                notes.forEach((freq, i) => {
+                    const startTime = audioCtx.currentTime + i * 0.09;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    gain.gain.setValueAtTime(0.001, startTime);
+                    gain.gain.linearRampToValueAtTime(0.25, startTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(startTime); osc.stop(startTime + 0.36);
+                });
+            } catch (e) {}
+        }
+
+        function launchConfetti() {
+            const emojis = ['🎉', '🎊', '🏆', '⭐', '🥳'];
+            for (let i = 0; i < 26; i++) {
+                const el = document.createElement('div');
+                el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                el.style.position = 'fixed';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.top = '-40px';
+                el.style.fontSize = (16 + Math.random() * 18) + 'px';
+                el.style.zIndex = 200;
+                el.style.pointerEvents = 'none';
+                el.style.transition = `transform ${2 + Math.random() * 1.5}s linear, opacity 0.3s ease ${2 + Math.random()}s`;
+                document.body.appendChild(el);
+                requestAnimationFrame(() => {
+                    el.style.transform = `translateY(${window.innerHeight + 80}px) rotate(${Math.random() * 500 - 250}deg)`;
+                    el.style.opacity = '0';
+                });
+                setTimeout(() => el.remove(), 4000);
+            }
+        }
+
+        // ===================== الاتصال بشات Kick =====================
+        function connectToChat() {
+            const idInput = document.getElementById('chatroomInput');
+            const nameInput = document.getElementById('channelNameInput');
+            const chatroomId = idInput.value.trim();
+            const channelName = nameInput.value.trim() || `غرفة #${chatroomId}`;
+
+            if (!chatroomId) {
+                alert('اكتب رقم غرفة الشات (Chatroom ID) أول');
+                return;
+            }
+            try {
+                localStorage.setItem('cbf_chatroom_id', chatroomId);
+                localStorage.setItem('cbf_channel_name', channelName);
+            } catch (e) {}
+            connectPusher(chatroomId, channelName);
+        }
+
+        function connectPusher(chatroomId, channelName) {
+            const statusPill = document.getElementById('statusPill');
+            const statusText = document.getElementById('statusText');
+            const displayName = channelName || `غرفة #${chatroomId}`;
+
+            statusPill.className = 'status-pill pending';
+            statusText.textContent = 'جاري الاتصال بالشات...';
+
+            if (pusher) pusher.disconnect();
+            pusher = new Pusher('32cbd69e4b950bf97679', { cluster: 'us2' });
+            channel = pusher.subscribe(`chatrooms.${chatroomId}.v2`);
+
+            channel.bind('App\\Events\\ChatMessageEvent', function (data) {
+                const rawMessage = (data.content || '').trim();
+                const username = data.sender ? data.sender.username : 'مجهول';
+                const userId = data.sender ? data.sender.id : username;
+
+                addLog(`💬 [${username}]: ${rawMessage}`);
+                handleIncomingChat(username, userId, rawMessage);
+            });
+
+            pusher.connection.bind('connected', () => {
+                statusPill.className = 'status-pill online';
+                statusText.textContent = `متصل — ${displayName}`;
+                addLog(`✅ تم الاتصال بـ ${displayName}`);
+            });
+
+            pusher.connection.bind('error', (err) => {
+                statusPill.className = 'status-pill offline';
+                statusText.textContent = 'خطأ بالاتصال';
+                addLog('⚠️ خطأ Pusher: ' + JSON.stringify(err));
+            });
+        }
+
+        function handleIncomingChat(username, userId, rawMessage) {
+            const msg = rawMessage.trim();
+            const lower = msg.toLowerCase();
+
+            if (!gameStarted) {
+                if (lower === 'join') addPlayer(username, userId);
+                return;
+            }
+
+            if (!waitingForPicks) return;
+
+            const clean = lower.replace(/^!/, '');
+            if (!/^\d{1,2}$/.test(clean)) return;
+            const num = parseInt(clean, 10);
+            if (num < 1 || num > tileCount) return;
+
+            registerPick(userId, num);
+        }
+
+        // ===================== البدء =====================
+        renderPendingGrid();
+
+        try {
+            const savedId = localStorage.getItem('cbf_chatroom_id');
+            const savedName = localStorage.getItem('cbf_channel_name');
+            if (savedId) {
+                document.getElementById('chatroomInput').value = savedId;
+                if (savedName) document.getElementById('channelNameInput').value = savedName;
+                connectPusher(savedId, savedName);
+            }
+        } catch (e) {}
+    </script>
+</body>
+</html>
