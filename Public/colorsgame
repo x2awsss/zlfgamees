@@ -519,12 +519,48 @@
             }
         });
 
-        // ===================== ثوابت الألوان =====================
-        const COLOR_POOL = [
-            '#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e84393',
-            '#8e44ad','#16a085','#d35400','#c0392b','#2980b9','#27ae60','#f39c12','#7f8c8d',
-            '#fd79a8','#00b894','#6c5ce7','#0984e3'
-        ];
+        // ===================== نظام توليد الألوان حسب صعوبة الجولة =====================
+        // الجولة 1: ألوان قليلة ومتباعدة جداً (سهلة جداً)
+        // الجولة 2: ألوان أكثر شوي بس لسا متباعدة (سهلة)
+        // من الجولة 3: عدد الألوان يزيد وتتقارب درجاتها (تشابه الألوان = الصعوبة الحقيقية)
+        function getRoundConfig(r) {
+            if (r === 1) {
+                return { tileCount: 4, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 5200 };
+            }
+            if (r === 2) {
+                return { tileCount: 6, hueSpread: 360, satRange: [60, 78], lightRange: [45, 58], timeMs: 4700 };
+            }
+            // من الجولة 3 فأكثر: كل جولة توسع عدد الألوان وتضيّق مدى الدرجات (تشابه أكبر)
+            const step = r - 2; // 1,2,3...
+            const tileCount = Math.min(20, 8 + (step - 1) * 2);      // 8,10,12,...20
+            const hueSpread = Math.max(22, 170 - (step - 1) * 22);   // 170 -> يضيق تدريجياً لين 22
+            const timeMs = Math.max(1500, 4400 - r * 230);
+            return { tileCount, hueSpread, satRange: [50, 68], lightRange: [40, 56], timeMs };
+        }
+
+        // يولّد ألوان قريبة من بعض حسب مدى الدرجة اللونية (hueSpread) لصعوبة حقيقية شبيهة بعمى الألوان
+        function generateRoundColors(n, hueSpread, satRange, lightRange) {
+            const centerHue = Math.random() * 360;
+            const startHue = centerHue - hueSpread / 2;
+            const step = hueSpread / n;
+            const hues = [];
+            for (let i = 0; i < n; i++) {
+                const jitter = (Math.random() - 0.5) * step * 0.35;
+                let h = startHue + step * i + step / 2 + jitter;
+                h = ((h % 360) + 360) % 360;
+                hues.push(h);
+            }
+            // خلط ترتيب المربعات
+            for (let i = hues.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [hues[i], hues[j]] = [hues[j], hues[i]];
+            }
+            return hues.map(h => {
+                const s = satRange[0] + Math.random() * (satRange[1] - satRange[0]);
+                const l = lightRange[0] + Math.random() * (lightRange[1] - lightRange[0]);
+                return `hsl(${h.toFixed(1)}, ${s.toFixed(0)}%, ${l.toFixed(0)}%)`;
+            });
+        }
 
         // ===================== حالة اللعبة =====================
         let players = [];          // { id, name, number, alive, isBot, isTest }
@@ -639,8 +675,6 @@
             gameStarted = true;
             gameOver = false;
             round = 1;
-            tileCount = 6;
-            roundTimeMs = 4200;
             roundNumEl.textContent = round;
             setupScreen.style.display = 'none';
             gameScreen.classList.add('show');
@@ -658,8 +692,6 @@
             gameOver = false;
             waitingForPicks = false;
             round = 1;
-            tileCount = 6;
-            roundTimeMs = 4200;
             gameScreen.classList.remove('show');
             setupScreen.style.display = 'block';
             renderPendingGrid();
@@ -722,27 +754,23 @@
         function closeManage() { manageOverlay.classList.remove('show'); }
 
         // ===================== تجهيز الأرضية =====================
-        function shuffledColors(n) {
-            const arr = COLOR_POOL.slice(0, Math.min(n, COLOR_POOL.length));
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
         function prepareRound() {
+            const cfg = getRoundConfig(round);
+            tileCount = cfg.tileCount;
+            roundTimeMs = cfg.timeMs;
+
             floorEl.style.setProperty('--n', tileCount);
             floorEl.innerHTML = '';
-            const colors = shuffledColors(tileCount);
+            const colors = generateRoundColors(tileCount, cfg.hueSpread, cfg.satRange, cfg.lightRange);
             correctNumber = Math.floor(Math.random() * colors.length) + 1; // 1-indexed
+            // اللون المطلوب فوق يطابق تماماً لون المربع الصحيح (نفس القيمة الحرفية)
             targetSwatch.style.background = colors[correctNumber - 1];
 
-            colors.forEach((hex, i) => {
+            colors.forEach((color, i) => {
                 const num = i + 1;
                 const tile = document.createElement('div');
                 tile.className = 'tile';
-                tile.style.background = hex;
+                tile.style.background = color;
                 tile.dataset.num = num;
                 tile.innerHTML = `<span class="occupant-count" id="occ-${num}" style="display:none;">0</span><span class="num">${num}</span>`;
                 floorEl.appendChild(tile);
@@ -750,7 +778,8 @@
 
             picks = {};
             waitingForPicks = false;
-            statusLine.textContent = `الجولة ${round} — اكتب رقم اللون الصح بالشات من 1 إلى ${tileCount}`;
+            const difficultyNote = round <= 2 ? '' : ' — الألوان تشابهت، ركزوا زين!';
+            statusLine.textContent = `الجولة ${round} — اكتب رقم اللون الصح بالشات من 1 إلى ${tileCount}${difficultyNote}`;
             timerBar.style.width = '100%';
             nextRoundBtn.disabled = false;
             nextRoundBtn.textContent = '▶️ ابدأ الجولة';
@@ -870,8 +899,6 @@
             roundResultOverlay.classList.remove('show');
             round += 1;
             roundNumEl.textContent = round;
-            tileCount = Math.min(20, 6 + round);
-            roundTimeMs = Math.max(1700, 4200 - round * 220);
             prepareRound();
         }
 
