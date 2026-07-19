@@ -40,7 +40,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // ===== حماية الصفحات المحمية + التحقق الفوري والشامل من حظر المنصة (Site Ban) =====
-const PROTECTED_PAGES = ['/roulette', '/countrywar']; 
+const PROTECTED_PAGES = ['/roulette', '/countrywar', '/personas'];
 
 function stripHtmlExt(p) {
   return p.replace(/\.html$/i, '');
