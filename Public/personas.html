@@ -929,13 +929,7 @@
                 chooser = alive[randomIndex];
                 isSpinning = false;
                 renderFancyGrid();
-
-                if (alive.length === 2) {
-                    const loser = alive.find(p => p.id !== chooser.id);
-                    startFinalShowdown(loser);
-                } else {
-                    startPickingPhase();
-                }
+                startPickingPhase();
             }, duration * 1000 + 150);
         }
 
@@ -1113,37 +1107,6 @@
                 drawWheel();
                 shootCloseBtn.style.display = 'inline-block';
             }, 250);
-        }
-
-        // ===================== الجولة الأخيرة (لاعبين اثنين بس) =====================
-        function startFinalShowdown(loser) {
-            currentTarget = { type: 'kill', player: loser };
-            renderFancyGrid();
-
-            targetPersonaElement.className = 'persona-avatar-big flip-in';
-            targetPersonaElement.style.background = colorFor(loser.number);
-            targetPersonaElement.textContent = '🧑';
-
-            shootTargetName.textContent = loser.name;
-            resultMsg.textContent = '';
-            resultMsg.className = 'result-msg';
-            shootCloseBtn.style.display = 'none';
-
-            addLog(`🏆 الجولة الأخيرة! #${chooser.number} ${chooser.name} يواجه ${loser.name}`);
-            shootEyebrow.textContent = '🏆 الجولة الأخيرة';
-            shootSubtitle.textContent = `${chooser.name} فاز بالعجلة... جارٍ حسم النتيجة!`;
-
-            shootOverlay.classList.add('show');
-            setTimeout(() => resolveFinal(loser), 1600);
-        }
-
-        function resolveFinal(loser) {
-            playEliminationSound();
-            targetPersonaElement.textContent = '💀';
-            targetPersonaElement.classList.add('fallen');
-            loser.dead = true;
-
-            setTimeout(() => finishGame(chooser, null), 300);
         }
 
         function finishGame(winner, selfEliminatedPlayer) {
