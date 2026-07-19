@@ -356,15 +356,33 @@
         .fancy-chip.chooser { border-color: #eab308 !important; box-shadow: 0 0 12px rgba(234,179,8,0.35) !important; }
         .fancy-chip.targeted { border-color: #f87171 !important; box-shadow: 0 0 12px rgba(248,113,113,0.4) !important; }
 
-        /* صورة الشخصية (أفتار) داخل الكرت */
-        .fancy-chip .persona-avatar {
-            width: 56px; height: 56px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
-            border: 2px solid rgba(255,255,255,0.15);
+        /* صف الاسم: شعار كيك يسار + الاسم + نقطة خضراء متوهجة يمين */
+        .fancy-chip .persona-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            direction: ltr;
         }
+        .fancy-chip .k-icon {
+            background: #53fc18;
+            color: #000;
+            width: 16px; height: 16px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .fancy-chip.dead .k-icon { background: #4b5563; }
+        .fancy-chip .live-dot {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            background: #53fc18;
+            box-shadow: 0 0 8px #53fc18, 0 0 14px rgba(83,252,24,0.6);
+            flex-shrink: 0;
+        }
+        .fancy-chip.dead .live-dot { background: #4b5563; box-shadow: none; }
 
         .fancy-chip .chip-name-under {
             font-size: 0.92rem !important;
@@ -804,8 +822,11 @@
 
                 chip.innerHTML = `
                     <span class="num-badge-mini">#${p.number}</span>
-                    <div class="persona-avatar" style="background:${colorFor(p.number)}">${p.dead ? '💀' : '🧑'}</div>
-                    <span class="chip-name-under">${p.name}${(p.revived && !p.dead) ? ' ✨' : ''}</span>
+                    <div class="persona-row">
+                        <span class="k-icon">K</span>
+                        <span class="chip-name-under">${p.dead ? '💀 ' : ''}${p.name}${(p.revived && !p.dead) ? ' ✨' : ''}</span>
+                        <span class="live-dot"></span>
+                    </div>
                 `;
                 fancyGrid.appendChild(chip);
             });
