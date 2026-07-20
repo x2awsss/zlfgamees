@@ -598,6 +598,24 @@
             transform: scale(1.05);
         }
 
+        /* شارة لعبة حصرية بتصميم يناسب زلف */
+        .badge-exclusive {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            color: #050816;
+            font-size: 0.78rem;
+            font-weight: 900;
+            padding: 5px 14px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+            z-index: 3;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         .game-content {
             padding: 25px;
             display: flex;
@@ -977,7 +995,7 @@
         </div>
     </section>
 
-    <!-- قسم الألعاب بعد توحيد الشكل تماماً لجميع البطاقات -->
+    <!-- قسم الألعاب -->
     <section id="games" class="content-section">
         <div class="section-header">
             <h2>الألعاب التفاعلية</h2>
@@ -1030,9 +1048,10 @@
                 </div>
             </a>
 
-            <!-- الكرت الرابع: تطابق الألوان -->
+            <!-- الكرت الرابع: تطابق الألوان (مُضاف عليه الشارة) -->
             <a href="#" class="game-card">
                 <div class="game-image-wrapper">
+                    <span class="badge-exclusive">لعبة حصرية</span>
                     <img src="/images/2.png" alt="تطابق الألوان">
                 </div>
                 <div class="game-content">
@@ -1045,10 +1064,10 @@
                 </div>
             </a>
 
-            <!-- الكرت الخامس: قيد الإنشاء (بطاقة 1 بنفس التصميم) -->
+            <!-- الكرت الخامس: قيد الإنشاء -->
             <a href="#" class="game-card">
                 <div class="game-image-wrapper">
-                    <img src="/images/2.png" alt="قيد الإنشاء">
+                    <img src="/images/3.png" alt="قيد الإنشاء">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">قيد الإنشاء</h3>
@@ -1060,10 +1079,10 @@
                 </div>
             </a>
 
-            <!-- الكرت السادس: قيد الإنشاء (بطاقة 2 بنفس التصميم) -->
+            <!-- الكرت السادس: قيد الإنشاء -->
             <a href="#" class="game-card">
                 <div class="game-image-wrapper">
-                    <img src="/images/2.png" alt="قيد الإنشاء">
+                    <img src="/images/3.png" alt="قيد الإنشاء">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">قيد الإنشاء</h3>
