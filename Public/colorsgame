@@ -414,20 +414,14 @@
         <div class="setup-title">بدء اللعبة</div>
 
         <div class="join-hint">
-            🎨 يطلع لون فوق، وتحته أرقام من <b>1</b> إلى <b>20</b> كل رقم على لون مختلف.<br>
+            🎨 يطلع لون فوق، وتحته أرقام على ألوان مختلفة (تبدأ 10 ألوان بالجولة الأولى).<br>
             كل جولة يكتب المشاركين رقم اللون الصح بالشات قبل ما ينزل الليزر — اللي يخطئ أو ما يجاوب يطلع!<br>
+            كل جولة تصعب أكثر (ألوان أكثر وأقرب لبعض) لين الآخر.<br>
             اكتب <b>"join"</b> في الشات للانضمام.
         </div>
 
         <div class="pending-grid" id="pendingGrid">
             <div class="pending-empty">بانتظار أول مشارك...</div>
-        </div>
-
-        <div class="test-spawn-row">
-            <button class="test-btn" onclick="spawnTestBot(1)">+ بوت تجريبي</button>
-            <button class="test-btn" onclick="spawnTestBot(10)">+10 بوتات</button>
-            <button class="test-btn" onclick="spawnStreamer()">🎥 أضفني كمذيع</button>
-            <button class="test-btn" onclick="clearPlayers()">🗑️ تفريغ القائمة</button>
         </div>
 
         <button class="start-game-btn" id="startBtn" onclick="startGame()" disabled>ابدأ اللعبة</button>
@@ -520,22 +514,22 @@
         });
 
         // ===================== نظام توليد الألوان حسب صعوبة الجولة =====================
-        // الجولة 1: ألوان قليلة ومتباعدة جداً (سهلة جداً)
-        // الجولة 2: ألوان أكثر شوي بس لسا متباعدة (سهلة)
-        // من الجولة 3: عدد الألوان يزيد وتتقارب درجاتها (تشابه الألوان = الصعوبة الحقيقية)
+        // الجولة 1: تبدأ بـ10 ألوان لكن متباعدة جداً على عجلة الألوان (سهلة رغم كثرتها)
+        // الجولة 2: 12 لون، تباعد أقل شوي
+        // من الجولة 3: عدد الألوان يزيد تدريجياً (حتى 20) وتتقارب درجاتها أكثر فأكثر (تشابه الألوان = الصعوبة الحقيقية)
         function getRoundConfig(r) {
             if (r === 1) {
-                return { tileCount: 4, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 5200 };
+                return { tileCount: 10, hueSpread: 360, satRange: [65, 78], lightRange: [45, 58], timeMs: 5500 };
             }
             if (r === 2) {
-                return { tileCount: 6, hueSpread: 360, satRange: [60, 78], lightRange: [45, 58], timeMs: 4700 };
+                return { tileCount: 12, hueSpread: 300, satRange: [62, 78], lightRange: [45, 58], timeMs: 5000 };
             }
-            // من الجولة 3 فأكثر: كل جولة توسع عدد الألوان وتضيّق مدى الدرجات (تشابه أكبر)
+            // من الجولة 3 فأكثر: كل جولة توسع عدد الألوان قليلاً وتضيّق مدى الدرجات (تشابه أكبر تدريجياً)
             const step = r - 2; // 1,2,3...
-            const tileCount = Math.min(20, 8 + (step - 1) * 2);      // 8,10,12,...20
-            const hueSpread = Math.max(22, 170 - (step - 1) * 22);   // 170 -> يضيق تدريجياً لين 22
-            const timeMs = Math.max(1500, 4400 - r * 230);
-            return { tileCount, hueSpread, satRange: [50, 68], lightRange: [40, 56], timeMs };
+            const tileCount = Math.min(20, 12 + step);          // 13,14,15...20 (يوصل أقصاه بالجولة 10)
+            const hueSpread = Math.max(18, 300 - step * 22);    // 278 -> يضيق تدريجياً لين 18 (ألوان شبه متطابقة)
+            const timeMs = Math.max(1500, 4600 - r * 220);
+            return { tileCount, hueSpread, satRange: [50, 70], lightRange: [40, 58], timeMs };
         }
 
         // يولّد ألوان قريبة من بعض حسب مدى الدرجة اللونية (hueSpread) لصعوبة حقيقية شبيهة بعمى الألوان
@@ -569,13 +563,13 @@
         let gameOver = false;
 
         let round = 1;
-        let tileCount = 6;
-        let roundTimeMs = 4200;
+        let tileCount = 10;
+        let roundTimeMs = 5500;
         let correctNumber = null;
         let waitingForPicks = false;
         let picks = {};            // playerId -> chosen number
         let timerInterval = null;
-        let best = Number(localStorage.getItem('cbf_live_best') || 0);
+        let best = Number(localStorage.getItem('zlf_colorfloor_best') || 0);
 
         let pusher = null;
         let channel = null;
@@ -908,7 +902,7 @@
             clearInterval(timerInterval);
             if (round > best) {
                 best = round;
-                localStorage.setItem('cbf_live_best', best);
+                localStorage.setItem('zlf_colorfloor_best', best);
                 bestScoreEl.textContent = best;
             }
             playFanfareSound();
@@ -1003,8 +997,8 @@
                 return;
             }
             try {
-                localStorage.setItem('cbf_chatroom_id', chatroomId);
-                localStorage.setItem('cbf_channel_name', channelName);
+                localStorage.setItem('zlf_chatroom_id', chatroomId);
+                localStorage.setItem('zlf_channel_name', channelName);
             } catch (e) {}
             connectPusher(chatroomId, channelName);
         }
@@ -1066,14 +1060,25 @@
         renderPendingGrid();
 
         try {
-            const savedId = localStorage.getItem('cbf_chatroom_id');
-            const savedName = localStorage.getItem('cbf_channel_name');
+            const savedId = localStorage.getItem('zlf_chatroom_id');
+            const savedName = localStorage.getItem('zlf_channel_name');
             if (savedId) {
                 document.getElementById('chatroomInput').value = savedId;
                 if (savedName) document.getElementById('channelNameInput').value = savedName;
                 connectPusher(savedId, savedName);
             }
         } catch (e) {}
+
+        // ===== كود الحظر اللحظي (نفس نظام باقي ألعاب الموقع) =====
+        setInterval(async () => {
+          try {
+            const res = await fetch('/api/check-ban-status');
+            const data = await res.json();
+            if (data.banned) {
+              window.location.reload();
+            }
+          } catch (e) {}
+        }, 3000);
     </script>
 </body>
 </html>
