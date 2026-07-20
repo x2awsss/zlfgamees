@@ -569,6 +569,8 @@
             -webkit-backdrop-filter: blur(8px);
             display: flex;
             flex-direction: column;
+            text-decoration: none;
+            color: inherit;
         }
 
         .game-card:hover {
@@ -975,7 +977,7 @@
         </div>
     </section>
 
-    <!-- قسم الألعاب بعد إزالة الشارات -->
+    <!-- قسم الألعاب بعد توحيد الشكل تماماً لجميع البطاقات -->
     <section id="games" class="content-section">
         <div class="section-header">
             <h2>الألعاب التفاعلية</h2>
@@ -984,72 +986,95 @@
 
         <div class="games-grid">
             <!-- الكرت الأول: حرب الدول -->
-           <a href="countrywar.html" style="display: contents;">
-            <div class="game-card">
+            <a href="countrywar.html" class="game-card">
                 <div class="game-image-wrapper">
-                    <!-- ضع رابط صورة حرب الدول في الـ src بالأسفل -->
                     <img src="/images/3.png" alt="حرب الدول">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">حرب الدول</h3>
                     <p class="game-desc">أعلام و دول!</p>
-                    
                     <div class="game-meta">
-                        <span class="meta-tag players">
-                            👥 متعدد
-                        </span>
-                        <span class="meta-tag category">
-                            🎮 استراتيجية
-                        </span>
+                        <span class="meta-tag players">👥 متعدد</span>
+                        <span class="meta-tag category">🎮 استراتيجية</span>
                     </div>
                 </div>
-            </div>
-</a>
+            </a>
+
             <!-- الكرت الثاني: شخصنة -->
-       <a href="personas.html" style="display: contents;">
-            <div class="game-card">
+            <a href="personas.html" class="game-card">
                 <div class="game-image-wrapper">
-                    <!-- ضع رابط صورة شخصنة في الـ src بالأسفل -->
                     <img src="/images/3.png" alt="السلم والثعبان اون ستريم">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">لعبة الشخصنة</h3>
                     <p class="game-desc">لعبة الشخصنة 5 نجوم !</p>
-                    
                     <div class="game-meta">
-                        <span class="meta-tag players">
-                            👥 متعدد
-                        </span>
-                        <span class="meta-tag category">
-                            🎮 مشاكل
-                        </span>
+                        <span class="meta-tag players">👥 متعدد</span>
+                        <span class="meta-tag category">🎮 مشاكل</span>
                     </div>
                 </div>
-            </div>
-</a>
+            </a>
+
             <!-- الكرت الثالث: الروليت الروسي -->
-          <a href="roulette" style="display: contents;">
-            <div class="game-card">
+            <a href="roulette" class="game-card">
                 <div class="game-image-wrapper">
-                    <!-- ضع رابط صورة الروليت الروسي في الـ src بالأسفل -->
-                   <img src="/images/3.png" alt="الروليت الروسي">
+                    <img src="/images/3.png" alt="الروليت الروسي">
                 </div>
                 <div class="game-content">
                     <h3 class="game-title">الروليت الروسي</h3>
                     <p class="game-desc">الروليت الروسي في عالم زلف!</p>
-                    
                     <div class="game-meta">
-                        <span class="meta-tag players">
-                            👥 متعدد
-                        </span>
-                        <span class="meta-tag category">
-                            🎮 حظ
-                        </span>
+                        <span class="meta-tag players">👥 متعدد</span>
+                        <span class="meta-tag category">🎮 حظ</span>
                     </div>
                 </div>
-            </div>
+            </a>
+
+            <!-- الكرت الرابع: تطابق الألوان -->
+            <a href="#" class="game-card">
+                <div class="game-image-wrapper">
+                    <img src="/images/2.png" alt="تطابق الألوان">
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">تطابق الألوان</h3>
+                    <p class="game-desc">تطابق الألوان في عالم زلف حصرية جدًا !</p>
+                    <div class="game-meta">
+                        <span class="meta-tag players">👥 متعدد</span>
+                        <span class="meta-tag category">🎮 نظر</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- الكرت الخامس: قيد الإنشاء (بطاقة 1 بنفس التصميم) -->
+            <a href="#" class="game-card">
+                <div class="game-image-wrapper">
+                    <img src="/images/3.png" alt="قيد الإنشاء">
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">قيد الإنشاء</h3>
+                    <p class="game-desc">لعبة جديدة قادمة قريباً في عالم زلف!</p>
+                    <div class="game-meta">
+                        <span class="meta-tag players">👥 متعدد</span>
+                        <span class="meta-tag category">🎮 قريباً</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- الكرت السادس: قيد الإنشاء (بطاقة 2 بنفس التصميم) -->
+            <a href="#" class="game-card">
+                <div class="game-image-wrapper">
+                    <img src="/images/3.png" alt="قيد الإنشاء">
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">قيد الإنشاء</h3>
+                    <p class="game-desc">لعبة جديدة قادمة قريباً في عالم زلف!</p>
+                    <div class="game-meta">
+                        <span class="meta-tag players">👥 متعدد</span>
+                        <span class="meta-tag category">🎮 قريباً</span>
+                    </div>
+                </div>
+            </a>
         </div>
-        </a>
     </section>
 
     <section id="about" class="content-section">
@@ -1234,11 +1259,8 @@
                             }
                         });
                     }
-                    // لو ما كان مسجل دخول، يبقى الزر الأخضر الأصلي كما هو بدون أي تغيير
                 })
-                .catch(() => {
-                    // لو صار خطأ بالاتصال بالسيرفر، نخلي الزر الافتراضي زي ما هو
-                });
+                .catch(() => {});
         })();
     </script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
@@ -1247,7 +1269,6 @@
     cluster: 'mt1'
   });
 
-  // استبدل 'CHANNEL_ID' برقم القناة حقت المستخدم اللي سجل دخوله
   const channel = pusher.subscribe('chatrooms.CHANNEL_ID.v2');
   
   channel.bind('App\\Events\\ChatMessageEvent', function(data) {
@@ -1256,15 +1277,11 @@
     
     console.log(`${username}: ${message}`);
     
-    // هنا المنطق حقك:
     if (message.toLowerCase() === 'join') {
       console.log('هذا المستخدم يبي يدخل اللعبة!');
-      // ضيفه للعبة في واجهة موقعك
     }
   });
 </script>
-<!-- ===== يمنع فتح أي لعبة قبل تسجيل الدخول عبر Kick ===== -->
-<!-- الصق هذا الكود قبل إغلاق وسم </body> مباشرة بملف ibra.html -->
 
 <div id="loginRequiredModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center; padding:20px;">
   <div style="background:#0f1420; border:1.5px solid #53fc18; border-radius:24px; padding:38px; text-align:center; max-width:380px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.6);">
@@ -1279,25 +1296,23 @@
 (function () {
   let isLoggedIn = false;
 
-  // نتحقق من حالة تسجيل الدخول مرة وحدة عند تحميل الصفحة
   fetch('/api/me')
     .then(res => res.json())
     .then(data => { isLoggedIn = !!data.loggedIn; })
     .catch(() => { isLoggedIn = false; });
 
-  // نعترض أي ضغطة على كرت لعبة (أو رابط بداخله) قبل ما تنفتح اللعبة
   document.addEventListener('click', function (e) {
     const card = e.target.closest('.game-card');
-    if (!card) return; // مو كرت لعبة، تجاهل
+    if (!card) return;
 
     if (!isLoggedIn) {
       e.preventDefault();
       e.stopPropagation();
       document.getElementById('loginRequiredModal').style.display = 'flex';
     }
-    // لو مسجل دخول، ما نسوي شي والرابط يشتغل عادي
   }, true);
 })();
+
 setInterval(async () => {
   try {
     const res = await fetch('/api/check-ban-status');
