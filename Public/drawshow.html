@@ -185,10 +185,12 @@ body{
     width:290px; flex-shrink:0;
     display:flex; flex-direction:column; gap:14px;
     padding:20px 16px; overflow-y:auto;
+    transition: all 0.25s ease;
 }
 
 .panel-box{
     background:#eef1ff; border:2px solid #b9c0f5; border-radius:16px; padding:14px;
+    transition: all 0.25s ease;
 }
 .panel-box h3{ font-size:0.82rem; color:#3a4180; margin-bottom:10px; font-weight:900; }
 
@@ -284,6 +286,7 @@ body{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     background:#fff9d6 !important; border:3px dashed #d8c24a !important;
     text-align:center; min-height:220px;
+    transition: all 0.25s ease;
 }
 #camIdleState{ color:#8a7a1f; font-weight:800; font-size:1rem; }
 #camIdleState .cam-emoji{ font-size:3.2rem; display:block; margin-bottom:10px; }
@@ -299,6 +302,22 @@ body{
 #camWordDisplayState{ font-weight:900; color:#5b2a00; font-size:1rem; }
 #camWordDisplayState b{ display:block; font-size:1.6rem; margin-top:8px; color:#c0392b; }
 
+/* ===== وضع توسعة الكاميرا وقت كتابة الكلمة (القيم) ===== */
+.side-panel.word-input-mode .panel-box:not(.camera-box){
+    display:none;
+}
+.side-panel.word-input-mode .camera-box{
+    flex:1;
+    min-height:100%;
+}
+.side-panel.word-input-mode #camIdleState .cam-emoji{ font-size:4.5rem; }
+.side-panel.word-input-mode #camWordInputState input{
+    padding:16px 12px; font-size:1.05rem;
+}
+.side-panel.word-input-mode #camWordInputState button{
+    padding:16px; font-size:1.05rem;
+}
+
 /* ===== شاشة نهاية اللعبة ===== */
 .overlay{
     position:fixed; inset:0; background:rgba(20,20,40,0.8); backdrop-filter:blur(4px);
@@ -310,8 +329,36 @@ body{
     text-align:center; max-width:480px; width:100%;
 }
 .finish-card h2{ font-size:1.6rem; color:#1e2a5e; margin-bottom:18px; }
-.finish-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
-.finish-row{ display:flex; align-items:center; gap:10px; background:#eef1ff; border-radius:12px; padding:10px 14px; font-weight:800; }
+.finish-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; max-height:56vh; overflow-y:auto; }
+.finish-row{
+    display:flex; align-items:center; gap:10px; background:#eef1ff; border-radius:12px;
+    padding:10px 14px; font-weight:800; color:#1e2a5e; border:2px solid transparent;
+}
+.finish-rank{ width:26px; text-align:center; flex-shrink:0; font-size:1rem; }
+.finish-name{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.finish-score{ flex-shrink:0; }
+.finish-trophy{ font-size:1.2rem; flex-shrink:0; }
+
+.finish-row.rank-gold{
+    background:linear-gradient(135deg,#fff6d0,#ffd23f);
+    border-color:#e6a800;
+    color:#6b4a00;
+    animation:goldGlow 1.5s ease-in-out infinite alternate;
+}
+.finish-row.rank-silver{
+    background:linear-gradient(135deg,#f4f6fb,#d3d9e6);
+    border-color:#aab3c5;
+    color:#3a4356;
+}
+.finish-row.rank-bronze{
+    background:linear-gradient(135deg,#f3dcc0,#c98a4b);
+    border-color:#a5652a;
+    color:#4a2c0f;
+}
+@keyframes goldGlow{
+    from{ box-shadow:0 0 10px rgba(255,210,63,0.55), 0 0 22px rgba(255,210,63,0.3); }
+    to{ box-shadow:0 0 22px rgba(255,210,63,0.95), 0 0 42px rgba(255,210,63,0.6); }
+}
 
 @media (max-width:820px){
     #gameScreen{ flex-direction:column; height:auto; max-height:76vh; overflow-y:auto; }
@@ -398,7 +445,7 @@ body{
 <div class="notebook-frame" id="gameScreen">
     <div class="spiral-row" id="spiralRowGame"></div>
 
-    <div class="side-panel">
+    <div class="side-panel" id="sidePanel">
         <div class="panel-box">
             <h3>🏆 الترتيب</h3>
             <div id="leaderboardList"><div class="lb-empty">ما فيه نقاط بعد</div></div>
@@ -499,6 +546,7 @@ let pusher = null, channel = null;
 
 const setupScreen = document.getElementById('setupScreen');
 const gameScreen = document.getElementById('gameScreen');
+const sidePanel = document.getElementById('sidePanel');
 const roundBadge = document.getElementById('roundBadge');
 const timerText = document.getElementById('timerText');
 const timerFill = document.getElementById('timerFill');
@@ -534,6 +582,7 @@ function backToSetup(){
     roundActive = false;
     gameScreen.classList.remove('show');
     setupScreen.style.display = 'block';
+    sidePanel.classList.remove('word-input-mode');
     camIdleState.style.display = 'block';
     camWordInputState.style.display = 'none';
     camWordDisplayState.style.display = 'none';
@@ -554,6 +603,7 @@ function startWordInputPhase(){
     camIdleState.style.display = 'none';
     camWordDisplayState.style.display = 'none';
     camWordInputState.style.display = 'block';
+    sidePanel.classList.add('word-input-mode');
     wordInput.value = '';
     wordInput.focus();
 }
@@ -565,6 +615,7 @@ function confirmWord(){
     if (!w){ alert('اكتب كلمة أول'); return; }
     currentWord = w;
     camWordInputState.style.display = 'none';
+    sidePanel.classList.remove('word-input-mode');
     startCountdown();
 }
 
@@ -654,8 +705,17 @@ function proceedNextRound(){
 function endGame(){
     gameScreen.classList.remove('show');
     const sorted = Object.values(scores).sort((a,b) => b.score - a.score).slice(0, 10);
+    const medal = ['🥇','🥈','🥉'];
+    const rankClass = ['rank-gold','rank-silver','rank-bronze'];
     finishList.innerHTML = sorted.length
-        ? sorted.map((s,i) => `<div class="finish-row"><span>${['🥇','🥈','🥉'][i] || (i+1)+'.'}</span><span style="flex:1;">${s.name}</span><span>${s.score}</span></div>`).join('')
+        ? sorted.map((s,i) => `
+            <div class="finish-row ${rankClass[i] || ''}">
+                <span class="finish-rank">${medal[i] || (i+1)}</span>
+                <span class="finish-name">${s.name}</span>
+                <span class="finish-score">${s.score}</span>
+                ${i === 0 ? '<span class="finish-trophy">🏆</span>' : ''}
+            </div>
+        `).join('')
         : '<div class="finish-row">محد سجل نقاط بهالجيم</div>';
     finishOverlay.classList.add('show');
     playFanfare();
@@ -664,7 +724,7 @@ function endGame(){
 // ===================== الليدر بورد =====================
 function renderLeaderboard(){
     const list = document.getElementById('leaderboardList');
-    const sorted = Object.values(scores).sort((a,b) => b.score - a.score).slice(0, 8);
+    const sorted = Object.values(scores).sort((a,b) => b.score - a.score).slice(0, 3);
     if (sorted.length === 0){
         list.innerHTML = '<div class="lb-empty">ما فيه نقاط بعد</div>';
         return;
