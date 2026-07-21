@@ -41,7 +41,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // ===== حماية الصفحات المحمية (الوايت لست) + التحقق الفوري والشامل من حظر المنصة (Site Ban) =====
 // تم إضافة /colorsgame هنا لحماية لعبة الألوان بالوايت لست
-const PROTECTED_PAGES = ['/roulette', '/countrywar', '/personas', '/colorsgame'];
+const PROTECTED_PAGES = ['/roulette', '/countrywar', '/personas', '/drawshow', '/colorsgame'];
 
 function stripHtmlExt(p) {
   return p.replace(/\.html$/i, '');
