@@ -173,8 +173,8 @@ body{
 /* ===== شاشة اللعب ===== */
 #gameScreen{
     display:none;
-    width:min(1180px, 94vw);
-    height:min(650px, 76vh);
+    width:min(1320px, 96vw);
+    height:min(760px, 83vh);
     flex-direction:row-reverse;
     gap:0;
     overflow:hidden;
@@ -182,7 +182,7 @@ body{
 #gameScreen.show{ display:flex; }
 
 .side-panel{
-    width:270px; flex-shrink:0;
+    width:290px; flex-shrink:0;
     display:flex; flex-direction:column; gap:14px;
     padding:20px 16px; overflow-y:auto;
 }
@@ -278,24 +278,26 @@ body{
     font-weight:800; font-size:0.72rem; cursor:pointer; font-family:inherit;
 }
 
-/* ===== صندوق الكاميرا الثابت ===== */
-#cameraAnchorBox{
-    position:fixed; bottom:20px; right:20px; width:250px; z-index:80;
-    background:#fff9d6; border:2.5px dashed #d8c24a; border-radius:14px;
-    padding:14px; text-align:center; box-shadow:0 10px 24px rgba(0,0,0,0.25);
+/* ===== صندوق الكاميرا (داخل اللوحة الجانبية، شاشة اللعب فقط) ===== */
+.camera-box{
+    flex:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:#fff9d6 !important; border:3px dashed #d8c24a !important;
+    text-align:center; min-height:220px;
 }
-#camIdleState{ color:#8a7a1f; font-weight:800; font-size:0.85rem; }
-#camIdleState .cam-emoji{ font-size:1.8rem; display:block; margin-bottom:6px; }
+#camIdleState{ color:#8a7a1f; font-weight:800; font-size:1rem; }
+#camIdleState .cam-emoji{ font-size:3.2rem; display:block; margin-bottom:10px; }
+#camWordInputState{ width:100%; }
 #camWordInputState input{
-    width:100%; border:2px solid #d8c24a; border-radius:10px; padding:8px 10px;
-    font-family:inherit; font-weight:800; text-align:center; margin-bottom:8px; outline:none;
+    width:100%; border:2px solid #d8c24a; border-radius:10px; padding:12px 10px;
+    font-family:inherit; font-weight:800; text-align:center; margin-bottom:10px; outline:none; font-size:0.95rem;
 }
 #camWordInputState button{
     width:100%; background:#3ecf8e; border:2px solid #1e2a5e; border-radius:10px;
-    padding:8px; font-weight:900; cursor:pointer; font-family:inherit;
+    padding:12px; font-weight:900; cursor:pointer; font-family:inherit; font-size:0.95rem;
 }
-#camWordDisplayState{ font-weight:900; color:#5b2a00; font-size:0.9rem; }
-#camWordDisplayState b{ display:block; font-size:1.15rem; margin-top:4px; color:#c0392b; }
+#camWordDisplayState{ font-weight:900; color:#5b2a00; font-size:1rem; }
+#camWordDisplayState b{ display:block; font-size:1.6rem; margin-top:8px; color:#c0392b; }
 
 /* ===== شاشة نهاية اللعبة ===== */
 .overlay{
@@ -419,6 +421,17 @@ body{
             </div>
             <div class="swatches" id="swatches"></div>
         </div>
+        <div class="panel-box camera-box">
+            <div id="camIdleState"><span class="cam-emoji">📷</span>ضع الكاميرا هنا</div>
+            <div id="camWordInputState" style="display:none;">
+                <input type="text" id="wordInput" placeholder="اكتب الكلمة اللي بترسمها" maxlength="30">
+                <button onclick="confirmWord()">ابدأ الرسم</button>
+            </div>
+            <div id="camWordDisplayState" style="display:none;">
+                ارسم هذي الكلمة:
+                <b id="currentWordDisplay">—</b>
+            </div>
+        </div>
     </div>
 
     <div class="canvas-panel">
@@ -446,19 +459,6 @@ body{
             <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
             <button class="end-round-btn" onclick="forceEndRound()">إنهاء الجولة</button>
         </div>
-    </div>
-</div>
-
-<!-- ===================== صندوق الكاميرا الثابت ===================== -->
-<div id="cameraAnchorBox">
-    <div id="camIdleState"><span class="cam-emoji">📷</span>ضع الكاميرا هنا</div>
-    <div id="camWordInputState" style="display:none;">
-        <input type="text" id="wordInput" placeholder="اكتب الكلمة اللي بترسمها" maxlength="30">
-        <button onclick="confirmWord()">ابدأ الرسم</button>
-    </div>
-    <div id="camWordDisplayState" style="display:none;">
-        ارسم هذي الكلمة:
-        <b id="currentWordDisplay">—</b>
     </div>
 </div>
 
