@@ -178,7 +178,7 @@
 
         /* ===================== شاشة اللعب ===================== */
         #gameScreen {
-            display: none; width: 100%; max-width: 1080px;
+            display: none; width: 100%; max-width: 1100px;
             max-height: calc(100vh - 60px);
             z-index: 2; flex-direction: column; align-items: center; gap: 10px;
             padding-bottom: 10px; flex: 1 1 auto; min-height: 0;
@@ -211,7 +211,7 @@
             overflow-x: hidden; margin-top: 4px;
         }
 
-        .arena-col { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1 1 620px; min-width: 0; }
+        .arena-col { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1 1 680px; min-width: 0; }
 
         .players-panel {
             background: rgba(15, 20, 32, 0.5);
@@ -260,54 +260,95 @@
             font-size: 0.62rem; font-weight: 900; padding: 1px 6px; border-radius: 8px;
         }
 
-        /* ===================== الأرينا ===================== */
+        /* ===================== الأرينا والتعديلات الجديدة للألوان ===================== */
         .arena {
             position: relative; width: 100%;
             background: rgba(15,20,32,0.55);
             border: 1.5px solid rgba(255,255,255,0.08);
-            border-radius: 18px; padding: 16px 18px 0; overflow: hidden;
+            border-radius: 18px; padding: 16px 18px 14px; overflow: hidden;
         }
-        .target-row { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 6px 0 14px; }
-        .target-label { font-size: 0.78rem; color: #929dae; }
+        .target-row { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 6px 0 12px; }
+        .target-label { font-size: 0.85rem; color: #929dae; font-weight: 800; }
         .target-swatch {
-            width: 62px; height: 62px; border-radius: 10px; border: 3px solid #fff;
+            width: 65px; height: 65px; border-radius: 12px; border: 3px solid #fff;
             box-shadow: 0 0 0 3px #050816, 0 0 20px rgba(255,255,255,0.25), inset 0 0 10px rgba(0,0,0,0.25);
         }
 
         .timer-wrap { width: 100%; height: 8px; background: #050816; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
         .timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #f2b632, #f87171); transition: width .1s linear; }
 
-        .status-line { text-align: center; min-height: 24px; font-size: 0.92rem; font-weight: 800; margin-bottom: 8px; color: #f2b632; }
+        .status-line { text-align: center; min-height: 24px; font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; color: #f2b632; }
 
-        .floor-scene { position: relative; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; }
-        .floor { display: grid; grid-template-columns: repeat(var(--n, 20), 1fr); gap: 3px; position: relative; z-index: 1; }
-        .tile {
-            position: relative; aspect-ratio: 1/1.25; border-radius: 5px 5px 2px 2px;
-            cursor: default; border: 2px solid rgba(0,0,0,0.35);
-            display: flex; align-items: flex-end; justify-content: center;
-            transition: transform .1s ease, filter .15s ease, box-shadow .15s ease;
+        .floor-scene { position: relative; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; }
+        
+        /* ⭐ حل مشكلة صغر المربعات: تحويل الأرضية لنظام المرونة المتعدد الأسطر ⭐ */
+        .floor {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 10px !important;
+            position: relative;
+            z-index: 1;
+            max-height: 380px;
+            overflow-y: auto;
+            padding: 4px;
         }
-        .tile.correct-reveal { box-shadow: 0 0 0 3px #f2b632, 0 0 18px #f2b632; transform: translateY(-3px); }
+
+        .tile {
+            position: relative;
+            flex: 1 1 calc(100% / var(--cols, 6) - 12px) !important;
+            min-width: 72px !important;
+            max-width: 120px !important;
+            height: 75px !important;
+            border-radius: 10px !important;
+            cursor: pointer;
+            border: 2px solid rgba(0,0,0,0.4) !important;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .tile:hover { transform: translateY(-2px); }
+        .tile.correct-reveal { box-shadow: 0 0 0 3.5px #f2b632, 0 0 22px #f2b632 !important; transform: translateY(-4px) scale(1.03); z-index: 5; }
         .tile.zapped { filter: brightness(1.9) saturate(0); box-shadow: 0 0 0 3px #f87171, 0 0 20px #f87171; }
-        .tile .num { font-size: 9px; color: rgba(0,0,0,0.55); font-weight: 900; margin-bottom: 3px; user-select: none; }
+        
+        .tile .num {
+            font-size: 15px !important;
+            color: #fff !important;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 2px #000 !important;
+            font-weight: 900 !important;
+            margin-bottom: 5px;
+            user-select: none;
+        }
         .tile .occupant-count {
-            position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
-            background: rgba(5,8,22,0.75); color: #fff; font-size: 9px; font-weight: 900;
-            padding: 1px 5px; border-radius: 8px; min-width: 14px; text-align: center;
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #050816;
+            color: #53fc18;
+            border: 1.5px solid #53fc18;
+            font-size: 11px !important;
+            font-weight: 900 !important;
+            padding: 1px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            z-index: 2;
         }
 
         .laser {
             position: absolute; top: -40px; left: 0; width: 100%; height: 24px;
             background: linear-gradient(180deg, rgba(248,113,113,0), rgba(248,113,113,0.95) 60%, rgba(255,255,255,0.9));
-            box-shadow: 0 0 30px 10px rgba(248,113,113,0.8); z-index: 2; opacity: 0; pointer-events: none;
+            box-shadow: 0 0 30px 10px rgba(248,113,113,0.8); z-index: 10; opacity: 0; pointer-events: none;
         }
         .laser.sweep { animation: sweepDown 0.6s cubic-bezier(.7,0,.9,1) forwards; }
         @keyframes sweepDown { 0% { top:-40px; opacity:1; } 85% { top:100%; opacity:1; } 100% { top:100%; opacity:0; } }
 
         .floor-base {
-            height: 14px; margin-top: 4px;
+            height: 12px; margin-top: 8px;
             background: repeating-linear-gradient(90deg, #0c0f1c, #0c0f1c 8px, #080a14 8px, #080a14 16px);
-            border-radius: 0 0 6px 6px; border: 1px solid rgba(255,255,255,0.08); border-top: none;
+            border-radius: 0 0 8px 8px; border: 1px solid rgba(255,255,255,0.08); border-top: none;
         }
 
         /* ===================== نوافذ منبثقة ===================== */
@@ -367,7 +408,7 @@
             .picker-grid, .pending-grid { grid-template-columns: repeat(2, 1fr); }
             .fancy-grid { grid-template-columns: repeat(3, 1fr); }
             .modal-big-name { font-size: 1.3rem; }
-            .tile .num { font-size: 7px; }
+            .tile .num { font-size: 11px !important; }
         }
 
         html, body, * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
@@ -519,22 +560,18 @@
             }
         });
 
-        // ===================== نظام إعدادات الجولات المحدث =====================
+        // ===================== نظام إعدادات الجولات =====================
         function getRoundConfig(r) {
             if (r === 1) {
-                // الجولة 1: 6 ألوان، ألوان واضحة، 20 ثانية
-                return { tileCount: 6, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 20000 };
+                return { tileCount: 6, cols: 6, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 20000 };
             }
             if (r === 2) {
-                // الجولة 2: 12 لون، ألوان متباعدة، 15 ثانية
-                return { tileCount: 12, hueSpread: 260, satRange: [60, 78], lightRange: [45, 58], timeMs: 15000 };
+                return { tileCount: 12, cols: 6, hueSpread: 260, satRange: [60, 78], lightRange: [45, 58], timeMs: 15000 };
             }
             
-            // الجولة 3 وما فوق: تثبيت الألوان على 20 والوقت على 12 ثانية
-            // زيادة الصعوبة عبر تضييق الفارق بين درجات الألوان (hueSpread يصغر أكثر)
             const extraRounds = r - 3;
-            const hueSpread = Math.max(12, 120 - extraRounds * 18); // يضيق مدى الدرجات للتمويه التدريجي
-            return { tileCount: 20, hueSpread, satRange: [50, 68], lightRange: [40, 56], timeMs: 12000 };
+            const hueSpread = Math.max(12, 120 - extraRounds * 18);
+            return { tileCount: 20, cols: 7, hueSpread, satRange: [50, 68], lightRange: [40, 56], timeMs: 12000 };
         }
 
         function generateRoundColors(n, hueSpread, satRange, lightRange) {
@@ -577,7 +614,6 @@
         let pusher = null;
         let channel = null;
 
-        // ===================== عناصر DOM =====================
         const pendingGrid = document.getElementById('pendingGrid');
         const startBtn = document.getElementById('startBtn');
         const setupScreen = document.getElementById('setupScreen');
@@ -756,7 +792,7 @@
             tileCount = cfg.tileCount;
             roundTimeMs = cfg.timeMs;
 
-            floorEl.style.setProperty('--n', tileCount);
+            floorEl.style.setProperty('--cols', cfg.cols);
             floorEl.innerHTML = '';
             const colors = generateRoundColors(tileCount, cfg.hueSpread, cfg.satRange, cfg.lightRange);
             correctNumber = Math.floor(Math.random() * colors.length) + 1;
@@ -818,7 +854,7 @@
             return n;
         }
 
-        // ===================== استقبال الاختيار من الشات =====================
+        // ===================== استقبال الاختيار =====================
         function registerPick(playerId, num) {
             if (!waitingForPicks) return;
             const player = players.find(p => String(p.id) === String(playerId));
@@ -923,7 +959,7 @@
             winnerOverlay.classList.remove('show');
         }
 
-        // ===== تأثيرات الصوت =====
+        // ===== أصوات =====
         function playEliminationSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
