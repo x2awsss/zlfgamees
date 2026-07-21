@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ارسم وخمّن | عالم زلف</title>
+     <link class="favicon-icon" rel="icon" type="image/webp" href="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <style>
@@ -185,12 +186,10 @@ body{
     width:290px; flex-shrink:0;
     display:flex; flex-direction:column; gap:14px;
     padding:20px 16px; overflow-y:auto;
-    transition: all 0.25s ease;
 }
 
 .panel-box{
     background:#eef1ff; border:2px solid #b9c0f5; border-radius:16px; padding:14px;
-    transition: all 0.25s ease;
 }
 .panel-box h3{ font-size:0.82rem; color:#3a4180; margin-bottom:10px; font-weight:900; }
 
@@ -286,7 +285,6 @@ body{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     background:#fff9d6 !important; border:3px dashed #d8c24a !important;
     text-align:center; min-height:220px;
-    transition: all 0.25s ease;
 }
 #camIdleState{ color:#8a7a1f; font-weight:800; font-size:1rem; }
 #camIdleState .cam-emoji{ font-size:3.2rem; display:block; margin-bottom:10px; }
@@ -301,22 +299,6 @@ body{
 }
 #camWordDisplayState{ font-weight:900; color:#5b2a00; font-size:1rem; }
 #camWordDisplayState b{ display:block; font-size:1.6rem; margin-top:8px; color:#c0392b; }
-
-/* ===== وضع توسعة الكاميرا وقت كتابة الكلمة (القيم) ===== */
-.side-panel.word-input-mode .panel-box:not(.camera-box){
-    display:none;
-}
-.side-panel.word-input-mode .camera-box{
-    flex:1;
-    min-height:100%;
-}
-.side-panel.word-input-mode #camIdleState .cam-emoji{ font-size:4.5rem; }
-.side-panel.word-input-mode #camWordInputState input{
-    padding:16px 12px; font-size:1.05rem;
-}
-.side-panel.word-input-mode #camWordInputState button{
-    padding:16px; font-size:1.05rem;
-}
 
 /* ===== شاشة نهاية اللعبة ===== */
 .overlay{
@@ -582,7 +564,6 @@ function backToSetup(){
     roundActive = false;
     gameScreen.classList.remove('show');
     setupScreen.style.display = 'block';
-    sidePanel.classList.remove('word-input-mode');
     camIdleState.style.display = 'block';
     camWordInputState.style.display = 'none';
     camWordDisplayState.style.display = 'none';
@@ -603,7 +584,6 @@ function startWordInputPhase(){
     camIdleState.style.display = 'none';
     camWordDisplayState.style.display = 'none';
     camWordInputState.style.display = 'block';
-    sidePanel.classList.add('word-input-mode');
     wordInput.value = '';
     wordInput.focus();
 }
@@ -615,7 +595,6 @@ function confirmWord(){
     if (!w){ alert('اكتب كلمة أول'); return; }
     currentWord = w;
     camWordInputState.style.display = 'none';
-    sidePanel.classList.remove('word-input-mode');
     startCountdown();
 }
 
