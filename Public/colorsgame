@@ -414,7 +414,7 @@
         <div class="setup-title">بدء اللعبة</div>
 
         <div class="join-hint">
-            🎨 يطلع لون فوق، وتحته أرقام من <b>1</b> إلى <b>20</b> كل رقم على لون مختلف.<br>
+            🎨 يطلع لون فوق، وتحته أرقام الألوان.<br>
             كل جولة يكتب المشاركين رقم اللون الصح بالشات قبل ما ينزل الليزر — اللي يخطئ أو ما يجاوب يطلع!<br>
             اكتب <b>"join"</b> في الشات للانضمام.
         </div>
@@ -519,19 +519,22 @@
             }
         });
 
-        // ===================== نظام توليد الألوان حسب صعوبة الجولة =====================
+        // ===================== نظام إعدادات الجولات المحدث =====================
         function getRoundConfig(r) {
             if (r === 1) {
-                return { tileCount: 4, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 5200 };
+                // الجولة 1: 6 ألوان، ألوان واضحة، 20 ثانية
+                return { tileCount: 6, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 20000 };
             }
             if (r === 2) {
-                return { tileCount: 6, hueSpread: 360, satRange: [60, 78], lightRange: [45, 58], timeMs: 4700 };
+                // الجولة 2: 12 لون، ألوان متباعدة، 15 ثانية
+                return { tileCount: 12, hueSpread: 260, satRange: [60, 78], lightRange: [45, 58], timeMs: 15000 };
             }
-            const step = r - 2;
-            const tileCount = Math.min(20, 8 + (step - 1) * 2);
-            const hueSpread = Math.max(22, 170 - (step - 1) * 22);
-            const timeMs = Math.max(1500, 4400 - r * 230);
-            return { tileCount, hueSpread, satRange: [50, 68], lightRange: [40, 56], timeMs };
+            
+            // الجولة 3 وما فوق: تثبيت الألوان على 20 والوقت على 12 ثانية
+            // زيادة الصعوبة عبر تضييق الفارق بين درجات الألوان (hueSpread يصغر أكثر)
+            const extraRounds = r - 3;
+            const hueSpread = Math.max(12, 120 - extraRounds * 18); // يضيق مدى الدرجات للتمويه التدريجي
+            return { tileCount: 20, hueSpread, satRange: [50, 68], lightRange: [40, 56], timeMs: 12000 };
         }
 
         function generateRoundColors(n, hueSpread, satRange, lightRange) {
@@ -564,7 +567,7 @@
 
         let round = 1;
         let tileCount = 6;
-        let roundTimeMs = 4200;
+        let roundTimeMs = 20000;
         let correctNumber = null;
         let waitingForPicks = false;
         let picks = {};
@@ -771,8 +774,9 @@
 
             picks = {};
             waitingForPicks = false;
-            const difficultyNote = round <= 2 ? '' : ' — الألوان تشابهت، ركزوا زين!';
-            statusLine.textContent = `الجولة ${round} — اكتب رقم اللون الصح بالشات من 1 إلى ${tileCount}${difficultyNote}`;
+            const sec = roundTimeMs / 1000;
+            const difficultyNote = round < 3 ? '' : ' — الألوان أصبحت أشد تشابهاً!';
+            statusLine.textContent = `الجولة ${round} — اختر من 1 إلى ${tileCount} (الوقت: ${sec} ثانية)${difficultyNote}`;
             timerBar.style.width = '100%';
             nextRoundBtn.disabled = false;
             nextRoundBtn.textContent = '▶️ ابدأ الجولة';
