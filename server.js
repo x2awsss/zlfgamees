@@ -22,7 +22,7 @@ const {
   PORT = 3000,
   SESSION_SECRET = 'change-this-secret',
   ADMIN_PASSWORD_HASH,
-  ALLOWED_USERS = '' // أسماء حسابات Kick المسموح لها بدخول الألعاب، مفصولة بفاصلة. اتركها فاضية للسماح للجميع
+  ALLOWED_USERS = '' // أسماء حسابات Kick المسموح لها بدخول الألعاب، مفصولة بفاصلة. اتركهافاضية للسماح للجميع
 } = process.env;
 
 // تحويل قائمة الأسماء المسموحة لأحرف صغيرة عشان المقارنة ما تتأثر بحالة الأحرف
@@ -39,8 +39,9 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// ===== حماية الصفحات المحمية + التحقق الفوري والشامل من حظر المنصة (Site Ban) =====
-const PROTECTED_PAGES = ['/roulette', '/countrywar', '/personas'];
+// ===== حماية الصفحات المحمية (الوايت لست) + التحقق الفوري والشامل من حظر المنصة (Site Ban) =====
+// تم إضافة /colorsgame هنا لحماية لعبة الألوان بالوايت لست
+const PROTECTED_PAGES = ['/roulette', '/countrywar', '/personas', '/colorsgame'];
 
 function stripHtmlExt(p) {
   return p.replace(/\.html$/i, '');
@@ -65,7 +66,7 @@ app.use((req, res, next) => {
     }
   }
 
-  // 2. حماية الصفحات الخاصة بالألعاب فقط (مثل الروليت) لمنع غير المصرح لهم
+  // 2. حماية الصفحات الخاصة بالألعاب فقط لمنع غير المصرح لهم (الوايت لست)
   if (!PROTECTED_PAGES.includes(normalizedPath)) {
     return next(); // الصفحات المفتوحة (مثل zlf) تكمل طبيعي لو مو محظور الحساب
   }
@@ -84,9 +85,9 @@ app.use((req, res, next) => {
     return res.status(403).send(`
       <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
         <div>
-          <h1 style="color:#f87171;">🚫 غير مصرح لك بالدخول</h1>
-          <p style="color:#929dae;">حسابك (${req.session.user.name}) مو ضمن قائمة الحسابات المسموح لها بهذه اللعبة.</p>
-          <a href="/logout" style="color:#3b82f6;">تسجيل خروج وتجربة حساب ثاني</a>
+          <h1 style="color:#f87171; font-size:2rem; margin-bottom:12px;">🚫 غير مصرح لك بالدخول</h1>
+          <p style="color:#929dae; font-size:1.1rem; margin-bottom:20px;">حسابك (${req.session.user.name}) غير مسموح له بالوصول لهذه اللعبة.</p>
+          <a href="/logout" style="color:#3b82f6; text-decoration:none; background:rgba(59,130,246,0.1); padding:10px 20px; border-radius:50px; border:1px solid rgba(59,130,246,0.3);">تسجيل خروج وتجربة حساب آخر</a>
         </div>
       </div>
     `);
@@ -102,21 +103,21 @@ app.get('/api/check-ban-status', (req, res) => {
   res.json({ banned: bannedUsers.has(currentUserId) });
 });
 
-// ===== يخلي أي صفحة HTML تشتغل بدون كتابة .html بالرابط =====
+// ===== يخلي أي صفحة HTML تشتغل بدون كتابة .html بالرابط ويجبر عرضها بدلاً من تحميلها =====
 app.use((req, res, next) => {
   if (req.path === '/' || req.path.includes('.')) {
     return next(); // فيه امتداد أصلاً أو الصفحة الرئيسية، تجاهل
   }
   const htmlPath = path.join(__dirname, 'Public', req.path + '.html');
   if (fs.existsSync(htmlPath)) {
-    return res.sendFile(htmlPath);
+    return res.sendFile(htmlPath); // يرسل ملف الـ HTML مباشرة لفتحه في المتصفح
   }
   next();
 });
 
-app.use(express.static('Public')); // مجلد الملفات العامة
+app.use(express.static(path.join(__dirname, 'Public'))); // مجلد الملفات العامة
 
-// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة الجديدة zلف بدون .html =====
+// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة الجديدة zlf بدون .html =====
 app.get('/', (req, res) => {
   res.redirect('/zlf');
 });
