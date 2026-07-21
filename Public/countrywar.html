@@ -7,7 +7,6 @@
     <title>حرب الدول | عالم زلف</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- الأعلام الحين تُعرض كصور مباشرة من flagcdn.com (أوثق وأضمن من مكتبة CSS) -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <style>
@@ -36,7 +35,7 @@
             pointer-events: none;
         }
 
-        /* ===== تصميم البار الموحد والمعدل بالملّي ===== */
+        /* ===== بار المنصة الموحد ===== */
         .navbar {
             width: 85%;
             max-width: 1200px;
@@ -88,7 +87,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* زر البيت (الهوم) بجانب اسم عالم زلف يسارًا */
         .nav-home-btn {
             display: flex;
             align-items: center;
@@ -112,7 +110,6 @@
             stroke: #fff;
         }
 
-        /* اسم اللعبة بمنتصف البار العلوي */
         .nav-center-title {
             font-size: 1.35rem;
             font-weight: 900;
@@ -122,13 +119,11 @@
             text-shadow: 0 0 15px rgba(248, 113, 113, 0.15);
         }
 
-        /* منطقة الاتصال بالجهة اليسرى للبار */
         .auth-area {
             display: flex;
             align-items: center;
         }
 
-        /* ===== حالة الاتصال داخل البار يسارًا ===== */
         .status-pill {
             display: flex;
             align-items: center;
@@ -366,44 +361,48 @@
         .fancy-grid::-webkit-scrollbar { width: 4px; }
         .fancy-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         
-        /* 🎨 كروت اللعبة بالترتيب العمودي الإجباري */
+        /* 🎨 كروت اللعبة بالترتيب العمودي المحسن */
         .fancy-chip {
             background: rgba(15, 20, 32, 0.8) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: 16px !important;
-            padding: 16px 10px !important;
+            padding: 12px 8px 10px !important;
             display: flex !important;
-            flex-direction: column !important; /* إجبار العلم فوق والاسم تحت */
+            flex-direction: column !important;
             align-items: center !important;    
             justify-content: center !important;
-            gap: 10px !important;
+            gap: 6px !important;
             transition: 0.3s !important;
             position: relative !important;
-            height: auto !important;
+            height: 95px !important;
+            overflow: hidden !important;
         }
         .fancy-chip.dead { opacity: 0.35 !important; }
         .fancy-chip.chooser { border-color: #eab308 !important; box-shadow: 0 0 12px rgba(234,179,8,0.35) !important; }
         .fancy-chip.targeted { border-color: #f87171 !important; box-shadow: 0 0 12px rgba(248,113,113,0.4) !important; }
 
-        /* العلم كصورة داخل الكرت */
+        /* ⭐ تعديل تحسين أبعاد العلم لمنع التمطط وجعله مرتب بداخل البوكس ⭐ */
         .fancy-chip .country-flag {
-            width: 100%;
-            height: 42px;
-            object-fit: cover;
-            border-radius: 6px !important;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
+            max-width: 85% !important;
+            max-height: 48px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+            border-radius: 5px !important;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4) !important;
             display: block !important;
+            margin: 0 auto !important;
         }
 
         /* اسم الدولة تحت العلم */
         .fancy-chip .chip-name-under {
-            font-size: 0.92rem !important;
+            font-size: 0.88rem !important;
             font-weight: 800 !important;
             color: #fff !important;
             text-align: center !important;
             width: 100% !important;
             display: block !important;
-            margin-top: 2px !important;
+            margin-top: 1px !important;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -412,19 +411,19 @@
         /* رقم الـ Index بالزاوية العليا */
         .fancy-chip .num-badge-mini {
             position: absolute !important;
-            top: 6px !important;
+            top: 5px !important;
             right: 8px !important;
             color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 0.72rem !important;
+            font-size: 0.68rem !important;
             font-weight: 700 !important;
         }
 
         /* عجلة الحظ */
-.wheel-wrapper { 
-    position: relative; 
-    width: min(440px, 50vh, 40vw); 
-    height: min(440px, 50vh, 40vw); 
-}
+        .wheel-wrapper { 
+            position: relative; 
+            width: min(440px, 50vh, 40vw); 
+            height: min(440px, 50vh, 40vw); 
+        }
         .pointer {
             position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0;
@@ -497,7 +496,7 @@
             cursor: pointer; transition: 0.25s;
         }
         .picker-btn:hover { border-color: #eab308; background: rgba(234,179,8,0.1); transform: translateY(-2px); }
-        .picker-btn .country-flag { width: 26px; height: 18px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
+        .picker-btn .country-flag { max-width: 32px; max-height: 22px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
         
         .num-badge {
             background: rgba(83,252,24,0.15); color: #53fc18;
@@ -517,7 +516,7 @@
             gap: 30px; height: 110px; margin-bottom: 18px; position: relative;
         }
         /* العلم الكبير وقت الطرد */
-        .shoot-scene .country-flag-big { width: 180px; height: 120px; object-fit: cover; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.25) !important; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .shoot-scene .country-flag-big { max-width: 180px; max-height: 120px; object-fit: contain; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.25) !important; transition: transform 0.4s ease, opacity 0.4s ease; }
         .shoot-scene .country-flag-big.fallen { transform: rotate(85deg) translateY(10px); opacity: 0.35; }
 
         .result-msg { font-size: 1.25rem; font-weight: 900; min-height: 34px; }
@@ -531,13 +530,14 @@
             .wheel-wrapper { width: 260px; height: 260px; }
             .game-columns { flex-wrap: wrap; }
         }
-        /* ============ قطع جذري: إخفاء أي سكرول بار نهائياً من كل الصفحة ============ */
+        
+        /* إخفاء السكرول بار نهائياً */
         html, body, * {
-            scrollbar-width: none !important;      /* Firefox */
-            -ms-overflow-style: none !important;    /* Edge القديم */
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
         }
         *::-webkit-scrollbar {
-            display: none !important;               /* Chrome / Safari / Edge الجديد */
+            display: none !important;
             width: 0 !important;
             height: 0 !important;
         }
@@ -550,16 +550,13 @@
 
     <div id="particles-js"></div>
 
-    <!-- 🌐 بار المنصة الرئيسي مدمج ومعدل حسب طلبك بالملّي -->
     <nav class="navbar">
-        <!-- اليمين: لوجو عالم زلف وجنبه زر الهوم (البيت) مباشرة -->
         <div class="nav-right">
             <div class="nav-logo-icon">
                 <img src="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp" alt="ZLF Logo">
             </div>
             <span class="nav-brand">عالم زلف</span>
             
-            <!-- زر بيت الهوم المرجوع للرئيسية يمينًا -->
             <a href="/" class="nav-home-btn" title="العودة للصفحة الرئيسية">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -568,12 +565,10 @@
             </a>
         </div>
 
-        <!-- المنتصف: اسم اللعبة المحدث -->
         <div class="nav-center-title">
             لعبة حرب الدول 🌍
         </div>
 
-        <!-- اليسار: لمبة المتصل الخضراء (مكان تسجيل الدخول القديم) -->
         <div class="auth-area">
             <div class="status-pill offline" id="statusPill">
                 <span class="status-dot"></span>
@@ -635,7 +630,6 @@
         </div>
     </div>
 
-
     <!-- ===================== نافذة اختيار الضحية ===================== -->
     <div class="overlay" id="pickerOverlay">
         <div class="modal-card">
@@ -655,7 +649,6 @@
             <div class="modal-instr" id="shootSubtitle">جارٍ الكشف عن صاحب الدولة...</div>
 
             <div class="shoot-scene">
-                <!-- مكان كشف العلم المطرود عبر كلاسات المكتبة -->
                 <img id="targetFlagElement" class="country-flag-big" src="" alt="">
             </div>
 
@@ -686,7 +679,7 @@
             }
         });
 
-        // ===================== قائمة الدول بترميز ISO المتوافق مع المكتبة =====================
+        // ===================== قائمة الدول بترميز ISO המתوافق =====================
         const COUNTRY_POOL = [
             { code: 'sa', name: 'السعودية' }, { code: 'eg', name: 'مصر' }, { code: 'ae', name: 'الإمارات' },
             { code: 'kw', name: 'الكويت' }, { code: 'jo', name: 'الأردن' }, { code: 'lb', name: 'لبنان' },
@@ -836,7 +829,7 @@
             addLog('🆕 بدأت جولة جديدة');
         }
 
-        // ===================== ⭐ توليد الأعلام من المكتبة السريعة بالملّي =====================
+        // ===================== توليد ألوان القائمة بكروت متناسقة =====================
         function renderFancyGrid() {
             const grid = document.getElementById('fancyGrid');
             if (!grid) return;
@@ -848,7 +841,6 @@
                 if (currentEliminatedFlag && f.number === currentEliminatedFlag.number) cls += ' targeted';
                 chip.className = cls;
                 
-                // عرض العلم كصورة مباشرة من flagcdn.com (بديل موثوق بدل مكتبة CSS)
                 chip.innerHTML = `
                     <span class="num-badge-mini">#${f.number}</span>
                     <img class="country-flag" src="https://flagcdn.com/w160/${f.code.toLowerCase()}.png" alt="${f.name}">
@@ -1021,7 +1013,6 @@
             shootTargetName.textContent = `${flagObj.name}`;
             shootSubtitle.textContent = 'جارٍ الكشف عن صاحب الدولة...';
             
-            // حقن كلاس العلم الكبير التابع للمكتبة
             targetFlagElement.className = 'country-flag-big';
             targetFlagElement.src = `https://flagcdn.com/w320/${flagObj.code.toLowerCase()}.png`;
             targetFlagElement.alt = flagObj.name;
@@ -1042,7 +1033,7 @@
             drawWheel();
         }
 
-        // ===== تأثيرات الصوت المدمجة =====
+        // ===== تأثيرات الصوت =====
         function playEliminationSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1128,7 +1119,7 @@
             }, 250);
         }
 
-        // ===================== احتفال بسيط =====================
+        // ===================== احتفال =====================
         function launchConfetti() {
             const emojis = ['🎉', '🎊', '🏆', '⭐', '🥳'];
             for (let i = 0; i < 26; i++) {
@@ -1220,7 +1211,6 @@
             }
         } catch (e) {}
         
-        // ===== كود الحظر اللحظي الذكي التابع للمنصة الشاملة =====
         setInterval(async () => {
           try {
             const res = await fetch('/api/check-ban-status');
