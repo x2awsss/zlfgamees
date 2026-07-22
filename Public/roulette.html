@@ -566,9 +566,30 @@
             60% { transform: translate(-5px,4px) rotate(-1deg); }
             80% { transform: translate(3px,-2px) rotate(0.6deg); }
         }
-        .gun-icon { font-size: 3.2rem; transform: scaleX(-1); transition: transform 0.12s ease; position: relative; z-index: 3; }
-        .gun-icon.recoil { transform: scaleX(-1) translateX(-8px) rotate(-8deg); }
+.gun-icon {
+            width: 112px; height: 96px;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFQAAAAMCAYAAAD8tppbAAADBUlEQVRIidWXP2/bRhiHn5PpIyVZlhMkGlQ3YAAXdlEgozYB7SYgHyN7v1EXf4Gs3jpoCMAlNYogNuDWLtqkwDmgLSmiSYbWdaiOoChRsqkgaN+FkO597vf+3rvjH8FnjP39fQBs28a2bdrtNr7v6+mw6Pf7n1PuPxnWuhN0u13G4zFJkiClZDQa6SiKaDab+L5Pr9fj6OhojgFSLooiM6QBWq3WTH6/3xfr1vmlwoLUoI7jWEgptVJqLnGRyW63SxzH1Ot1rZQiiiI6nQ6e5wHgui6Hh4eG1YBpjI7jWBgur+O6LgcHBwAzi7GiTmFOhuM42TrX8ndfLt2hkyAQslbTSqk0yXVdPM9bZlJLKckyJsfzPEwBNzc3olqtskoryxndfCxipzrpyciFyHOdTiet1Sx40SLel7MAzt+c891XOww/+LSe7Kbm8s3Jm5wEgZh88HWWMfnZvPF4TPb+uRVHC7UyuxmA6c5IfxfVuWrh89zFxUU6Z6vVQim10F8ZzgLYlhXevLvWP3ba/HQ+u63zIlmTV+8uaT1qiL+V0uRiOBwKx3GQUlKv12fGirTynJRyZiGK6uz1emmtixqT57I7bZm/MpwFsGNv0LQ30kFzVM11OByK7e1tgDmTZ+8HMwaVUtRqNREEgQ7DUJyens417dnjqnj59lK/+Pbxnbnn3+yhK4KrMJmr8+TkZGlj8v7MPd5ci/yV4SwADXqvYQPw4mmTl28vuZabYlIRADoMQ46Pj+cakxXMckEQZB9Ac3EVJnN6gxWcH9/qvYbN908fAPAwjLmWm2Kz6uB5nm42myIMw/SBlG1MWX9lOAvgz9En9ho2v/415GwU4TtyOh8sa4wRLOBYtDtX6Ikirogxr1yDwaCM3lJ/ZbjKoj+rya2YAoUGjWA2ap+SGe6ukdEr1FpRY1m9dTQXculr09no35XesiqC5JZffjtbKbAjN8TP7z/qH9pbADi3E17/frfiyuiVYdZl78ut9QWy+3AXQH/d2GTLqoiPyYRXf5yvM+X/Pv4BlLiduToueJcAAAAASUVORK5CYII=');
+            background-repeat: no-repeat;
+            background-size: 600% 100%;
+            background-position: 0% 0%;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            transform: scaleX(-1);
+            transition: transform 0.12s ease;
+            position: relative; z-index: 3; flex-shrink: 0;
+        }
         .gun-icon.recoil-strong { animation: strongRecoil 0.28s cubic-bezier(.2,.9,.3,1); }
+        .gun-icon.sprite-fire { animation: gunSpriteFire 0.5s steps(1) both; }
+        @keyframes gunSpriteFire {
+            0%    { background-position: 0% 0%; }
+            16.6% { background-position: 20% 0%; }
+            33.3% { background-position: 40% 0%; }
+            50%   { background-position: 60% 0%; }
+            66.6% { background-position: 80% 0%; }
+            83.3% { background-position: 100% 0%; }
+            100%  { background-position: 0% 0%; }
+        }
         @keyframes strongRecoil {
             0%   { transform: scaleX(-1) translateX(0) rotate(0deg); }
             22%  { transform: scaleX(-1) translateX(-20px) rotate(-16deg); }
@@ -773,7 +794,7 @@
                 <span class="target-char" id="targetChar">🧍</span>
                 <div class="bullet-fx" id="bulletFx"></div>
                 <div class="muzzle-flash" id="muzzleFlash"></div>
-                <span class="gun-icon" id="gunIcon">🔫</span>
+                <div class="gun-icon" id="gunIcon"></div>
             </div>
 
             <div class="chambers" id="chambers"></div>
@@ -1273,11 +1294,15 @@
             void gunIcon.offsetWidth;
             gunIcon.classList.add('recoil-strong');
 
-            muzzleFlash.classList.remove('flash');
-            void muzzleFlash.offsetWidth;
-            muzzleFlash.classList.add('flash');
+            gunIcon.classList.remove('sprite-fire');
+            void gunIcon.offsetWidth;
+            gunIcon.classList.add('sprite-fire');
 
             if (isDead) {
+                muzzleFlash.classList.remove('flash');
+                void muzzleFlash.offsetWidth;
+                muzzleFlash.classList.add('flash');
+
                 bulletFx.classList.remove('fire');
                 void bulletFx.offsetWidth;
                 bulletFx.classList.add('fire');
