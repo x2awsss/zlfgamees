@@ -814,6 +814,13 @@
     </div>
 
     <script>
+        // ===================== تجهيز الأصوات بالذاكرة مسبقاً لمنع التأخير =====================
+        const audioShot = new Audio('shot.mp3');
+        audioShot.preload = 'auto';
+
+        const audioClick = new Audio('click.mp3');
+        audioClick.preload = 'auto';
+
         // ===================== إعداد الخلفية المتحركة =====================
         particlesJS("particles-js", {
             "particles": {
@@ -1208,19 +1215,18 @@
             }
         }
 
-        // ===== تشغيل صوت shot.mp3 عند الإطلاق مباشرة =====
-function playGunshotSound() {
-    try {
-        const audio = new Audio('shot.mp3');
-        audio.currentTime = 0; // يبدأ من أول ملي ثانية مباشرة
-        audio.play().catch(e => console.log('تعذر تشغيل shot.mp3:', e));
-    } catch (e) {}
-}
+        // ===== تشغيل صوت shot.mp3 مسبق التحميل مع تقديم خفيف 0.04 ثانية لسبق التأخير =====
+        function playGunshotSound() {
+            try {
+                audioShot.currentTime = 0.04; // 👈 التقديم السريع لحذف الصمت الملي ثواني أول الملف
+                audioShot.play().catch(e => console.log('تعذر تشغيل shot.mp3:', e));
+            } catch (e) {}
+        }
 
         function playClickSound() {
             try {
-                const audio = new Audio('click.mp3');
-                audio.play().catch(e => console.log('تعذر تشغيل click.mp3:', e));
+                audioClick.currentTime = 0;
+                audioClick.play().catch(e => console.log('تعذر تشغيل click.mp3:', e));
             } catch (e) {}
         }
 
@@ -1275,7 +1281,7 @@ function playGunshotSound() {
             gunIcon.classList.add('sprite-fire');
 
             if (isDead) {
-                // تشغيل الصوت متزامن تماماً في نفس الملي ثانية مع اندفاع النار والهزة
+                // تشغيل الصوت فوراً
                 playGunshotSound();
 
                 muzzleFlash.classList.remove('flash');
