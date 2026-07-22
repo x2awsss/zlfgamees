@@ -552,7 +552,6 @@
             font-family: inherit; font-weight: 700; cursor: pointer; font-size: 0.95rem;
         }
 
-        /* 🛠️ تم زيادة المسافة (gap) بين المسدس والشخصية هنا إلى 90px 🛠️ */
         .shoot-scene {
             display: flex; align-items: center; justify-content: center;
             gap: 90px; height: 110px; margin-bottom: 18px; position: relative;
@@ -827,7 +826,7 @@
             }
         });
 
-        // رسمة الشخصية البسيطة (نفس تصميم السكيتش) — أبيض وهو حي، أحمر وهو ميت
+        // رسمة الشخصية البسيطة — أبيض وهو حي، أحمر وهو ميت
         const STICK_FIGURE_ALIVE = `<svg viewBox="0 0 70 100" xmlns="http://www.w3.org/2000/svg">
             <circle cx="35" cy="20" r="18" stroke="#ffffff" stroke-width="3" fill="none"/>
             <line x1="24" y1="17" x2="30" y2="17" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
@@ -1185,7 +1184,7 @@
 
             shootOverlay.classList.add('show');
             
-            /* 🛠️ تم زيادة وقت الانتظار هنا قبل الإطلاق إلى 3000ms (3 ثوانٍ) 🛠️ */
+            // انتظر 3 ثوانٍ حتى يتعرف المتابعون على الهدف ثم أطلق
             setTimeout(() => fireShot(), 3000);
         }
 
@@ -1209,49 +1208,18 @@
             }
         }
 
-        // ===== أصوات =====
+        // ===== تشغيل صوت shot.mp3 عند الإطلاق =====
         function playGunshotSound() {
             try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const audio = new Audio('shot.mp3');
+                audio.play().catch(e => console.log('تعذر تشغيل shot.mp3:', e));
+            } catch (e) {}
+        }
 
-                const bufferSize = audioCtx.sampleRate * 0.35;
-                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.08));
-                }
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.value = 2400;
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
-                noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-                noise.start();
-
-                const sub = audioCtx.createOscillator();
-                const subGain = audioCtx.createGain();
-                sub.type = 'sine';
-                sub.frequency.setValueAtTime(130, audioCtx.currentTime);
-                sub.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.22);
-                subGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
-                subGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.28);
-                sub.connect(subGain); subGain.connect(audioCtx.destination);
-                sub.start(); sub.stop(audioCtx.currentTime + 0.3);
-
-                const echoNoise = audioCtx.createBufferSource();
-                echoNoise.buffer = buffer;
-                const echoFilter = audioCtx.createBiquadFilter();
-                echoFilter.type = 'lowpass';
-                echoFilter.frequency.value = 800;
-                const echoGain = audioCtx.createGain();
-                echoGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-                echoGain.gain.setValueAtTime(0.22, audioCtx.currentTime + 0.1);
-                echoGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
-                echoNoise.connect(echoFilter); echoFilter.connect(echoGain); echoGain.connect(audioCtx.destination);
-                echoNoise.start(audioCtx.currentTime + 0.1);
+        function playClickSound() {
+            try {
+                const audio = new Audio('click.mp3');
+                audio.play().catch(e => console.log('تعذر تشغيل click.mp3:', e));
             } catch (e) {}
         }
 
@@ -1290,25 +1258,6 @@
             }
         }
 
-        function playClickSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const notes = [880, 1108, 1318, 1568];
-                notes.forEach((freq, i) => {
-                    const startTime = audioCtx.currentTime + i * 0.045;
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(freq, startTime);
-                    gain.gain.setValueAtTime(0.001, startTime);
-                    gain.gain.linearRampToValueAtTime(0.22, startTime + 0.015);
-                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.13);
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    osc.start(startTime); osc.stop(startTime + 0.14);
-                });
-            } catch (e) {}
-        }
-
         // ===================== الإطلاق =====================
         function fireShot() {
             if (!currentTarget || currentTarget.dead) return;
@@ -1325,6 +1274,9 @@
             gunIcon.classList.add('sprite-fire');
 
             if (isDead) {
+                // شغل ملف الصوت الحقيقي مباشرة عند خروج النارية
+                playGunshotSound();
+
                 muzzleFlash.classList.remove('flash');
                 void muzzleFlash.offsetWidth;
                 muzzleFlash.classList.add('flash');
@@ -1334,8 +1286,6 @@
                 bulletFx.classList.add('fire');
 
                 setTimeout(() => {
-                    playGunshotSound();
-
                     if (shootScene) {
                         shootScene.classList.remove('shake');
                         void shootScene.offsetWidth;
@@ -1355,7 +1305,7 @@
                     renderFancyGrid();
                     drawWheel();
                     shootCloseBtn.style.display = 'inline-block';
-                }, 220);
+                }, 100);
             } else {
                 playClickSound();
                 targetChar.classList.add('flinch');
