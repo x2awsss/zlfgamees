@@ -575,7 +575,7 @@
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
-            transform: scaleX(-1);
+            transform: scaleX(1);
             transition: transform 0.12s ease;
             position: relative; z-index: 3; flex-shrink: 0;
         }
@@ -591,10 +591,10 @@
             100%  { background-position: 0% 0%; }
         }
         @keyframes strongRecoil {
-            0%   { transform: scaleX(-1) translateX(0) rotate(0deg); }
-            22%  { transform: scaleX(-1) translateX(-20px) rotate(-16deg); }
-            55%  { transform: scaleX(-1) translateX(5px) rotate(5deg); }
-            100% { transform: scaleX(-1) translateX(0) rotate(0deg); }
+            0%   { transform: scaleX(1) translateX(0) rotate(0deg); }
+            22%  { transform: scaleX(1) translateX(-20px) rotate(-16deg); }
+            55%  { transform: scaleX(1) translateX(5px) rotate(5deg); }
+            100% { transform: scaleX(1) translateX(0) rotate(0deg); }
         }
         .muzzle-flash {
             position: absolute; width: 46px; height: 46px; border-radius: 50%;
@@ -608,7 +608,8 @@
             30%  { opacity: 1; transform: translate(-50%,-50%) scale(1.35) rotate(20deg); }
             100% { opacity: 0; transform: translate(-50%,-50%) scale(1.8) rotate(35deg); }
         }
-        .target-char { font-size: 3.6rem; transition: transform 0.4s ease, opacity 0.4s ease; position: relative; z-index: 2; }
+        .target-char { width: 70px; height: 96px; transition: transform 0.4s ease, opacity 0.4s ease; position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: center; }
+        .target-char svg { width: 100%; height: 100%; overflow: visible; }
         .target-char.flinch { animation: flinch 0.35s ease; }
         .target-char.fallen { animation: strongFall 0.65s cubic-bezier(.36,.07,.19,.97) forwards; }
         @keyframes flinch {
@@ -791,7 +792,7 @@
             <div class="modal-instr" id="shootSubtitle">المسدس فيه خانات، رصاصة وحدة موزعة عشوائياً</div>
 
             <div class="shoot-scene">
-                <span class="target-char" id="targetChar">🧍</span>
+                <span class="target-char" id="targetChar"></span>
                 <div class="bullet-fx" id="bulletFx"></div>
                 <div class="muzzle-flash" id="muzzleFlash"></div>
                 <div class="gun-icon" id="gunIcon"></div>
@@ -824,6 +825,32 @@
                 "move": { "enable": true, "speed": 0.8 }
             }
         });
+
+        // رسمة الشخصية البسيطة (نفس تصميم السكيتش) — أبيض وهو حي، أحمر وهو ميت
+        const STICK_FIGURE_ALIVE = `<svg viewBox="0 0 70 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="35" cy="20" r="18" stroke="#ffffff" stroke-width="3" fill="none"/>
+            <line x1="24" y1="17" x2="30" y2="17" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="40" y1="17" x2="46" y2="17" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="28" y1="27" x2="42" y2="27" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="35" y1="38" x2="35" y2="72" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="35" y1="46" x2="14" y2="68" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="46" x2="56" y2="68" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="72" x2="17" y2="98" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="72" x2="53" y2="98" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+        </svg>`;
+        const STICK_FIGURE_DEAD = `<svg viewBox="0 0 70 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="35" cy="20" r="18" stroke="#f87171" stroke-width="3" fill="none"/>
+            <line x1="24" y1="14" x2="30" y2="20" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="30" y1="14" x2="24" y2="20" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="40" y1="14" x2="46" y2="20" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="46" y1="14" x2="40" y2="20" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="30" y1="29" x2="40" y2="26" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="35" y1="38" x2="35" y2="72" stroke="#f87171" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="35" y1="46" x2="14" y2="68" stroke="#f87171" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="46" x2="56" y2="68" stroke="#f87171" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="72" x2="17" y2="98" stroke="#f87171" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="72" x2="53" y2="98" stroke="#f87171" stroke-width="3" stroke-linecap="round"/>
+        </svg>`;
 
         // ===================== حالة اللعبة =====================
         let players = [];
@@ -1148,7 +1175,7 @@
 
             shootTargetName.textContent = `#${target.number} ${target.name}`;
             shootSubtitle.textContent = `المسدس فيه ${shotsPerPlayer} خانات، رصاصة وحدة موزعة عشوائياً`;
-            targetChar.textContent = '🧍';
+            targetChar.innerHTML = STICK_FIGURE_ALIVE;
             targetChar.className = 'target-char';
             resultMsg.textContent = '';
             resultMsg.className = 'result-msg';
@@ -1318,7 +1345,7 @@
                     spawnBloodParticles();
 
                     currentTarget.dead = true;
-                    targetChar.textContent = '💀';
+                    targetChar.innerHTML = STICK_FIGURE_DEAD;
                     targetChar.classList.add('fallen');
                     setTimeout(() => playBodyFallSound(), 380);
 
