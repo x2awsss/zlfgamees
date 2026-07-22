@@ -1208,7 +1208,7 @@
             }
         }
 
-        // ===== تشغيل صوت shot.mp3 عند الإطلاق =====
+        // ===== تشغيل صوت shot.mp3 عند الإطلاق مباشرة =====
         function playGunshotSound() {
             try {
                 const audio = new Audio('shot.mp3');
@@ -1258,7 +1258,7 @@
             }
         }
 
-        // ===================== الإطلاق =====================
+        // ===================== الإطلاق متزامن بدون تأخير =====================
         function fireShot() {
             if (!currentTarget || currentTarget.dead) return;
 
@@ -1274,7 +1274,7 @@
             gunIcon.classList.add('sprite-fire');
 
             if (isDead) {
-                // شغل ملف الصوت الحقيقي مباشرة عند خروج النارية
+                // تشغيل الصوت متزامن تماماً في نفس الملي ثانية مع اندفاع النار والهزة
                 playGunshotSound();
 
                 muzzleFlash.classList.remove('flash');
@@ -1285,27 +1285,25 @@
                 void bulletFx.offsetWidth;
                 bulletFx.classList.add('fire');
 
-                setTimeout(() => {
-                    if (shootScene) {
-                        shootScene.classList.remove('shake');
-                        void shootScene.offsetWidth;
-                        shootScene.classList.add('shake');
-                    }
-                    spawnBloodParticles();
+                if (shootScene) {
+                    shootScene.classList.remove('shake');
+                    void shootScene.offsetWidth;
+                    shootScene.classList.add('shake');
+                }
+                spawnBloodParticles();
 
-                    currentTarget.dead = true;
-                    targetChar.innerHTML = STICK_FIGURE_DEAD;
-                    targetChar.classList.add('fallen');
-                    setTimeout(() => playBodyFallSound(), 380);
+                currentTarget.dead = true;
+                targetChar.innerHTML = STICK_FIGURE_DEAD;
+                targetChar.classList.add('fallen');
+                setTimeout(() => playBodyFallSound(), 380);
 
-                    resultMsg.className = 'result-msg dead';
-                    resultMsg.textContent = `💀 لقد مات ${currentTarget.name}!`;
-                    addLog(`💀 #${currentTarget.number} ${currentTarget.name} مات بالمحاولة رقم ${currentTarget.shotCount}`);
-                    renderChambers();
-                    renderFancyGrid();
-                    drawWheel();
-                    shootCloseBtn.style.display = 'inline-block';
-                }, 100);
+                resultMsg.className = 'result-msg dead';
+                resultMsg.textContent = `💀 لقد مات ${currentTarget.name}!`;
+                addLog(`💀 #${currentTarget.number} ${currentTarget.name} مات بالمحاولة رقم ${currentTarget.shotCount}`);
+                renderChambers();
+                renderFancyGrid();
+                drawWheel();
+                shootCloseBtn.style.display = 'inline-block';
             } else {
                 playClickSound();
                 targetChar.classList.add('flinch');
