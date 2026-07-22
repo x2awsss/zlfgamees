@@ -394,7 +394,6 @@
         .fancy-grid::-webkit-scrollbar { width: 4px; }
         .fancy-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         
-        /* ⭐ كود الكروت المعدل لإصلاح محاذاة الأسماء ومنع خروجها ⭐ */
         .fancy-chip {
             background: rgba(15, 20, 32, 0.8);
             border: 1px solid rgba(255,255,255,0.08);
@@ -420,7 +419,7 @@
             font-weight: 800 !important;
             width: 100% !important;
             min-width: 0 !important;
-            direction: ltr !important; /* ضمان الترتيب الأفقي بدون تداخل لليسار */
+            direction: ltr !important;
         }
         
         .fancy-chip .chip-name {
@@ -521,7 +520,7 @@
             border-radius: 24px;
             padding: 38px 42px;
             text-align: center;
-            max-width: 560px; width: 100%;
+            max-width: 620px; width: 100%;
             box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 40px rgba(234,179,8,0.15);
             animation: popIn 0.35s ease;
         }
@@ -553,10 +552,11 @@
             font-family: inherit; font-weight: 700; cursor: pointer; font-size: 0.95rem;
         }
 
+        /* 🛠️ تم زيادة المسافة (gap) بين المسدس والشخصية هنا إلى 90px 🛠️ */
         .shoot-scene {
             display: flex; align-items: center; justify-content: center;
-            gap: 30px; height: 110px; margin-bottom: 18px; position: relative;
-            overflow: visible;
+            gap: 90px; height: 110px; margin-bottom: 18px; position: relative;
+            overflow: visible; width: 100%;
         }
         .shoot-scene.shake { animation: screenShake 0.4s ease; }
         @keyframes screenShake {
@@ -566,7 +566,7 @@
             60% { transform: translate(-5px,4px) rotate(-1deg); }
             80% { transform: translate(3px,-2px) rotate(0.6deg); }
         }
-.gun-icon {
+        .gun-icon {
             width: 112px; height: 96px;
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFQAAAAMCAYAAAD8tppbAAADBUlEQVRIidWXP2/bRhiHn5PpIyVZlhMkGlQ3YAAXdlEgozYB7SYgHyN7v1EXf4Gs3jpoCMAlNYogNuDWLtqkwDmgLSmiSYbWdaiOoChRsqkgaN+FkO597vf+3rvjH8FnjP39fQBs28a2bdrtNr7v6+mw6Pf7n1PuPxnWuhN0u13G4zFJkiClZDQa6SiKaDab+L5Pr9fj6OhojgFSLooiM6QBWq3WTH6/3xfr1vmlwoLUoI7jWEgptVJqLnGRyW63SxzH1Ot1rZQiiiI6nQ6e5wHgui6Hh4eG1YBpjI7jWBgur+O6LgcHBwAzi7GiTmFOhuM42TrX8ndfLt2hkyAQslbTSqk0yXVdPM9bZlJLKckyJsfzPEwBNzc3olqtskoryxndfCxipzrpyciFyHOdTiet1Sx40SLel7MAzt+c891XOww/+LSe7Kbm8s3Jm5wEgZh88HWWMfnZvPF4TPb+uRVHC7UyuxmA6c5IfxfVuWrh89zFxUU6Z6vVQim10F8ZzgLYlhXevLvWP3ba/HQ+u63zIlmTV+8uaT1qiL+V0uRiOBwKx3GQUlKv12fGirTynJRyZiGK6uz1emmtixqT57I7bZm/MpwFsGNv0LQ30kFzVM11OByK7e1tgDmTZ+8HMwaVUtRqNREEgQ7DUJyens417dnjqnj59lK/+Pbxnbnn3+yhK4KrMJmr8+TkZGlj8v7MPd5ci/yV4SwADXqvYQPw4mmTl28vuZabYlIRADoMQ46Pj+cakxXMckEQZB9Ac3EVJnN6gxWcH9/qvYbN908fAPAwjLmWm2Kz6uB5nm42myIMw/SBlG1MWX9lOAvgz9En9ho2v/415GwU4TtyOh8sa4wRLOBYtDtX6Ikirogxr1yDwaCM3lJ/ZbjKoj+rya2YAoUGjWA2ap+SGe6ukdEr1FpRY1m9dTQXculr09no35XesiqC5JZffjtbKbAjN8TP7z/qH9pbADi3E17/frfiyuiVYdZl78ut9QWy+3AXQH/d2GTLqoiPyYRXf5yvM+X/Pv4BlLiduToueJcAAAAASUVORK5CYII=');
             background-repeat: no-repeat;
@@ -598,7 +598,7 @@
         }
         .muzzle-flash {
             position: absolute; width: 46px; height: 46px; border-radius: 50%;
-            left: 38%; top: 46%; transform: translate(-50%,-50%) scale(0.2);
+            left: 32%; top: 46%; transform: translate(-50%,-50%) scale(0.2);
             background: radial-gradient(circle, #ffffff 0%, #ffd23f 30%, #f97316 60%, transparent 78%);
             opacity: 0; pointer-events: none; z-index: 4;
         }
@@ -634,15 +634,15 @@
             100% { transform: translate(var(--dx), var(--dy)) scale(0.25); opacity: 0; }
         }
         .bullet-fx {
-            position: absolute; top: 50%; left: 40%;
+            position: absolute; top: 50%; left: 35%;
             width: 10px; height: 4px; border-radius: 4px;
             background: #eab308; opacity: 0;
             box-shadow: 0 0 8px #eab308;
         }
         .bullet-fx.fire { animation: bulletFly 0.25s linear forwards; }
         @keyframes bulletFly {
-            0% { opacity: 1; left: 40%; }
-            100% { opacity: 0; left: 65%; }
+            0% { opacity: 1; left: 35%; }
+            100% { opacity: 0; left: 68%; }
         }
 
         .chambers { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
@@ -664,6 +664,7 @@
             .modal-big-name { font-size: 1.5rem; }
             .wheel-wrapper { width: 260px; height: 260px; }
             .game-columns { flex-wrap: wrap; }
+            .shoot-scene { gap: 40px; }
         }
 
         /* إخفاء السكرول بار نهائياً */
@@ -1183,7 +1184,9 @@
             renderChambers();
 
             shootOverlay.classList.add('show');
-            setTimeout(() => fireShot(), 1300);
+            
+            /* 🛠️ تم زيادة وقت الانتظار هنا قبل الإطلاق إلى 3000ms (3 ثوانٍ) 🛠️ */
+            setTimeout(() => fireShot(), 3000);
         }
 
         function closeShootOverlay() {
@@ -1211,7 +1214,6 @@
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-                // ضجيج الطلقة الحادة
                 const bufferSize = audioCtx.sampleRate * 0.35;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
@@ -1229,7 +1231,6 @@
                 noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
                 noise.start();
 
-                // دفعة باص عميقة تحس فيها بوقع الطلقة
                 const sub = audioCtx.createOscillator();
                 const subGain = audioCtx.createGain();
                 sub.type = 'sine';
@@ -1240,7 +1241,6 @@
                 sub.connect(subGain); subGain.connect(audioCtx.destination);
                 sub.start(); sub.stop(audioCtx.currentTime + 0.3);
 
-                // صدى خفيف بعد الطلقة مباشرة
                 const echoNoise = audioCtx.createBufferSource();
                 echoNoise.buffer = buffer;
                 const echoFilter = audioCtx.createBiquadFilter();
@@ -1270,7 +1270,6 @@
             } catch (e) {}
         }
 
-        // رذاذ دم ستايلايزد بسيط (نقاط صغيرة تتطاير) بدون أي مشاهد فاجرة
         function spawnBloodParticles() {
             if (!shootScene) return;
             const originXPercent = 62, originYPercent = 50;
