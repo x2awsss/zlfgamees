@@ -7,6 +7,7 @@
     <title>حرب الدول | عالم زلف</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- الأعلام الحين تُعرض كصور مباشرة من flagcdn.com (أوثق وأضمن من مكتبة CSS) -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <style>
@@ -35,7 +36,7 @@
             pointer-events: none;
         }
 
-        /* ===== بار المنصة الموحد ===== */
+        /* ===== تصميم البار الموحد والمعدل بالملّي ===== */
         .navbar {
             width: 85%;
             max-width: 1200px;
@@ -87,6 +88,7 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* زر البيت (الهوم) بجانب اسم عالم زلف يسارًا */
         .nav-home-btn {
             display: flex;
             align-items: center;
@@ -110,6 +112,7 @@
             stroke: #fff;
         }
 
+        /* اسم اللعبة بمنتصف البار العلوي */
         .nav-center-title {
             font-size: 1.35rem;
             font-weight: 900;
@@ -119,11 +122,13 @@
             text-shadow: 0 0 15px rgba(248, 113, 113, 0.15);
         }
 
+        /* منطقة الاتصال بالجهة اليسرى للبار */
         .auth-area {
             display: flex;
             align-items: center;
         }
 
+        /* ===== حالة الاتصال داخل البار يسارًا ===== */
         .status-pill {
             display: flex;
             align-items: center;
@@ -361,61 +366,61 @@
         .fancy-grid::-webkit-scrollbar { width: 4px; }
         .fancy-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         
-        /* 🎨 كروت اللعبة بالترتيب العمودي المحسن */
+        /* 🎨 كروت اللعبة بالتصميم المعدل لعدم اقتطاع الاسم */
         .fancy-chip {
             background: rgba(15, 20, 32, 0.8) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: 16px !important;
-            padding: 12px 8px 10px !important;
+            padding: 14px 8px 10px !important;
             display: flex !important;
-            flex-direction: column !important;
+            flex-direction: column !important; /* العلم فوق والاسم تحت */
             align-items: center !important;    
-            justify-content: center !important;
+            justify-content: flex-start !important;
             gap: 6px !important;
             transition: 0.3s !important;
             position: relative !important;
-            height: 95px !important;
-            overflow: hidden !important;
+            height: auto !important;
+            min-height: 85px !important;
+            word-break: break-word !important;
         }
         .fancy-chip.dead { opacity: 0.35 !important; }
         .fancy-chip.chooser { border-color: #eab308 !important; box-shadow: 0 0 12px rgba(234,179,8,0.35) !important; }
         .fancy-chip.targeted { border-color: #f87171 !important; box-shadow: 0 0 12px rgba(248,113,113,0.4) !important; }
 
-        /* ⭐ تعديل تحسين أبعاد العلم لمنع التمطط وجعله مرتب بداخل البوكس ⭐ */
+        /* العلم كصورة داخل الكرت */
         .fancy-chip .country-flag {
-            max-width: 85% !important;
-            max-height: 48px !important;
-            width: auto !important;
-            height: auto !important;
-            object-fit: contain !important;
-            border-radius: 5px !important;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.4) !important;
+            width: 100%;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
             display: block !important;
-            margin: 0 auto !important;
         }
 
-        /* اسم الدولة تحت العلم */
+        /* اسم الدولة تحت العلم المصلح بظهور كامل */
         .fancy-chip .chip-name-under {
-            font-size: 0.88rem !important;
+            font-size: 0.82rem !important;
             font-weight: 800 !important;
             color: #fff !important;
             text-align: center !important;
             width: 100% !important;
             display: block !important;
-            margin-top: 1px !important;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            margin-top: 2px !important;
+            overflow: visible !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            line-height: 1.2 !important;
         }
 
         /* رقم الـ Index بالزاوية العليا */
         .fancy-chip .num-badge-mini {
             position: absolute !important;
-            top: 5px !important;
-            right: 8px !important;
-            color: rgba(255, 255, 255, 0.4) !important;
+            top: 4px !important;
+            right: 6px !important;
+            color: rgba(255, 255, 255, 0.5) !important;
             font-size: 0.68rem !important;
             font-weight: 700 !important;
+            z-index: 2;
         }
 
         /* عجلة الحظ */
@@ -496,7 +501,7 @@
             cursor: pointer; transition: 0.25s;
         }
         .picker-btn:hover { border-color: #eab308; background: rgba(234,179,8,0.1); transform: translateY(-2px); }
-        .picker-btn .country-flag { max-width: 32px; max-height: 22px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
+        .picker-btn .country-flag { width: 26px; height: 18px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
         
         .num-badge {
             background: rgba(83,252,24,0.15); color: #53fc18;
@@ -516,7 +521,7 @@
             gap: 30px; height: 110px; margin-bottom: 18px; position: relative;
         }
         /* العلم الكبير وقت الطرد */
-        .shoot-scene .country-flag-big { max-width: 180px; max-height: 120px; object-fit: contain; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.25) !important; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .shoot-scene .country-flag-big { width: 180px; height: 120px; object-fit: cover; border-radius: 8px; box-shadow: 0 0 20px rgba(255,255,255,0.25) !important; transition: transform 0.4s ease, opacity 0.4s ease; }
         .shoot-scene .country-flag-big.fallen { transform: rotate(85deg) translateY(10px); opacity: 0.35; }
 
         .result-msg { font-size: 1.25rem; font-weight: 900; min-height: 34px; }
@@ -530,14 +535,13 @@
             .wheel-wrapper { width: 260px; height: 260px; }
             .game-columns { flex-wrap: wrap; }
         }
-        
-        /* إخفاء السكرول بار نهائياً */
+        /* ============ إخفاء أشرطة التمرير ============ */
         html, body, * {
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;      /* Firefox */
+            -ms-overflow-style: none !important;    /* Edge القديم */
         }
         *::-webkit-scrollbar {
-            display: none !important;
+            display: none !important;               /* Chrome / Safari / Edge الجديد */
             width: 0 !important;
             height: 0 !important;
         }
@@ -550,6 +554,7 @@
 
     <div id="particles-js"></div>
 
+    <!-- 🌐 بار المنصة الرئيسي مدمج ومعدل -->
     <nav class="navbar">
         <div class="nav-right">
             <div class="nav-logo-icon">
@@ -679,7 +684,7 @@
             }
         });
 
-        // ===================== قائمة الدول بترميز ISO המתوافق =====================
+        // ===================== قائمة الدول بترميز ISO =====================
         const COUNTRY_POOL = [
             { code: 'sa', name: 'السعودية' }, { code: 'eg', name: 'مصر' }, { code: 'ae', name: 'الإمارات' },
             { code: 'kw', name: 'الكويت' }, { code: 'jo', name: 'الأردن' }, { code: 'lb', name: 'لبنان' },
@@ -713,7 +718,6 @@
         let gameStarted = false;
         let gameOver = false;
         let nextNumber = 1;
-        let testCounter = 1;
         let totalRotation = 0; 
 
         let pusher = null;
@@ -829,7 +833,7 @@
             addLog('🆕 بدأت جولة جديدة');
         }
 
-        // ===================== توليد ألوان القائمة بكروت متناسقة =====================
+        // ===================== ⭐ توليد الأعلام والكروت =====================
         function renderFancyGrid() {
             const grid = document.getElementById('fancyGrid');
             if (!grid) return;
@@ -1119,7 +1123,7 @@
             }, 250);
         }
 
-        // ===================== احتفال =====================
+        // ===================== احتفال الفوز =====================
         function launchConfetti() {
             const emojis = ['🎉', '🎊', '🏆', '⭐', '🥳'];
             for (let i = 0; i < 26; i++) {
