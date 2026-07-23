@@ -928,9 +928,30 @@
         }
 
         // نبدأ التحميل فوراً من فتح الصفحة
+        // ===== تحميل صوت النجاة الحقيقي (rsound.mp3) مسبقاً بدون أي تأخير =====
+        const SURVIVE_SOUND_B64 = "data:audio/mp3;base64,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";
+        let surviveBuffer = null;
+        let surviveLoadingPromise = null;
+
+        function preloadSurviveSound() {
+            if (surviveLoadingPromise) return surviveLoadingPromise;
+            surviveLoadingPromise = (async () => {
+                try {
+                    const ctx = getSharedAudioCtx();
+                    const res = await fetch(SURVIVE_SOUND_B64);
+                    const arrayBuffer = await res.arrayBuffer();
+                    surviveBuffer = await ctx.decodeAudioData(arrayBuffer);
+                } catch (e) {
+                    console.warn('تعذر تحميل صوت النجاة الحقيقي مسبقاً، بيتم استخدام صوت بديل', e);
+                }
+            })();
+            return surviveLoadingPromise;
+        }
+
         preloadGunshotSound();
         // وأيضاً عند أول تفاعل من المستخدم (بعض المتصفحات ما تسمح بتشغيل الصوت قبل أول ضغطة)
-        document.addEventListener('pointerdown', () => { getSharedAudioCtx(); preloadGunshotSound(); }, { once: true });
+        preloadSurviveSound();
+        document.addEventListener('pointerdown', () => { getSharedAudioCtx(); preloadGunshotSound(); preloadSurviveSound(); }, { once: true });
 
         const manageOverlay = document.getElementById('manageOverlay');
         const manageGrid = document.getElementById('manageGrid');
@@ -1351,6 +1372,26 @@
         }
 
         function playClickSound() {
+            // إذا الصوت الحقيقي (rsound.mp3) جاهز ومحمّل مسبقاً، شغّله فوراً بدون أي تأخير
+            if (surviveBuffer) {
+                try {
+                    const ctx = getSharedAudioCtx();
+                    const source = ctx.createBufferSource();
+                    source.buffer = surviveBuffer;
+                    const gain = ctx.createGain();
+                    gain.gain.value = 1;
+                    source.connect(gain);
+                    gain.connect(ctx.destination);
+                    // نتخطى الصمت المسجّل ببداية ملف mp3 (شي شائع بسبب ترميز LAME)
+                    const leadingSilence = Math.min(0.165, surviveBuffer.duration - 0.1);
+                    source.start(0, Math.max(0, leadingSilence));
+                    return;
+                } catch (e) {
+                    console.warn('فشل تشغيل صوت النجاة الحقيقي، رجعنا للصوت البديل', e);
+                }
+            }
+
+            // خطة بديلة (fallback): صوت مُصنّع، يُستخدم فقط لو ما تحمّل rsound.mp3 بعد
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const notes = [880, 1108, 1318, 1568];
