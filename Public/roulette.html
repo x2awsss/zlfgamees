@@ -1256,7 +1256,10 @@
                     gain.gain.value = 1;
                     source.connect(gain);
                     gain.connect(ctx.destination);
-                    source.start(0);
+                    // نتخطى الصمت المسجّل ببداية ملف mp3 (شي شائع بسبب ترميز LAME)
+                    // عشان الصوت يطلع فوراً بدون أي تأخير محسوس
+                    const leadingSilence = Math.min(0.065, gunshotBuffer.duration - 0.05);
+                    source.start(0, Math.max(0, leadingSilence));
                     return;
                 } catch (e) {
                     console.warn('فشل تشغيل صوت الطلقة الحقيقي، رجعنا للصوت البديل', e);
