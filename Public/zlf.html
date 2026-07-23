@@ -13,29 +13,29 @@
     
     <style>
         /* تأثير ظهور السهم الأصفر عند تمرير الماوس على اللعبة */
-.game-content {
-    position: relative; /* لجعل موقع السهم مرتبطاً بداخل محتوى اللعبة */
-}
+        .game-content {
+            position: relative;
+        }
 
-.game-content::after {
-    content: '←'; /* رمز السهم لليسار */
-    position: absolute;
-    top: 24px; /* يتماشى رأسياً بشكل دقيق مع عنوان اللعبة */
-    left: 25px; /* يظهر في أقصى اليسار */
-    font-size: 1.7rem;
-    color: #eab308; /* نفس درجة اللون الأصفر الرسمي لـ زلف */
-    font-weight: 900;
-    opacity: 0; /* مخفي في الحالة الطبيعية */
-    transform: translateX(15px); /* إزاحة خفيفة لليمين قبل الظهور ليعطي تأثير دخول حركي */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* حركة فيزيائية ناعمة جداً */
-    pointer-events: none;
-}
+        .game-content::after {
+            content: '←';
+            position: absolute;
+            top: 24px;
+            left: 25px;
+            font-size: 1.7rem;
+            color: #eab308;
+            font-weight: 900;
+            opacity: 0;
+            transform: translateX(15px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
 
-/* عند تمرير الماوس على كرت اللعبة */
-.game-card:hover .game-content::after {
-    opacity: 1; /* يظهر السهم */
-    transform: translateX(0); /* يتحرك لليسار لمكانه الطبيعي */
-}
+        .game-card:hover .game-content::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -72,7 +72,7 @@
             width: 85%;
             max-width: 1200px;
             height: 70px;
-            padding: 0 30px;
+            padding: 0 25px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -115,6 +115,30 @@
             background: linear-gradient(45deg, #ffffff, #c3dafe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        /* زر التواصل بالبريد العالي اليمين بالنافبار */
+        .btn-nav-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(234, 179, 8, 0.12);
+            color: #eab308;
+            border: 1px solid #eab308;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.15);
+        }
+
+        .btn-nav-email:hover {
+            background: #eab308;
+            color: #050816;
+            box-shadow: 0 0 18px rgba(234, 179, 8, 0.5);
+            transform: scale(1.04);
         }
 
         .nav-links {
@@ -236,7 +260,6 @@
             transform: translateY(-3px);
         }
 
-        /* ===== منطقة تسجيل الدخول بالنافبار ===== */
         .auth-area {
             display: flex;
             align-items: center;
@@ -266,14 +289,13 @@
             transform: scale(1.05);
         }
 
-        /* حالة تسجيل الدخول: صورة المستخدم بدل الزر */
         .user-menu {
             position: relative;
         }
 
         .user-avatar-wrapper {
             display: flex;
-            flex-direction: row-reverse; /* الصورة يسار، الاسم يمين */
+            flex-direction: row-reverse;
             align-items: center;
             gap: 12px;
             text-decoration: none;
@@ -311,7 +333,6 @@
             white-space: nowrap;
         }
 
-        /* القائمة المنسدلة (تسجيل خروج) */
         .user-dropdown {
             position: absolute;
             top: calc(100% + 10px);
@@ -352,16 +373,6 @@
         .logout-btn:hover {
             background: #f87171;
             color: #000;
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                width: 90%;
-                padding: 0 20px;
-            }
-            .nav-links {
-                display: none;
-            }
         }
 
         .hero-card {
@@ -506,18 +517,9 @@
         }
 
         @keyframes scrollWheel {
-            0% {
-                top: 6px;
-                opacity: 1;
-            }
-            50% {
-                top: 18px;
-                opacity: 0;
-            }
-            100% {
-                top: 6px;
-                opacity: 1;
-            }
+            0% { top: 6px; opacity: 1; }
+            50% { top: 18px; opacity: 0; }
+            100% { top: 6px; opacity: 1; }
         }
 
         .content-section {
@@ -598,7 +600,6 @@
             transform: scale(1.05);
         }
 
-        /* شارة لعبة حصرية بتصميم يناسب زلف */
         .badge-exclusive {
             position: absolute;
             top: 14px;
@@ -657,13 +658,8 @@
             color: #929dae;
         }
 
-        .meta-tag.category {
-            color: #eab308;
-        }
-
-        .meta-tag.players {
-            color: #3b82f6;
-        }
+        .meta-tag.category { color: #eab308; }
+        .meta-tag.players { color: #3b82f6; }
 
         .about-row {
             display: flex;
@@ -797,130 +793,238 @@
             transition: all 0.3s ease;
         }
 
-        .social-name {
-            font-size: 1.15rem;
-            font-weight: 700;
+        .social-name { font-size: 1.15rem; font-weight: 700; }
+        .social-username { font-size: 0.85rem; color: #929dae; direction: ltr; }
+
+        .social-card.twitter:hover { border-color: #1da1f2; box-shadow: 0 10px 25px rgba(29, 161, 242, 0.2); transform: translateY(-5px); }
+        .social-card.twitter .social-icon-wrapper { background: rgba(29, 161, 242, 0.1); color: #1da1f2; }
+        .social-card.twitter:hover .social-icon-wrapper { background: #1da1f2; color: white; box-shadow: 0 0 15px rgba(29, 161, 242, 0.5); }
+
+        .social-card.instagram:hover { border-color: #e1306c; box-shadow: 0 10px 25px rgba(225, 48, 108, 0.2); transform: translateY(-5px); }
+        .social-card.instagram .social-icon-wrapper { background: rgba(225, 48, 108, 0.1); color: #e1306c; }
+        .social-card.instagram:hover .social-icon-wrapper { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; box-shadow: 0 0 15px rgba(225, 48, 108, 0.5); }
+
+        .social-card.youtube:hover { border-color: #ff0000; box-shadow: 0 10px 25px rgba(255, 0, 0, 0.2); transform: translateY(-5px); }
+        .social-card.youtube .social-icon-wrapper { background: rgba(255, 0, 0, 0.1); color: #ff0000; }
+        .social-card.youtube:hover .social-icon-wrapper { background: #ff0000; color: white; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); }
+
+        .social-card.tiktok:hover { border-color: #00f2fe; box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2); transform: translateY(-5px); }
+        .social-card.tiktok .social-icon-wrapper { background: rgba(0, 242, 254, 0.1); color: #00f2fe; }
+        .social-card.tiktok:hover .social-icon-wrapper { background: linear-gradient(45deg, #fe2c55, #25f4ee); color: white; box-shadow: 0 0 15px rgba(37, 244, 238, 0.5); }
+
+        .social-card.discord:hover { border-color: #5865f2; box-shadow: 0 10px 25px rgba(88, 101, 242, 0.2); transform: translateY(-5px); }
+        .social-card.discord .social-icon-wrapper { background: rgba(88, 101, 242, 0.1); color: #5865f2; }
+        .social-card.discord:hover .social-icon-wrapper { background: #5865f2; color: white; box-shadow: 0 0 15px rgba(88, 101, 242, 0.5); }
+
+        /* ===== تصميم الفوتر الفخم والمعصرن ===== */
+        .site-footer {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(5, 8, 22, 0) 0%, rgba(10, 17, 40, 0.85) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 60px 8% 30px 8%;
+            margin-top: 60px;
         }
 
-        .social-username {
-            font-size: 0.85rem;
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid #eab308;
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.3);
+        }
+
+        .footer-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ffffff;
+        }
+
+        .footer-desc {
             color: #929dae;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .footer-section-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 3px;
+            background: #eab308;
+            border-radius: 2px;
+            box-shadow: 0 0 8px #eab308;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: #929dae;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: #eab308;
+            transform: translateX(-5px);
+        }
+
+        .contact-box {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
             direction: ltr;
+            justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
-        .social-card.twitter:hover {
-            border-color: #1da1f2;
-            box-shadow: 0 10px 25px rgba(29, 161, 242, 0.2);
-            transform: translateY(-5px);
-        }
-        .social-card.twitter .social-icon-wrapper {
-            background: rgba(29, 161, 242, 0.1);
-            color: #1da1f2;
-        }
-        .social-card.twitter:hover .social-icon-wrapper {
-            background: #1da1f2;
-            color: white;
-            box-shadow: 0 0 15px rgba(29, 161, 242, 0.5);
+        .contact-item:hover {
+            border-color: #eab308;
+            background: rgba(234, 179, 8, 0.08);
+            box-shadow: 0 5px 15px rgba(234, 179, 8, 0.15);
         }
 
-        .social-card.instagram:hover {
-            border-color: #e1306c;
-            box-shadow: 0 10px 25px rgba(225, 48, 108, 0.2);
-            transform: translateY(-5px);
-        }
-        .social-card.instagram .social-icon-wrapper {
-            background: rgba(225, 48, 108, 0.1);
-            color: #e1306c;
-        }
-        .social-card.instagram:hover .social-icon-wrapper {
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            color: white;
-            box-shadow: 0 0 15px rgba(225, 48, 108, 0.5);
+        .contact-item .label {
+            font-size: 0.8rem;
+            color: #929dae;
+            direction: rtl;
         }
 
-        .social-card.youtube:hover {
-            border-color: #ff0000;
-            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.2);
-            transform: translateY(-5px);
-        }
-        .social-card.youtube .social-icon-wrapper {
-            background: rgba(255, 0, 0, 0.1);
-            color: #ff0000;
-        }
-        .social-card.youtube:hover .social-icon-wrapper {
-            background: #ff0000;
-            color: white;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        .contact-item .val {
+            font-weight: 700;
+            color: #eab308;
+            font-family: monospace;
         }
 
-        .social-card.tiktok:hover {
-            border-color: #00f2fe;
-            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2);
-            transform: translateY(-5px);
-        }
-        .social-card.tiktok .social-icon-wrapper {
-            background: rgba(0, 242, 254, 0.1);
-            color: #00f2fe;
-        }
-        .social-card.tiktok:hover .social-icon-wrapper {
-            background: linear-gradient(45deg, #fe2c55, #25f4ee);
-            color: white;
-            box-shadow: 0 0 15px rgba(37, 244, 238, 0.5);
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 30px auto 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #6b7280;
+            font-size: 0.9rem;
         }
 
-        .social-card.discord:hover {
-            border-color: #5865f2;
-            box-shadow: 0 10px 25px rgba(88, 101, 242, 0.2);
-            transform: translateY(-5px);
+        .owner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 8px 18px;
+            border-radius: 50px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.15);
         }
-        .social-card.discord .social-icon-wrapper {
-            background: rgba(88, 101, 242, 0.1);
+
+        .owner-badge:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .owner-badge span.highlight-owner {
+            color: #eab308;
+            font-weight: 900;
+        }
+
+        .discord-tag {
+            background: rgba(88, 101, 242, 0.2);
             color: #5865f2;
-        }
-        .social-card.discord:hover .social-icon-wrapper {
-            background: #5865f2;
-            color: white;
-            box-shadow: 0 0 15px rgba(88, 101, 242, 0.5);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            direction: ltr;
+            font-family: monospace;
+            border: 1px solid rgba(88, 101, 242, 0.4);
         }
 
         @media (max-width: 992px) {
-            .about-row {
-                flex-direction: column;
-                text-align: center;
-                gap: 40px;
-            }
-            .about-image-side {
-                max-width: 350px;
-            }
-            .about-quote-box {
-                border-right: none;
-                border-top: 4px solid #3b82f6;
-            }
-            .quote-icon {
-                display: none;
-            }
+            .about-row { flex-direction: column; text-align: center; gap: 40px; }
+            .about-image-side { max-width: 350px; }
+            .about-quote-box { border-right: none; border-top: 4px solid #3b82f6; }
+            .quote-icon { display: none; }
         }
 
         @media (max-width: 768px) {
-            .hero-section {
-                height: auto;
-                padding-top: 120px;
-                padding-bottom: 60px;
-            }
-            .main-container {
-                flex-direction: column;
-                justify-content: center;
-                gap: 50px;
-                padding: 0;
-            }
+            .navbar { width: 92%; padding: 0 15px; }
+            .nav-links { display: none; }
+            .hero-section { height: auto; padding-top: 120px; padding-bottom: 60px; }
+            .main-container { flex-direction: column; justify-content: center; gap: 50px; padding: 0; }
             .hero-text { text-align: center; }
             .cta-buttons { justify-content: center; }
             .hero-text h1 { font-size: 2.2rem; }
             .scroll-indicator { display: none; }
-            .content-section {
-                padding: 80px 5% 60px 5%;
-            }
+            .content-section { padding: 80px 5% 60px 5%; }
             .user-avatar-wrapper span { display: none; }
+            .footer-bottom { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -930,6 +1034,9 @@
 
     <nav class="navbar">
         <div class="nav-right">
+            <!-- زر التواصل بالبريد في جهة اليمين داخل النافبار -->
+
+
             <div class="nav-logo-icon">
                 <img src="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp" alt="ZLF Logo">
             </div>
@@ -943,7 +1050,7 @@
             <li><a href="#socials" class="nav-item">حسابات زلف</a></li>
         </ul>
 
-        <!-- منطقة تسجيل الدخول: تتحول تلقائياً بين الزر وصورة المستخدم -->
+        <!-- منطقة تسجيل الدخول -->
         <div id="auth-area" class="auth-area">
             <a href="/login" id="kick-login-btn" class="btn-login-kick">تسجيل الدخول باستخدام Kick</a>
         </div>
@@ -1003,7 +1110,6 @@
         </div>
 
         <div class="games-grid">
-            <!-- الكرت الأول: حرب الدول -->
             <a href="countrywar.html" class="game-card">
                 <div class="game-image-wrapper">
                     <img src="/images/3.png" alt="حرب الدول">
@@ -1018,7 +1124,6 @@
                 </div>
             </a>
 
-            <!-- الكرت الثاني: شخصنة -->
             <a href="personas.html" class="game-card">
                 <div class="game-image-wrapper">
                     <img src="/images/3.png" alt="السلم والثعبان اون ستريم">
@@ -1033,7 +1138,6 @@
                 </div>
             </a>
 
-            <!-- الكرت الثالث: الروليت الروسي -->
             <a href="roulette" class="game-card">
                 <div class="game-image-wrapper">
                     <img src="/images/3.png" alt="الروليت الروسي">
@@ -1048,7 +1152,6 @@
                 </div>
             </a>
 
-            <!-- الكرت الرابع: تطابق الألوان (مُضاف عليه الشارة) -->
             <a href="colorsgame" class="game-card">
                 <div class="game-image-wrapper">
                     <span class="badge-exclusive">لعبة حصرية ( تجريبية )</span>
@@ -1064,10 +1167,9 @@
                 </div>
             </a>
 
-            <!-- الكرت الخامس: ارسم وخمن -->
             <a href="drawshow" class="game-card">
                 <div class="game-image-wrapper">
-          <span class="badge-exclusive">لعبة حصرية ( تجريبية )</span>
+                    <span class="badge-exclusive">لعبة حصرية ( تجريبية )</span>
                     <img src="/images/3.png" alt="إرسم وخمّن">
                 </div>
                 <div class="game-content">
@@ -1080,7 +1182,6 @@
                 </div>
             </a>
 
-            <!-- الكرت السادس: قيد الإنشاء -->
             <a href="#" class="game-card">
                 <div class="game-image-wrapper">
                     <img src="/images/2.png" alt="قيد الإنشاء">
@@ -1136,7 +1237,6 @@
         </div>
 
         <div class="socials-grid">
-            <!-- إكس / تويتر -->
             <a href="https://x.com/ibrahimlive33" target="_blank" class="social-card twitter">
                 <div class="social-icon-wrapper">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -1147,7 +1247,6 @@
                 <div class="social-username">@ibrahimlive33</div>
             </a>
 
-            <!-- انستقرام -->
             <a href="https://instagram.com/ib_yts" target="_blank" class="social-card instagram">
                 <div class="social-icon-wrapper">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1160,7 +1259,6 @@
                 <div class="social-username">IBRA | ابرا (@ib_yts)</div>
             </a>
 
-            <!-- يوتيوب -->
             <a href="https://youtube.com/@ibralive3" target="_blank" class="social-card youtube">
                 <div class="social-icon-wrapper">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1172,7 +1270,6 @@
                 <div class="social-username">@ibralive3</div>
             </a>
 
-            <!-- تيك توك -->
             <a href="https://tiktok.com/@ibrahimlive33" target="_blank" class="social-card tiktok">
                 <div class="social-icon-wrapper">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -1183,7 +1280,6 @@
                 <div class="social-username">@ibrahimlive33</div>
             </a>
 
-            <!-- ديسكورد -->
             <a href="https://discord.gg/hJFbVWhjnK" target="_blank" class="social-card discord">
                 <div class="social-icon-wrapper">
                     <svg width="24" height="24" viewBox="0 0 127.14 96.36" fill="currentColor">
@@ -1195,6 +1291,58 @@
             </a>
         </div>
     </section>
+
+    <!-- ===== الفوتر الاحترافي الفخم أسفل الصفحة ===== -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp" alt="ZLF Logo">
+                    <span class="footer-title">عالم زلف</span>
+                </div>
+                <p class="footer-desc">
+                    المنصة الأولى والأقوى للألعاب التفاعلية المباشرة على البث المباشر. تجربة تفاعلية حصرية بخمس نجوم جدًا!
+                </p>
+            </div>
+
+            <div>
+                <h4 class="footer-section-title">روابط سريعة</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">الرئيسية</a></li>
+                    <li><a href="#games">الألعاب التفاعلية</a></li>
+                    <li><a href="#about">من هو زلف؟</a></li>
+                    <li><a href="#socials">منصات التواصل</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-section-title">تواصل معنا | Contact Us</h4>
+                <div class="contact-box">
+                    <a href="mailto:x2aws@proton.me" class="contact-item" title="راسلنا عبر البريد">
+                        <span class="label">البريد الإلكتروني:</span>
+                        <span class="val">x2aws@proton.me</span>
+                    </a>
+                    <div class="contact-item">
+                        <span class="label">ديسكورد المطور:</span>
+                        <span class="val">x2aws</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>
+                جميع الحقوق محفوظة &copy; 2026 - <strong>عالم زلف ZLF</strong>
+            </div>
+            <div>
+                <div class="owner-badge">
+                    <span>Owned & Developed by</span>
+                    <span class="highlight-owner">Abofahad (aws)</span>
+                    <span class="discord-tag">x2aws</span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
@@ -1283,65 +1431,66 @@
                 .catch(() => {});
         })();
     </script>
+
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-<script>
-  const pusher = new Pusher('32cbd69e0618063f2536', {
-    cluster: 'mt1'
-  });
+    <script>
+      const pusher = new Pusher('32cbd69e0618063f2536', {
+        cluster: 'mt1'
+      });
 
-  const channel = pusher.subscribe('chatrooms.CHANNEL_ID.v2');
-  
-  channel.bind('App\\Events\\ChatMessageEvent', function(data) {
-    const message = data.data.content;
-    const username = data.sender.username;
-    
-    console.log(`${username}: ${message}`);
-    
-    if (message.toLowerCase() === 'join') {
-      console.log('هذا المستخدم يبي يدخل اللعبة!');
-    }
-  });
-</script>
+      const channel = pusher.subscribe('chatrooms.CHANNEL_ID.v2');
+      
+      channel.bind('App\\Events\\ChatMessageEvent', function(data) {
+        const message = data.data.content;
+        const username = data.sender.username;
+        
+        console.log(`${username}: ${message}`);
+        
+        if (message.toLowerCase() === 'join') {
+          console.log('هذا المستخدم يبي يدخل اللعبة!');
+        }
+      });
+    </script>
 
-<div id="loginRequiredModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center; padding:20px;">
-  <div style="background:#0f1420; border:1.5px solid #53fc18; border-radius:24px; padding:38px; text-align:center; max-width:380px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.6);">
-    <div style="font-size:1.3rem; font-weight:900; color:#fff; margin-bottom:10px;">🔒 لازم تسجل دخول أول</div>
-    <p style="color:#929dae; font-size:0.9rem; margin-bottom:24px;">لازم تربط حسابك في Kick عشان تقدر تلعب أي لعبة بالموقع.</p>
-    <a href="/logintab.html" style="display:inline-block; width:100%; background:#53fc18; color:#000; font-weight:900; padding:13px; border-radius:14px; text-decoration:none;">تسجيل الدخول عبر Kick</a>
-    <div onclick="document.getElementById('loginRequiredModal').style.display='none'" style="margin-top:14px; color:#6b7280; font-size:0.8rem; cursor:pointer;">إغلاق</div>
-  </div>
-</div>
+    <div id="loginRequiredModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center; padding:20px;">
+      <div style="background:#0f1420; border:1.5px solid #53fc18; border-radius:24px; padding:38px; text-align:center; max-width:380px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.6);">
+        <div style="font-size:1.3rem; font-weight:900; color:#fff; margin-bottom:10px;">🔒 لازم تسجل دخول أول</div>
+        <p style="color:#929dae; font-size:0.9rem; margin-bottom:24px;">لازم تربط حسابك في Kick عشان تقدر تلعب أي لعبة بالموقع.</p>
+        <a href="/logintab.html" style="display:inline-block; width:100%; background:#53fc18; color:#000; font-weight:900; padding:13px; border-radius:14px; text-decoration:none;">تسجيل الدخول عبر Kick</a>
+        <div onclick="document.getElementById('loginRequiredModal').style.display='none'" style="margin-top:14px; color:#6b7280; font-size:0.8rem; cursor:pointer;">إغلاق</div>
+      </div>
+    </div>
 
-<script>
-(function () {
-  let isLoggedIn = false;
+    <script>
+    (function () {
+      let isLoggedIn = false;
 
-  fetch('/api/me')
-    .then(res => res.json())
-    .then(data => { isLoggedIn = !!data.loggedIn; })
-    .catch(() => { isLoggedIn = false; });
+      fetch('/api/me')
+        .then(res => res.json())
+        .then(data => { isLoggedIn = !!data.loggedIn; })
+        .catch(() => { isLoggedIn = false; });
 
-  document.addEventListener('click', function (e) {
-    const card = e.target.closest('.game-card');
-    if (!card) return;
+      document.addEventListener('click', function (e) {
+        const card = e.target.closest('.game-card');
+        if (!card) return;
 
-    if (!isLoggedIn) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('loginRequiredModal').style.display = 'flex';
-    }
-  }, true);
-})();
+        if (!isLoggedIn) {
+          e.preventDefault();
+          e.stopPropagation();
+          document.getElementById('loginRequiredModal').style.display = 'flex';
+        }
+      }, true);
+    })();
 
-setInterval(async () => {
-  try {
-    const res = await fetch('/api/check-ban-status');
-    const data = await res.json();
-    if (data.banned) {
-      window.location.reload(); 
-    }
-  } catch (e) {}
-}, 3000);
-</script>
+    setInterval(async () => {
+      try {
+        const res = await fetch('/api/check-ban-status');
+        const data = await res.json();
+        if (data.banned) {
+          window.location.reload(); 
+        }
+      } catch (e) {}
+    }, 3000);
+    </script>
 </body>
 </html>
