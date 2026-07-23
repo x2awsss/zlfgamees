@@ -300,6 +300,16 @@ body{
 #camWordDisplayState{ font-weight:900; color:#5b2a00; font-size:1rem; }
 #camWordDisplayState b{ display:block; font-size:1.6rem; margin-top:8px; color:#c0392b; }
 
+#camWordPickState{ width:100%; }
+#camWordPickState .pick-title{ font-weight:800; color:#5b2a00; font-size:0.85rem; margin-bottom:10px; }
+.word-pick-btn{
+    width:100%; background:#fff; border:2.5px solid #1e2a5e; border-radius:10px;
+    padding:12px; font-weight:900; cursor:pointer; font-family:inherit; font-size:1rem;
+    margin-bottom:8px; color:#1e2a5e; transition:0.15s;
+}
+.word-pick-btn:hover{ background:#3ecf8e; transform:translateY(-2px); }
+.word-pick-btn:last-child{ margin-bottom:0; }
+
 /* ===== شاشة نهاية اللعبة ===== */
 .overlay{
     position:fixed; inset:0; background:rgba(20,20,40,0.8); backdrop-filter:blur(4px);
@@ -405,6 +415,13 @@ body{
             <option value="30">30 راوند</option>
         </select>
     </div>
+    <div class="settings-row">
+        <span class="icon">📝</span>
+        <select id="wordSourceSelect">
+            <option value="custom" selected>أكتب الكلمة بنفسي</option>
+            <option value="pick2">يعطيني كلمتين أختار وحدة منهم</option>
+        </select>
+    </div>
 
     <div class="howto">
         <div class="howto-card"><span class="emoji">🤔</span>خمّن رسمة البثّاث بالشات</div>
@@ -455,6 +472,11 @@ body{
             <div id="camWordInputState" style="display:none;">
                 <input type="text" id="wordInput" placeholder="اكتب الكلمة اللي بترسمها" maxlength="30">
                 <button onclick="confirmWord()">ابدأ الرسم</button>
+            </div>
+            <div id="camWordPickState" style="display:none;">
+                <div class="pick-title">اختار كلمة ترسمها:</div>
+                <button class="word-pick-btn" id="wordPickBtn1"></button>
+                <button class="word-pick-btn" id="wordPickBtn2"></button>
             </div>
             <div id="camWordDisplayState" style="display:none;">
                 ارسم هذي الكلمة:
@@ -514,8 +536,58 @@ function renderSpirals(id, count){
 renderSpirals('spiralRowSetup', 14);
 renderSpirals('spiralRowGame', 16);
 
+// ===================== بنك الكلمات العربي (لوضع "كلمتين أختار بينهم") =====================
+const WORD_BANK = [
+    // حيوانات
+    'قطة','كلب','أسد','فيل','زرافة','حصان','بقرة','خروف','دجاجة','بطة','سمكة','ثعبان',
+    'تمساح','سلحفاة','أرنب','قرد','دب','نمر','جمل','فأر','غراب','بومة','نحلة','فراشة',
+    'عنكبوت','حوت','دلفين','بطريق','كنغر','حمار','ديك','خفاش','قنفذ','نسر',
+    // فواكه وخضار
+    'تفاحة','موزة','برتقالة','عنب','بطيخ','فراولة','أناناس','مانجو','خيار','طماطم',
+    'بصل','جزرة','بطاطس','ذرة','فلفل','ليمون','رمان','جوز هند',
+    // أطعمة ومشروبات
+    'بيتزا','برجر','دجاج مشوي','أرز','خبز','بيضة','كيكة','آيسكريم','شاي','قهوة',
+    'حليب','عسل','شوكولاتة','ساندويتش','فشار','مكرونة','تفاح مكرمل',
+    // مواصلات
+    'سيارة','طائرة','قطار','دراجة','سفينة','صاروخ','مروحية','حافلة','غواصة','دراجة نارية',
+    // مهن
+    'طبيب','معلم','شرطي','طباخ','نجار','مزارع','رسام','طيار','صياد','رجل إطفاء','ممرضة',
+    // أشياء يومية
+    'كرسي','طاولة','باب','نافذة','مفتاح','ساعة','هاتف','تلفاز','حقيبة','مظلة',
+    'نظارة','قبعة','حذاء','مرآة','مصباح','كتاب','قلم','مقص','فرشاة أسنان','صابون',
+    'شمعة','ساعة يد','كاميرا','سماعة',
+    // طبيعة وأماكن
+    'شمس','قمر','نجمة','سحابة','مطر','جبل','بحر','نهر','شجرة','زهرة',
+    'صحراء','بركان','قوس قزح','ثلج','بيت','مسجد','قلعة','جسر','مدرسة','مصنع',
+    'جزيرة','كهف','شلال',
+    // رياضة وألعاب
+    'كرة قدم','كرة سلة','دراجة هوائية','سباحة','شطرنج','طائرة ورقية','تنس','بولينج',
+    // خيال وحكايات
+    'روبوت','وحش','شبح','جنية','تنين','عملاق','نينجا','قرصان','ساحر','ملك','ملكة','تاج',
+    'جني','مصاصة دماء','مذنب فضائي',
+    // جسم الإنسان ومشاعر
+    'قلب','عين','يد','قدم','أنف','ابتسامة','دموع',
+    // فصول وطقس
+    'رعد','برق','قوس نجوم',
+    // أدوات موسيقية
+    'قيثارة','طبلة','بيانو','ميكروفون'
+];
+
+let usedWords = [];
+function getRandomWords(count){
+    let pool = WORD_BANK.filter(w => !usedWords.includes(w));
+    if (pool.length < count){ usedWords = []; pool = WORD_BANK.slice(); }
+    const picked = [];
+    const poolCopy = pool.slice();
+    for (let i = 0; i < count && poolCopy.length > 0; i++){
+        const idx = Math.floor(Math.random() * poolCopy.length);
+        picked.push(poolCopy.splice(idx, 1)[0]);
+    }
+    return picked;
+}
+
 // ===================== حالة اللعبة =====================
-let settings = { duration: 90, rounds: 15 };
+let settings = { duration: 90, rounds: 15, wordSource: 'custom' };
 let currentRoundNum = 0;
 let currentWord = '';
 let roundActive = false;
@@ -539,6 +611,9 @@ const roundEndWord = document.getElementById('roundEndWord');
 const roundEndList = document.getElementById('roundEndList');
 const camIdleState = document.getElementById('camIdleState');
 const camWordInputState = document.getElementById('camWordInputState');
+const camWordPickState = document.getElementById('camWordPickState');
+const wordPickBtn1 = document.getElementById('wordPickBtn1');
+const wordPickBtn2 = document.getElementById('wordPickBtn2');
 const camWordDisplayState = document.getElementById('camWordDisplayState');
 const wordInput = document.getElementById('wordInput');
 const currentWordDisplay = document.getElementById('currentWordDisplay');
@@ -551,8 +626,10 @@ function addLog(t){ console.log(t); }
 function startGame(){
     settings.duration = parseInt(document.getElementById('durationSelect').value, 10);
     settings.rounds = parseInt(document.getElementById('roundsSelect').value, 10);
+    settings.wordSource = document.getElementById('wordSourceSelect').value;
     currentRoundNum = 0;
     scores = {};
+    usedWords = [];
     renderLeaderboard();
     setupScreen.style.display = 'none';
     gameScreen.classList.add('show');
@@ -566,10 +643,11 @@ function backToSetup(){
     setupScreen.style.display = 'block';
     camIdleState.style.display = 'block';
     camWordInputState.style.display = 'none';
+    camWordPickState.style.display = 'none';
     camWordDisplayState.style.display = 'none';
 }
 
-// ===================== مرحلة كتابة الكلمة =====================
+// ===================== مرحلة اختيار/كتابة الكلمة =====================
 function startWordInputPhase(){
     currentRoundNum++;
     if (currentRoundNum > settings.rounds){ endGame(); return; }
@@ -583,9 +661,17 @@ function startWordInputPhase(){
 
     camIdleState.style.display = 'none';
     camWordDisplayState.style.display = 'none';
-    camWordInputState.style.display = 'block';
-    wordInput.value = '';
-    wordInput.focus();
+
+    if (settings.wordSource === 'pick2'){
+        camWordInputState.style.display = 'none';
+        camWordPickState.style.display = 'block';
+        showWordPickPhase();
+    } else {
+        camWordPickState.style.display = 'none';
+        camWordInputState.style.display = 'block';
+        wordInput.value = '';
+        wordInput.focus();
+    }
 }
 
 wordInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmWord(); });
@@ -595,6 +681,21 @@ function confirmWord(){
     if (!w){ alert('اكتب كلمة أول'); return; }
     currentWord = w;
     camWordInputState.style.display = 'none';
+    startCountdown();
+}
+
+function showWordPickPhase(){
+    const [w1, w2] = getRandomWords(2);
+    wordPickBtn1.textContent = w1;
+    wordPickBtn2.textContent = w2;
+    wordPickBtn1.onclick = () => selectPickedWord(w1);
+    wordPickBtn2.onclick = () => selectPickedWord(w2);
+}
+
+function selectPickedWord(w){
+    usedWords.push(w);
+    currentWord = w;
+    camWordPickState.style.display = 'none';
     startCountdown();
 }
 
