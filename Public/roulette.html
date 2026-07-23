@@ -555,7 +555,7 @@
 
         .shoot-scene {
             display: flex; align-items: center; justify-content: center;
-            gap: 30px; height: 110px; margin-bottom: 18px; position: relative;
+            gap: 50px; height: 110px; margin-bottom: 18px; position: relative;
             overflow: visible;
         }
         .shoot-scene.shake { animation: screenShake 0.4s ease; }
@@ -1063,7 +1063,7 @@
                 chip.innerHTML = `
                     <span class="remove-x" onclick="removePlayer('${p.id}'); openManage();">✕</span>
                     <span class="k-icon">K</span>
-                    <span>#${p.number} ${p.name}${p.dead ? ' ' : ''}</span>
+                    <span>#${p.number} ${p.name}${p.dead ? ' 💀' : ''}</span>
                 `;
                 manageGrid.appendChild(chip);
             });
@@ -1221,7 +1221,7 @@
             renderChambers();
 
             shootOverlay.classList.add('show');
-            setTimeout(() => fireShot(), 1300);
+            setTimeout(() => fireShot(), 3000);
         }
 
         function closeShootOverlay() {
