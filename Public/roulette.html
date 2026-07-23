@@ -768,7 +768,7 @@
                     <div class="empty-wheel-msg" id="emptyWheelMsg"></div>
                 </div>
 
-                <button class="action-btn spin" id="spinBtn" onclick="spinWheel()"> لف العجلة</button>
+                <button class="action-btn spin" id="spinBtn" onclick="spinWheel()">🎡 لف العجلة</button>
             </div>
         </div>
     </div>
@@ -776,7 +776,7 @@
     <!-- ===================== نافذة اختيار الضحية ===================== -->
     <div class="overlay" id="pickerOverlay">
         <div class="modal-card">
-            <div class="modal-eyebrow">جاء الاختيار على</div>
+            <div class="modal-eyebrow">وقع الاختيار على</div>
             <div class="modal-big-name" id="pickerChooserName">—</div>
             <div class="modal-instr">اختر لاعب لضربه، اكتب رقمه أو اسمه بالشات.</div>
             <div class="picker-grid" id="pickerGrid"></div>
@@ -1240,6 +1240,12 @@
             resultMsg.className = 'result-msg';
             shootCloseBtn.style.display = 'none';
             renderChambers();
+
+            // نصفّر شكل السلاح والومضة والرصاصة من الجولة السابقة
+            // عشان ما يبين السلاح وكأنه طلق فور فتح الشاشة قبل الوقت الفعلي
+            gunIcon.className = 'gun-icon';
+            muzzleFlash.className = 'muzzle-flash';
+            bulletFx.className = 'bullet-fx';
 
             shootOverlay.classList.add('show');
             setTimeout(() => fireShot(), 3000);
