@@ -22,36 +22,56 @@ const {
   PORT = 3000,
   SESSION_SECRET = 'change-this-secret',
   ADMIN_PASSWORD_HASH,
-  ALLOWED_USERS = '' // أسماء حسابات Kick المسموح لها بدخول الألعاب، مفصولة بفاصلة. اتركهافاضية للسماح للجميع
+  ALLOWED_USERS = '' // أسماء حسابات Kick المسموح لها بدخول الألعاب
 } = process.env;
 
-// تحويل قائمة الأسماء المسموحة لأحرف صغيرة عشان المقارنة ما تتأثر بحالة الأحرف
-const allowedUsersList = ALLOWED_USERS.split(',').map(u => u.trim().toLowerCase()).filter(Boolean);
+// ===== إدارة الوايت لست (الدمج بين الـ .env والتحكم الديناميكي من الأدمن) =====
+// 1. القراءة الأولى من الـ .env
+const envAllowedUsers = ALLOWED_USERS.split(',').map(u => u.trim().toLowerCase()).filter(Boolean);
 
-// ===== إعداد الجلسة (Session) لتخزين بيانات المستخدم بعد تسجيل الدخول =====
+// 2. Set ديناميكي يجمع بين يوزرات الـ .env والتعديلات اللحظية من لوحة الأدمن
+let customAddedUsers = new Set();
+let customRemovedUsers = new Set();
+
+function isUserWhitelisted(username) {
+  if (!username) return false;
+  const cleanName = username.toLowerCase().trim();
+
+  // إذا تم حذفه من لوحة الأدمن يدوياً
+  if (customRemovedUsers.has(cleanName)) return false;
+
+  // إذا تم إضافته من لوحة الأدمن يدوياً
+  if (customAddedUsers.has(cleanName)) return true;
+
+  // إذا كانت القائمة الأساسية بالكامل فارغة (وضع مفتوح)
+  if (envAllowedUsers.length === 0 && customAddedUsers.size === 0) return true;
+
+  // الفحص في قائمة الـ .env الأصلية
+  return envAllowedUsers.includes(cleanName);
+}
+
+// ===== إعداد الجلسة (Session) =====
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'lax' } // خليها secure:true عند النشر على https
+  cookie: { httpOnly: true, sameSite: 'lax' }
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// ===== حماية الصفحات المحمية (الوايت لست) + التحقق الفوري والشامل من حظر المنصة (Site Ban) =====
-// تم إضافة /colorsgame هنا لحماية لعبة الألوان بالوايت لست
+// ===== حماية الصفحات المحمية (الوايت لست) + التحقق الفوري من حظر المنصة =====
 const PROTECTED_PAGES = ['/roulette', '/countrywar', '/personas', '/drawshow', '/colorsgame'];
 
 function stripHtmlExt(p) {
   return p.replace(/\.html$/i, '');
 }
 
-// تعديل خطاف الفحص الشامل: الحظر يطبق على كل الصفحات بدون استثناء
 app.use((req, res, next) => {
   const normalizedPath = stripHtmlExt(req.path);
 
-  // 1. الفحص الشامل: لو اليوزر مسجل دخول ومحظور، يقفل عليه الموقع كامل فوراً وينطرد من أي صفحة
+  // 1. الفحص الشامل للحظر من المنصة
   if (req.session.user) {
     const currentUserId = String(req.session.user.id || req.session.user.user_id || '');
     if (bannedUsers.has(currentUserId)) {
@@ -66,22 +86,19 @@ app.use((req, res, next) => {
     }
   }
 
-  // 2. حماية الصفحات الخاصة بالألعاب فقط لمنع غير المصرح لهم (الوايت لست)
+  // 2. حماية الصفحات الخاصة بالألعاب فقط (الوايت لست)
   if (!PROTECTED_PAGES.includes(normalizedPath)) {
-    return next(); // الصفحات المفتوحة (مثل zlf) تكمل طبيعي لو مو محظور الحساب
+    return next();
   }
 
   if (!req.session.user) {
     return res.redirect('/logintab.html');
   }
 
-  // لو القائمة فاضية بالكامل، نسمح لأي حد مسجل دخول (وضع مفتوح مؤقت)
-  if (allowedUsersList.length === 0) {
-    return next();
-  }
+  const username = (req.session.user.name || '').toString();
 
-  const username = (req.session.user.name || '').toString().toLowerCase();
-  if (!allowedUsersList.includes(username)) {
+  // دالة الفحص الذكية (تفحص الـ .env + الأدمن)
+  if (!isUserWhitelisted(username)) {
     return res.status(403).send(`
       <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
         <div>
@@ -103,26 +120,25 @@ app.get('/api/check-ban-status', (req, res) => {
   res.json({ banned: bannedUsers.has(currentUserId) });
 });
 
-// ===== يخلي أي صفحة HTML تشتغل بدون كتابة .html بالرابط ويجبر عرضها بدلاً من تحميلها =====
+// تشغيل صفحات الـ HTML بدون امتداد
 app.use((req, res, next) => {
   if (req.path === '/' || req.path.includes('.')) {
-    return next(); // فيه امتداد أصلاً أو الصفحة الرئيسية، تجاهل
+    return next();
   }
   const htmlPath = path.join(__dirname, 'Public', req.path + '.html');
   if (fs.existsSync(htmlPath)) {
-    return res.sendFile(htmlPath); // يرسل ملف الـ HTML مباشرة لفتحه في المتصفح
+    return res.sendFile(htmlPath);
   }
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'Public'))); // مجلد الملفات العامة
+app.use(express.static(path.join(__dirname, 'Public')));
 
-// ===== 0) المسار الرئيسي: التوجيه المباشر للواجهة الجديدة zlf بدون .html =====
 app.get('/', (req, res) => {
   res.redirect('/zlf');
 });
 
-// ===== دوال مساعدة لـ PKCE =====
+// دوال مساعدة لـ PKCE
 function base64url(buffer) {
   return buffer.toString('base64')
     .replace(/\+/g, '-')
@@ -139,7 +155,7 @@ function generateCodeChallenge(verifier) {
   return base64url(hash);
 }
 
-// ===== 1) صفحة تبدأ تسجيل الدخول =====
+// 1) صفحة تبدأ تسجيل الدخول
 app.get('/login', (req, res) => {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = generateCodeChallenge(codeVerifier);
@@ -169,7 +185,7 @@ app.get('/login', (req, res) => {
   res.redirect(authUrl.toString());
 });
 
-// ===== 2) نقطة الرجوع (Callback) =====
+// 2) نقطة الرجوع (Callback)
 app.get('/callback', async (req, res) => {
   const { code, state } = req.query;
 
@@ -226,7 +242,7 @@ app.get('/callback', async (req, res) => {
   }
 });
 
-// ===== 3) APIs جلب البيانات =====
+// 3) APIs جلب البيانات
 app.get('/api/chatroom', async (req, res) => {
   if (!req.session.user || !req.session.accessToken) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً' });
@@ -279,13 +295,13 @@ app.get('/api/me', (req, res) => {
   res.json({ loggedIn: true, user: updatedUser });
 });
 
-// ===== 4) تسجيل الخروج =====
+// 4) تسجيل الخروج
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/logintab.html'));
 });
 
 // =====================================================
-// ===============  تاب الأدمن وبقية الـ APIs  ===========
+// ===============  تاب الأدمن وبقية الـ APIs ===========
 // =====================================================
 
 function requireAdmin(req, res, next) {
@@ -329,7 +345,39 @@ app.get('/admin/api/users', requireAdmin, (req, res) => {
   res.json({ users: usersList });
 });
 
-// ⭐ API تنفيذ حظر المستخدم من المنصة بالكامل
+// ⭐ APIs التحكم بالوايت لست المباشرة من الأدمن
+app.get('/admin/api/whitelist', requireAdmin, (req, res) => {
+  // يجمع كل المسموحين حالياً لتنسيق العرض بالأدمن
+  const currentList = Array.from(new Set([...envAllowedUsers, ...customAddedUsers]))
+    .filter(u => !customRemovedUsers.has(u));
+  res.json({ whitelist: currentList });
+});
+
+app.post('/admin/api/whitelist/add', requireAdmin, (req, res) => {
+  const { username } = req.body;
+  if (!username || !username.trim()) return res.status(400).json({ error: 'لازم تحدد اسم اليوزر' });
+  
+  const cleanName = username.trim().toLowerCase();
+  customRemovedUsers.delete(cleanName);
+  customAddedUsers.add(cleanName);
+  
+  console.log(`✅ [Whitelist Add] تم إضافة اليوزر: ${cleanName} للوايت لست من لوحة الأدمن.`);
+  res.json({ ok: true, message: 'تم إضافة المستخدم بنجاح' });
+});
+
+app.post('/admin/api/whitelist/remove', requireAdmin, (req, res) => {
+  const { username } = req.body;
+  if (!username || !username.trim()) return res.status(400).json({ error: 'لازم تحدد اسم اليوزر' });
+  
+  const cleanName = username.trim().toLowerCase();
+  customAddedUsers.delete(cleanName);
+  customRemovedUsers.add(cleanName);
+  
+  console.log(`🗑️ [Whitelist Remove] تم إزالة اليوزر: ${cleanName} من الوايت لست من لوحة الأدمن.`);
+  res.json({ ok: true, message: 'تم إزالة المستخدم بنجاح' });
+});
+
+// API تنفيذ حظر المنصة
 app.post('/admin/api/site-ban', requireAdmin, (req, res) => {
   const { userId } = req.body;
   if (!userId) return res.status(400).json({ error: 'لازم تحدد ID المستخدم' });
@@ -339,7 +387,6 @@ app.post('/admin/api/site-ban', requireAdmin, (req, res) => {
   res.json({ ok: true, message: 'تم الحظر من الموقع' });
 });
 
-// ⭐ API فك حظر المستخدم من المنصة
 app.post('/admin/api/site-unban', requireAdmin, (req, res) => {
   const { userId } = req.body;
   if (!userId) return res.status(400).json({ error: 'لازم تحدد ID المستخدم' });
