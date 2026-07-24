@@ -34,7 +34,74 @@
     margin-bottom: -55px;
   }
 
-  /* قسم الفلترة والبحث الجديد */
+  /* قسم إمدادات الوايت لست والفلترة */
+  .glass-card {
+    background: rgba(10, 17, 40, 0.45) !important; 
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 16px; 
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .whitelist-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .whitelist-controls input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 9px 14px;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 220px;
+    font-size: 0.85rem;
+    outline: none;
+  }
+  .whitelist-controls input:focus { border-color: #3b82f6; }
+
+  .wl-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .wl-tag {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #93c5fd;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .wl-tag .remove-btn {
+    cursor: pointer;
+    color: #ff5c5c;
+    font-weight: bold;
+  }
+
+  /* قسم الفلترة والبحث */
   .filter-container {
     padding: 16px;
     margin-bottom: 20px;
@@ -69,7 +136,6 @@
 
   .stats { color:#929dae; font-size:0.9rem; font-weight: bold; }
   
-  /* تأثير الـ Glassmorphism الأساسي للأقسام والجدول */
   table, .filter-container { 
     background: rgba(10, 17, 40, 0.45) !important; 
     backdrop-filter: blur(12px) !important;
@@ -88,7 +154,6 @@
   .user-cell { display:flex; align-items:center; gap:10px; }
   .user-cell img { width:32px; height:32px; border-radius:50%; border: 1px solid rgba(255,255,255,0.1); }
   
-  /* لمبة الحالة المضيئة نيون */
   .status-dot {
     display: inline-block;
     width: 9px;
@@ -113,7 +178,6 @@
   .msg-input { padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.25); color:#fff; width:220px; font-size:0.85rem; }
   .msg-input:focus { border-color: rgba(255,255,255,0.25); outline: none; }
   
-  /* أزرار الماكرو الجاهزة للأوامر السريعة */
   .chat-macros { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; max-width: 220px; }
   .macro-btn {
     background: rgba(255, 255, 255, 0.06);
@@ -149,6 +213,8 @@
   button.mini-btn.ban { background:#ff5c5c; color:#fff; }
   button.mini-btn.unban { background:#333; color:#fff; }
   button.mini-btn.chan { background:#3b82f6; color:#fff; }
+  button.mini-btn.add-wl { background:#3b82f6; color:#fff; }
+  button.mini-btn.rem-wl { background:#ef4444; color:#fff; }
   button.mini-btn:disabled { opacity:0.5; cursor:wait; }
   .section-label { color:#929dae; font-size:0.72rem; margin-top:4px; }
 </style>
@@ -161,6 +227,19 @@
 
   <div class="alert-box" id="botAlert">
     <span>⚠️ ما حددت بوت الموقع بعد. سجّل دخول بأي حساب Kick تبي يكون البوت عبر صفحة تسجيل الدخول العادية، وبعدها اضغط "اجعله بوت الموقع" من قائمة الخيارات بالجدول.</span>
+  </div>
+
+  <!-- ⭐ قسم إدارة الوايت لست الجديد ⭐ -->
+  <div class="glass-card">
+    <div class="card-title">🛡️ إدارة الوايت لست (Whitelist)</div>
+    <div class="whitelist-controls">
+      <input type="text" id="wlInput" placeholder="اكتب اسم يوزر Kick المسموح له بالدخول...">
+      <button class="mini-btn add-wl" onclick="handleWhitelistAdd()">إضافة مسموح ✅</button>
+      <button class="mini-btn rem-wl" onclick="handleWhitelistRemove()">حذف / منع ❌</button>
+    </div>
+    <div class="wl-tags-container" id="wlTagsContainer">
+      <!-- يتم تعبئة اليوزرات المسموحة هنا -->
+    </div>
   </div>
 
   <div class="filter-container">
@@ -212,6 +291,78 @@ function insertMacro(userId, text) {
   }
 }
 
+// ===== 1) جلب وإدارة الوايت لست =====
+async function loadWhitelist() {
+  try {
+    const res = await fetch('/admin/api/whitelist');
+    if (!res.ok) return;
+    const data = await res.json();
+    const container = document.getElementById('wlTagsContainer');
+    container.innerHTML = '';
+
+    if (!data.whitelist || data.whitelist.length === 0) {
+      container.innerHTML = '<span style="color:#929dae; font-size:0.8rem;">لا توجد تقييدات حالياً (الجميع مسموح لهم بدخول الألعاب).</span>';
+      return;
+    }
+
+    data.whitelist.forEach(username => {
+      const tag = document.createElement('div');
+      tag.className = 'wl-tag';
+      tag.innerHTML = `
+        <span>${username}</span>
+        <span class="remove-btn" title="حذف" onclick="removeWlTag('${username}')">✕</span>
+      `;
+      container.appendChild(tag);
+    });
+  } catch (err) {
+    console.error('فشل جلب الوايت لست:', err);
+  }
+}
+
+async function handleWhitelistAdd() {
+  const input = document.getElementById('wlInput');
+  const username = input.value.trim();
+  if (!username) { showToast('يرجى كتابة اسم اليوزر أولاً', false); return; }
+
+  const res = await fetch('/admin/api/whitelist/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username })
+  });
+  const data = await res.json();
+  if (res.ok) {
+    showToast(`تمت إضافة ${username} للوايت لست ✅`, true);
+    input.value = '';
+    loadWhitelist();
+  } else {
+    showToast(data.error || 'حدث خطأ أثناء الإضافة', false);
+  }
+}
+
+async function handleWhitelistRemove() {
+  const input = document.getElementById('wlInput');
+  const username = input.value.trim();
+  if (!username) { showToast('يرجى كتابة اسم اليوزر أولاً', false); return; }
+  await removeWlTag(username);
+  input.value = '';
+}
+
+async function removeWlTag(username) {
+  const res = await fetch('/admin/api/whitelist/remove', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username })
+  });
+  const data = await res.json();
+  if (res.ok) {
+    showToast(`تم إزالة ${username} من الوايت لست ❌`, true);
+    loadWhitelist();
+  } else {
+    showToast(data.error || 'حدث خطأ أثناء الإزالة', false);
+  }
+}
+
+// ===== 2) جلب وخدمات المستخدمين =====
 async function loadUsers() {
   const res = await fetch('/admin/api/users');
   if (res.status === 401) { window.location.href = '/admin/login'; return; }
@@ -231,8 +382,6 @@ async function loadUsers() {
   users.forEach((u) => {
     const userStatus = u.is_online || true; 
     const statusClass = userStatus ? 'online' : 'offline';
-    
-    // التحقق هل اليوزر محظور من الموقع أصلاً لتحديد نص ولون الزر
     const isSiteBanned = u.is_site_banned || false; 
 
     const tr = document.createElement('tr');
@@ -292,7 +441,6 @@ async function loadUsers() {
           <div class="action-row" style="margin-top: 8px; flex-direction: column; gap: 6px;">
              <button class="mini-btn set-bot-btn" data-userid="${u.user_id}" style="background:#22c55e; color:#000; width:100%;">اجعله بوت الموقع 🤖</button>
              
-             <!-- زر حظر المستخدم من المنصة بالكامل في المساحة الفاضية يسار -->
              <button class="mini-btn site-ban-btn" data-userid="${u.user_id}" data-banned="${isSiteBanned}" style="background:${isSiteBanned ? '#333333' : '#ff3b30'}; color:#fff; width:100%;">
                ${isSiteBanned ? 'فك حظر الموقع ✅' : 'حظر من الموقع 🚫'}
              </button>
@@ -314,7 +462,6 @@ async function loadUsers() {
     });
   });
 
-  // تفعيل زر حظر/فك حظر الموقع الجديد برمجياً
   body.querySelectorAll('.site-ban-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const userId = btn.dataset.userid;
@@ -486,6 +633,8 @@ async function loadUsers() {
   });
 }
 
+// تشغيل جلب المسموحين والجدول فور فتح الصفحة
+loadWhitelist();
 loadUsers();
 </script>
 </body>
