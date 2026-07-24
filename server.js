@@ -26,10 +26,8 @@ const {
 } = process.env;
 
 // ===== إدارة الوايت لست (الدمج بين الـ .env والتحكم الديناميكي من الأدمن) =====
-// 1. القراءة الأولى من الـ .env
 const envAllowedUsers = ALLOWED_USERS.split(',').map(u => u.trim().toLowerCase()).filter(Boolean);
 
-// 2. Set ديناميكي يجمع بين يوزرات الـ .env والتعديلات اللحظية من لوحة الأدمن
 let customAddedUsers = new Set();
 let customRemovedUsers = new Set();
 
@@ -37,27 +35,22 @@ function isUserWhitelisted(username) {
   if (!username) return false;
   const cleanName = username.toLowerCase().trim();
 
-  // إذا تم حذفه من لوحة الأدمن يدوياً
   if (customRemovedUsers.has(cleanName)) return false;
-
-  // إذا تم إضافته من لوحة الأدمن يدوياً
   if (customAddedUsers.has(cleanName)) return true;
-
-  // إذا كانت القائمة الأساسية بالكامل فارغة (وضع مفتوح)
   if (envAllowedUsers.length === 0 && customAddedUsers.size === 0) return true;
 
-  // الفحص في قائمة الـ .env الأصلية
   return envAllowedUsers.includes(cleanName);
 }
 
 // ===== إعداد الجلسة (Session) =====
-app.use(session({
+const sessionMiddleware = session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { httpOnly: true, sameSite: 'lax' }
-}));
+});
 
+app.use(sessionMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -72,9 +65,11 @@ app.use((req, res, next) => {
   const normalizedPath = stripHtmlExt(req.path);
 
   // 1. الفحص الشامل للحظر من المنصة
-  if (req.session.user) {
+  if (req.session && req.session.user) {
     const currentUserId = String(req.session.user.id || req.session.user.user_id || '');
     if (bannedUsers.has(currentUserId)) {
+      // تدمير الجلسة لضمان عدم استمرار الدخول
+      req.session.destroy();
       return res.status(403).send(`
         <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
           <div>
@@ -97,7 +92,6 @@ app.use((req, res, next) => {
 
   const username = (req.session.user.name || '').toString();
 
-  // دالة الفحص الذكية (تفحص الـ .env + الأدمن)
   if (!isUserWhitelisted(username)) {
     return res.status(403).send(`
       <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
@@ -115,9 +109,17 @@ app.use((req, res, next) => {
 
 // ممر خاص بالـ Real-time لطرد المستخدم حياً عند استدعائه
 app.get('/api/check-ban-status', (req, res) => {
-  if (!req.session.user) return res.json({ banned: false });
+  if (!req.session || !req.session.user) {
+    return res.json({ banned: false, loggedIn: false });
+  }
   const currentUserId = String(req.session.user.id || req.session.user.user_id || '');
-  res.json({ banned: bannedUsers.has(currentUserId) });
+  const isBanned = bannedUsers.has(currentUserId);
+  
+  if (isBanned) {
+    req.session.destroy();
+  }
+  
+  res.json({ banned: isBanned, loggedIn: true });
 });
 
 // تشغيل صفحات الـ HTML بدون امتداد
@@ -229,6 +231,15 @@ app.get('/callback', async (req, res) => {
     });
     const userData = await userRes.json();
     const profile = userData?.data?.[0] || null;
+    
+    // التحقق من الحظر أثناء تسجيل الدخول
+    if (profile) {
+      const pId = String(profile.id || profile.user_id || '');
+      if (bannedUsers.has(pId)) {
+        return res.status(403).send('🚫 حسابك محظور من دخول هذه المنصة.');
+      }
+    }
+
     req.session.user = profile;
 
     if (profile) {
@@ -333,7 +344,8 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/admin/login');
 });
 
-app.get('/admin', requireAdmin, (req, res) => {
+app.get('/admin/
+', requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin', 'dashboard.html'));
 });
 
@@ -345,9 +357,7 @@ app.get('/admin/api/users', requireAdmin, (req, res) => {
   res.json({ users: usersList });
 });
 
-// ⭐ APIs التحكم بالوايت لست المباشرة من الأدمن
 app.get('/admin/api/whitelist', requireAdmin, (req, res) => {
-  // يجمع كل المسموحين حالياً لتنسيق العرض بالأدمن
   const currentList = Array.from(new Set([...envAllowedUsers, ...customAddedUsers]))
     .filter(u => !customRemovedUsers.has(u));
   res.json({ whitelist: currentList });
@@ -377,14 +387,33 @@ app.post('/admin/api/whitelist/remove', requireAdmin, (req, res) => {
   res.json({ ok: true, message: 'تم إزالة المستخدم بنجاح' });
 });
 
-// API تنفيذ حظر المنصة
+// ⭐ API تنفيذ حظر المنصة بالطرد الفوري 🔥
 app.post('/admin/api/site-ban', requireAdmin, (req, res) => {
   const { userId } = req.body;
   if (!userId) return res.status(400).json({ error: 'لازم تحدد ID المستخدم' });
   
-  bannedUsers.add(String(userId));
-  console.log(`🚫 [Platform Ban] تم حظر المستخدم ذو الـ ID: ${userId} من دخول الموقع.`);
-  res.json({ ok: true, message: 'تم الحظر من الموقع' });
+  const targetId = String(userId);
+  bannedUsers.add(targetId);
+
+  // 💥 تدمير جلسة المستخدم فوراً من ذاكرة السيرفر
+  if (req.sessionStore && typeof req.sessionStore.all === 'function') {
+    req.sessionStore.all((err, sessions) => {
+      if (!err && sessions) {
+        Object.keys(sessions).forEach((sid) => {
+          const sess = sessions[sid];
+          if (sess.user) {
+            const uId = String(sess.user.id || sess.user.user_id || '');
+            if (uId === targetId) {
+              req.sessionStore.destroy(sid, () => {});
+            }
+          }
+        });
+      }
+    });
+  }
+
+  console.log(`🚫 [Platform Ban] تم حظر وقطع جلسة المستخدم ID: ${targetId} فوراً.`);
+  res.json({ ok: true, message: 'تم الحظر والطرد الفوري من الموقع' });
 });
 
 app.post('/admin/api/site-unban', requireAdmin, (req, res) => {
