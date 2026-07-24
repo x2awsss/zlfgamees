@@ -482,13 +482,6 @@
             cursor: pointer; transition: 0.25s;
         }
         .picker-btn:hover { border-color: #eab308; background: rgba(234,179,8,0.1); transform: translateY(-2px); }
-        .picker-btn .persona-avatar-mini {
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
 
         .num-badge {
             background: rgba(83,252,24,0.15); color: #53fc18;
@@ -518,10 +511,9 @@
         }
         /* بطاقة الشخصية الكبيرة وقت الطرد/الإنعاش + أنيميشن فليب */
         .shoot-scene .persona-avatar-big {
-            width: 150px; height: 150px;
+            width: 120px; height: 120px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 4.5rem;
             box-shadow: 0 0 30px rgba(255,255,255,0.3);
             border: 4px solid rgba(255,255,255,0.2);
             transition: transform 0.4s ease, opacity 0.4s ease;
@@ -953,7 +945,7 @@
                 alive.forEach(p => {
                     const btn = document.createElement('button');
                     btn.className = 'picker-btn';
-                    btn.innerHTML = `<span class="num-badge">${p.number}</span> <div class="persona-avatar-mini" style="background:${colorFor(p.number)}">🧑</div> ${p.name}`;
+                    btn.innerHTML = `<span class="num-badge">${p.number}</span> ${p.name}`;
                     btn.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
                     pickerGrid.appendChild(btn);
                 });
@@ -972,11 +964,11 @@
                 eligibleDead.forEach(p => {
                     const btn = document.createElement('button');
                     btn.className = 'picker-btn';
-                    btn.innerHTML = `<span class="num-badge">${p.number}</span> <div class="persona-avatar-mini" style="background:${colorFor(p.number)}">💀</div> ${p.name}`;
+                    btn.innerHTML = `<span class="num-badge">${p.number}</span> ${p.name}`;
                     btn.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
                     pickerGrid.appendChild(btn);
                 });
-                pickerInstr.textContent = 'اختر شخص تنعشه، اكتب رقمه بالشات (فرصة وحدة بس لكل شخص)';
+                pickerInstr.textContent = 'اختر شخص تنعشه، اكتب رقمه بالشات — أو اكتب "طرد" لو تبي ترجع لقائمة الطرد';
 
                 reviveToggleWrap.style.display = 'block';
                 reviveToggleBtn.textContent = '🔙 رجوع لقائمة الطرد';
@@ -1020,6 +1012,12 @@
                 pickerOverlay.classList.remove('show');
                 openActionOverlay('kill', picked);
             } else {
+                if (msg === 'طرد') {
+                    pickMode = 'kill';
+                    renderPickerGrid();
+                    return;
+                }
+
                 const eligibleDead = players.filter(p => p.dead && !p.revived);
                 let picked = null;
                 if (/^\d+$/.test(msg)) {
@@ -1042,7 +1040,7 @@
 
             targetPersonaElement.className = 'persona-avatar-big flip-in';
             targetPersonaElement.style.background = colorFor(targetPlayer.number);
-            targetPersonaElement.textContent = type === 'kill' ? '🧑' : '💀';
+            targetPersonaElement.textContent = '';
 
             shootTargetName.textContent = targetPlayer.name;
             resultMsg.textContent = '';
@@ -1066,7 +1064,7 @@
 
         function resolveKill(target) {
             playEliminationSound();
-            targetPersonaElement.textContent = '💀';
+            targetPersonaElement.textContent = '';
             targetPersonaElement.classList.add('fallen');
             target.dead = true;
 
@@ -1093,7 +1091,7 @@
 
         function resolveRevive(target) {
             playRevivalSound();
-            targetPersonaElement.textContent = '💚';
+            targetPersonaElement.textContent = '';
             targetPersonaElement.classList.add('revived-pop');
             target.dead = false;
             target.revived = true;
