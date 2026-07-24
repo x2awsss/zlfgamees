@@ -281,7 +281,6 @@
 
         .floor-scene { position: relative; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; }
         
-        /* ⭐ حل مشكلة صغر المربعات: تحويل الأرضية لنظام المرونة المتعدد الأسطر ⭐ */
         .floor {
             display: flex !important;
             flex-wrap: wrap !important;
@@ -351,7 +350,7 @@
             border-radius: 0 0 8px 8px; border: 1px solid rgba(255,255,255,0.08); border-top: none;
         }
 
-        /* ===================== نوافذ منبثقة ===================== */
+        /* ===================== نوافذ منبثقة والعد التنازلي ===================== */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
@@ -366,6 +365,41 @@
             animation: popIn 0.35s ease;
         }
         @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* ⭐ عد تنازلي متطور للجولة ⭐ */
+        #countdownOverlay {
+            background: rgba(5, 8, 22, 0.88);
+            backdrop-filter: blur(8px);
+            z-index: 150;
+        }
+        .countdown-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .round-announce {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #f2b632;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(242,182,50,0.5);
+            letter-spacing: 1px;
+        }
+        .countdown-number {
+            font-size: 7rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 50px rgba(83,252,24,0.6);
+            animation: pulseScale 0.8s ease-in-out infinite alternate;
+            line-height: 1;
+        }
+        @keyframes pulseScale {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            100% { transform: scale(1.15); opacity: 1; }
+        }
+
         .modal-eyebrow { color: #f2b632; font-size: 0.95rem; margin-bottom: 10px; opacity: 0.85; }
         .modal-big-name { font-size: 1.7rem; font-weight: 900; color: #fff; margin-bottom: 14px; }
         .modal-instr { color: #929dae; font-size: 0.88rem; margin-bottom: 18px; line-height: 1.7; }
@@ -503,13 +537,21 @@
                         <div class="floor-base"></div>
                     </div>
                 </div>
-                <button class="action-btn next" id="nextRoundBtn" onclick="beginCountdown()" disabled>▶️ ابدأ الجولة</button>
+                <button class="action-btn next" id="nextRoundBtn" onclick="startCountdownSequence()" disabled>▶️ الجولة التالية</button>
             </div>
 
             <div class="players-panel">
                 <div class="players-panel-title">المشاركون</div>
                 <div class="fancy-grid" id="fancyGrid"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- ===================== نافذة العد التنازلي التلقائي ===================== -->
+    <div class="overlay" id="countdownOverlay">
+        <div class="countdown-box">
+            <div class="round-announce" id="roundAnnounceTitle">راوند 1</div>
+            <div class="countdown-number" id="countdownVal">3</div>
         </div>
     </div>
 
@@ -643,6 +685,10 @@
         const manageOverlay = document.getElementById('manageOverlay');
         const manageGrid = document.getElementById('manageGrid');
 
+        const countdownOverlay = document.getElementById('countdownOverlay');
+        const roundAnnounceTitle = document.getElementById('roundAnnounceTitle');
+        const countdownVal = document.getElementById('countdownVal');
+
         bestScoreEl.textContent = best;
 
         function addLog(text) { console.log(text); }
@@ -702,7 +748,7 @@
             addPlayer('أنت (اختبار)', 'test_streamer', { isTest: true });
         }
 
-        // ===================== بدء اللعبة =====================
+        // ===================== بدء اللعبة المباشر والتلقائي =====================
         function startGame() {
             if (players.length < 2) return;
             gameStarted = true;
@@ -715,6 +761,9 @@
             updateCounters();
             prepareRound();
             addLog('🎨 بدأت اللعبة');
+            
+            // ⭐ يبدأ العد التنازلي التلقائي للجولة الأولى مباشرة
+            startCountdownSequence();
         }
 
         function newGame() {
@@ -729,6 +778,30 @@
             setupScreen.style.display = 'block';
             renderPendingGrid();
             addLog('🆕 بدأت جولة جديدة');
+        }
+
+        // ===================== تسلسل العد التنازلي التلقائي (3.. 2.. 1) =====================
+        function startCountdownSequence() {
+            if (gameOver) return;
+            nextRoundBtn.disabled = true;
+            roundAnnounceTitle.textContent = `راوند ${round}`;
+            countdownOverlay.classList.add('show');
+            
+            let count = 3;
+            countdownVal.textContent = count;
+
+            const cdInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownVal.textContent = count;
+                } else if (count === 0) {
+                    countdownVal.textContent = 'ابدأ!';
+                } else {
+                    clearInterval(cdInterval);
+                    countdownOverlay.classList.remove('show');
+                    beginRoundGame(); // بداية التايمر والألوان فوراً!
+                }
+            }, 900);
         }
 
         // ===================== شبكة المشاركين =====================
@@ -814,12 +887,10 @@
             const difficultyNote = round < 3 ? '' : ' — الألوان أصبحت أشد تشابهاً!';
             statusLine.textContent = `الجولة ${round} — اختر من 1 إلى ${tileCount} (الوقت: ${sec} ثانية)${difficultyNote}`;
             timerBar.style.width = '100%';
-            nextRoundBtn.disabled = false;
-            nextRoundBtn.textContent = '▶️ ابدأ الجولة';
         }
 
-        // ===================== بدء العد التنازلي =====================
-        function beginCountdown() {
+        // ===================== بدء الجولة الفعلي والتايمر =====================
+        function beginRoundGame() {
             if (gameOver) return;
             nextRoundBtn.disabled = true;
             waitingForPicks = true;
@@ -931,6 +1002,9 @@
             round += 1;
             roundNumEl.textContent = round;
             prepareRound();
+            
+            // ⭐ يبدأ العد التنازلي التلقائي للجولة الجديدة بمجرد إغلاق النتيجة
+            startCountdownSequence();
         }
 
         // ===================== نهاية اللعبة =====================
