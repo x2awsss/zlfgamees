@@ -661,6 +661,13 @@
         .meta-tag.category { color: #eab308; }
         .meta-tag.players { color: #3b82f6; }
 
+        /* تجميد التفاعل مع خيارات أو أزرار الألوان ليصبح للعرض فقط */
+        .color-option, .color-picker, .color-box, [class*="color-"] {
+            pointer-events: none !important;
+            cursor: default !important;
+            user-select: none !important;
+        }
+
         .about-row {
             display: flex;
             align-items: center;
