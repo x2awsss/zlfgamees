@@ -533,6 +533,70 @@
             100% { transform: scale(1); }
         }
 
+        /* ===== أنيميشن الجزمة وقت الطرد ===== */
+        .boot-kick {
+            position: absolute;
+            top: 50%; left: 50%;
+            font-size: 3.4rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 6;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            transform: translate(-170px, -20px) rotate(-40deg) scale(0.8);
+        }
+        .boot-kick.kick-anim {
+            animation: bootKickMove 0.65s cubic-bezier(0.34, 1.5, 0.5, 1) forwards;
+        }
+        @keyframes bootKickMove {
+            0%   { transform: translate(-170px, -20px) rotate(-40deg) scale(0.8); opacity: 0; }
+            18%  { opacity: 1; }
+            45%  { transform: translate(-14px, -10px) rotate(10deg) scale(1.15); opacity: 1; }
+            58%  { transform: translate(14px, -16px) rotate(30deg) scale(1.05); opacity: 1; }
+            100% { transform: translate(160px, -46px) rotate(55deg) scale(0.7); opacity: 0; }
+        }
+
+        /* ===== أنيميشن الإبرة/اللقاح وقت الإنعاش ===== */
+        .syringe-inject {
+            position: absolute;
+            top: 50%; left: 50%;
+            font-size: 3.1rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 6;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            transform: translate(100px, -160px) rotate(-40deg) scale(0.8);
+        }
+        .syringe-inject.inject-anim {
+            animation: syringeMove 0.95s ease forwards;
+        }
+        @keyframes syringeMove {
+            0%   { transform: translate(100px, -160px) rotate(-40deg) scale(0.8); opacity: 0; }
+            22%  { opacity: 1; }
+            48%  { transform: translate(6px, -6px) rotate(-25deg) scale(1); opacity: 1; }
+            60%  { transform: translate(0px, 4px) rotate(-25deg) scale(1.04); opacity: 1; }
+            78%  { transform: translate(0px, 4px) rotate(-25deg) scale(1.04); opacity: 1; }
+            100% { transform: translate(90px, -150px) rotate(-40deg) scale(0.8); opacity: 0; }
+        }
+
+        /* ===== ومضة الأثر (ركلة أو حقنة) ===== */
+        .impact-spark {
+            position: absolute;
+            top: 50%; left: 50%;
+            font-size: 2.3rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 7;
+            transform: translate(-50%, -50%) scale(0.3);
+        }
+        .impact-spark.spark-anim {
+            animation: sparkPop 0.45s ease forwards;
+        }
+        @keyframes sparkPop {
+            0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+            40%  { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.7); opacity: 0; }
+        }
+
         .result-msg { font-size: 1.25rem; font-weight: 900; min-height: 34px; }
         .result-msg.dead { color: #f87171; }
         .result-msg.alive { color: #53fc18; }
@@ -658,6 +722,9 @@
 
             <div class="shoot-scene">
                 <div id="targetPersonaElement" class="persona-avatar-big"></div>
+                <div id="bootKickEl" class="boot-kick">🥾</div>
+                <div id="syringeEl" class="syringe-inject">💉</div>
+                <div id="impactSparkEl" class="impact-spark">💥</div>
             </div>
 
             <div class="result-msg" id="resultMsg"></div>
@@ -727,6 +794,9 @@
         const shootSubtitle = document.getElementById('shootSubtitle');
         const resultMsg = document.getElementById('resultMsg');
         const targetPersonaElement = document.getElementById('targetPersonaElement');
+        const bootKickEl = document.getElementById('bootKickEl');
+        const syringeEl = document.getElementById('syringeEl');
+        const impactSparkEl = document.getElementById('impactSparkEl');
         const shootCloseBtn = document.getElementById('shootCloseBtn');
 
         const manageOverlay = document.getElementById('manageOverlay');
@@ -1047,15 +1117,33 @@
             resultMsg.className = 'result-msg';
             shootCloseBtn.style.display = 'none';
 
+            // إعادة ضبط أنيميشن الجزمة/الإبرة/الومضة قبل التشغيل من جديد
+            bootKickEl.classList.remove('kick-anim');
+            syringeEl.classList.remove('inject-anim');
+            impactSparkEl.classList.remove('spark-anim');
+            void bootKickEl.offsetWidth;
+
             if (type === 'kill') {
                 addLog(`⚔️ #${chooser.number} ${chooser.name} اختار يطرد ${targetPlayer.name}`);
                 shootEyebrow.textContent = '⚔️ جارٍ الطرد';
                 shootSubtitle.textContent = 'جارٍ تنفيذ الطرد...';
+                bootKickEl.classList.add('kick-anim');
+                setTimeout(() => {
+                    impactSparkEl.classList.remove('spark-anim');
+                    void impactSparkEl.offsetWidth;
+                    impactSparkEl.classList.add('spark-anim');
+                }, 300);
                 setTimeout(() => resolveKill(targetPlayer), 1400);
             } else {
                 addLog(`💚 #${chooser.number} ${chooser.name} اختار ينعش ${targetPlayer.name}`);
                 shootEyebrow.textContent = '✨ جارٍ الإنعاش';
                 shootSubtitle.textContent = 'جارٍ إرجاع الروح...';
+                syringeEl.classList.add('inject-anim');
+                setTimeout(() => {
+                    impactSparkEl.classList.remove('spark-anim');
+                    void impactSparkEl.offsetWidth;
+                    impactSparkEl.classList.add('spark-anim');
+                }, 460);
                 setTimeout(() => resolveRevive(targetPlayer), 1400);
             }
 
