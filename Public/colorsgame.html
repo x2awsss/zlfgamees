@@ -201,7 +201,7 @@
 
         .arena-col { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1 1 680px; min-width: 0; }
 
-        /* ⭐ توسيع صندوق قائمة المشاركين (اليسار) ⭐ */
+        /* ⭐ صندوق قائمة المشاركين ⭐ */
         .players-panel {
             background: rgba(15, 20, 32, 0.5);
             border: 1.5px solid rgba(83,252,24,0.35);
@@ -224,7 +224,6 @@
             align-items: center !important; justify-content: space-between !important;
             gap: 6px !important; transition: 0.3s !important; position: relative !important;
         }
-        /* ⭐ جعل الشفافية على الاسم والكرت عند الموت ⭐ */
         .fancy-chip.dead { opacity: 0.25 !important; border-color: rgba(255,255,255,0.03) !important; }
         .fancy-chip.picked { border-color: #f2b632 !important; box-shadow: 0 0 10px rgba(242,182,50,0.35) !important; }
         .fancy-chip .persona-row { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
@@ -378,7 +377,6 @@
         .result-chip.out .num { color: #f87171; }
         .result-chip .lbl { font-size: 0.72rem; color: #929dae; }
 
-        /* ⭐ ترتيب وتنسيق أسر الموتى والناجين في قائمة النتائج ⭐ */
         .modal-next-btn {
             width: 100%;
             background: linear-gradient(135deg, #a855f7, #7c3aed);
@@ -510,7 +508,7 @@
                 </div>
             </div>
 
-            <!-- ⭐ القائمة الجانبية الموّسعة جهة اليسار ⭐ -->
+            <!-- ⭐ القائمة الجانبية جهة اليسار ⭐ -->
             <div class="players-panel">
                 <div class="players-panel-title">المشاركون</div>
                 <div class="fancy-grid" id="fancyGrid"></div>
@@ -526,7 +524,7 @@
         </div>
     </div>
 
-    <!-- ===================== نافذة نتيجة الجولة المحدثة بالكامل ===================== -->
+    <!-- ===================== نافذة نتيجة الجولة ===================== -->
     <div class="overlay" id="roundResultOverlay">
         <div class="modal-card">
             <div class="modal-eyebrow">⚡ نتيجة الجولة</div>
@@ -537,10 +535,8 @@
                 <div class="result-chip out"><div class="num" id="eliminatedNum">0</div><div class="lbl">طاحوا</div></div>
             </div>
 
-            <!-- ⭐ زر الجولة التالية في الأعلى ⭐ -->
             <button class="modal-next-btn" id="continueBtn" onclick="closeRoundResult()">▶️ الجولة التالية</button>
 
-            <!-- ⭐ أسماء الناجين والمستبعدين مرتبة ومفصلة تحت الزر ⭐ -->
             <div class="round-lists-wrapper">
                 <div class="list-section">
                     <div class="list-title survived">🟢 الناجون في هذه الجولة:</div>
@@ -764,7 +760,7 @@
             }, 900);
         }
 
-        // ===================== شبكة المشاركين المعدلة (بدون جمجمة) =====================
+        // ===================== شبكة المشاركين =====================
         function renderFancyGrid() {
             fancyGrid.innerHTML = '';
             players.forEach(p => {
@@ -777,7 +773,6 @@
                 const pickBadge = (waitingForPicks && picks[p.id] !== undefined)
                     ? `<span class="pick-badge">${picks[p.id]}</span>` : '';
 
-                /* ⭐ بدون جمجمة، فقط الشفافية للـ dead وإلغاء النقطة الخضراء ⭐ */
                 chip.innerHTML = `
                     <div class="persona-row">
                         <span class="k-icon">${p.isBot ? '🤖' : (p.isTest ? '🎥' : 'K')}</span>
@@ -861,7 +856,7 @@
             players.forEach(p => {
                 if (p.isBot && p.alive) {
                     const willBeCorrect = Math.random() < 0.42;
-                    picks[p.id] = willBeCorrect ? correctNumber : randomWrongNumber();
+                    registerPick(p.id, willBeCorrect ? correctNumber : randomWrongNumber());
                 }
             });
 
@@ -885,20 +880,38 @@
             return n;
         }
 
-        // ===================== استقبال الاختيار =====================
+        // ===================== تحديث أعداد المتواجدين فوق كل لون =====================
+        function updateTileOccupants() {
+            const counts = {};
+            for (let i = 1; i <= tileCount; i++) counts[i] = 0;
+
+            Object.values(picks).forEach(num => {
+                if (counts[num] !== undefined) counts[num]++;
+            });
+
+            for (let i = 1; i <= tileCount; i++) {
+                const occ = document.getElementById('occ-' + i);
+                if (occ) {
+                    if (counts[i] > 0) {
+                        occ.textContent = counts[i];
+                        occ.style.display = 'inline-block';
+                    } else {
+                        occ.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // ===================== استقبال وتغيير الاختيار =====================
         function registerPick(playerId, num) {
             if (!waitingForPicks) return;
             const player = players.find(p => String(p.id) === String(playerId));
             if (!player || !player.alive) return;
-            if (picks[player.id] !== undefined) return;
+
+            // تسجيل أو تغيير الاختيار قبل انتهاء الوقت
             picks[player.id] = num;
 
-            const occ = document.getElementById('occ-' + num);
-            if (occ) {
-                const current = parseInt(occ.textContent, 10) || 0;
-                occ.textContent = current + 1;
-                occ.style.display = 'inline-block';
-            }
+            updateTileOccupants();
             renderFancyGrid();
         }
 
@@ -931,7 +944,7 @@
                 let eliminatedList = [];
 
                 players.forEach(p => {
-                    if (!p.alive) return; // تم استبعاده سابقاً
+                    if (!p.alive) return;
                     
                     const userPick = picks[p.id];
                     if (userPick === correctNumber) {
@@ -953,7 +966,6 @@
                     return;
                 }
 
-                /* ⭐ تعبئة قوائم النتائج بأسلوب مرتب وشيك ⭐ */
                 roundResultTitle.textContent = `نهاية الجولة ${round}`;
                 survivedNum.textContent = survivedList.length;
                 eliminatedNum.textContent = eliminatedList.length;
