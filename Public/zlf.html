@@ -374,6 +374,44 @@
             white-space: nowrap;
         }
 
+        /* تخصيص الثيم الأخضر لـ Kick */
+        .user-avatar-wrapper.kick-user {
+            background: rgba(83, 252, 24, 0.15);
+            border: 2px solid #53fc18;
+            box-shadow: 0 0 18px rgba(83, 252, 24, 0.35);
+        }
+        .user-avatar-wrapper.kick-user:hover {
+            background: rgba(83, 252, 24, 0.25);
+            box-shadow: 0 0 25px rgba(83, 252, 24, 0.7);
+        }
+        .user-avatar-wrapper.kick-user img {
+            border: 2px solid #53fc18;
+            box-shadow: 0 0 10px rgba(83, 252, 24, 0.6);
+        }
+        .user-avatar-wrapper.kick-user span {
+            color: #53fc18;
+            text-shadow: 0 0 8px rgba(83, 252, 24, 0.5);
+        }
+
+        /* تخصيص الثيم البنفسجي لـ Twitch */
+        .user-avatar-wrapper.twitch-user {
+            background: rgba(145, 70, 255, 0.15);
+            border: 2px solid #9146ff;
+            box-shadow: 0 0 18px rgba(145, 70, 255, 0.35);
+        }
+        .user-avatar-wrapper.twitch-user:hover {
+            background: rgba(145, 70, 255, 0.25);
+            box-shadow: 0 0 25px rgba(145, 70, 255, 0.7);
+        }
+        .user-avatar-wrapper.twitch-user img {
+            border: 2px solid #9146ff;
+            box-shadow: 0 0 10px rgba(145, 70, 255, 0.6);
+        }
+        .user-avatar-wrapper.twitch-user span {
+            color: #9146ff;
+            text-shadow: 0 0 8px rgba(145, 70, 255, 0.5);
+        }
+
         .user-dropdown {
             position: absolute;
             top: calc(100% + 10px);
@@ -1453,9 +1491,14 @@
                 .then(data => {
                     if (data.loggedIn && data.user) {
                         const user = data.user;
+                        // تحديد الكلاس بناءً على المنصة (تويتش أو كيك)
+                        const provider = (user.provider || '').toLowerCase();
+                        const isTwitch = provider.includes('twitch');
+                        const userClass = isTwitch ? 'twitch-user' : 'kick-user';
+
                         authArea.innerHTML = `
                             <div class="user-menu">
-                                <button type="button" id="user-menu-toggle" class="user-avatar-wrapper" title="القائمة">
+                                <button type="button" id="user-menu-toggle" class="user-avatar-wrapper ${userClass}" title="القائمة">
                                     <img src="${user.profile_picture || ''}" alt="${user.name || 'المستخدم'}">
                                     <span>${user.name || 'المستخدم'}</span>
                                 </button>
@@ -1528,4 +1571,3 @@
     <script src="/ban-checker.js"></script>
 </body>
 </html>
-```[cite: 6]
