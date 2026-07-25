@@ -236,7 +236,7 @@
             transform: translateY(-3px);
         }
 
-        /* ===== تعديلات منطقة تسجيل الدخول الجديدة ===== */
+        /* ===== منطقة تسجيل الدخول المصممة بالتأثير الأزرق الشاع ===== */
         .auth-area {
             display: flex;
             align-items: center;
@@ -255,10 +255,12 @@
             transition: all 0.3s ease;
         }
 
+        /* تأثير إشعاع أزرق فخم للزر عند التمرير */
         .login-multi-container:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: scale(1.02);
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), inset 0 0 10px rgba(59, 130, 246, 0.2);
+            transform: scale(1.03);
         }
 
         .login-label {
@@ -266,6 +268,12 @@
             font-weight: 700;
             color: #d1d5db;
             white-space: nowrap;
+            transition: color 0.3s ease;
+        }
+
+        .login-multi-container:hover .login-label {
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
         }
 
         .login-separator {
@@ -293,19 +301,18 @@
 
         .icon-login-btn.kick {
             background: rgba(83, 252, 24, 0.15);
-            color: #53fc18;
             border: 1px solid rgba(83, 252, 24, 0.5);
-            overflow: hidden;
         }
 
         .icon-login-btn.kick img {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             object-fit: contain;
+            filter: drop-shadow(0 0 4px #53fc18);
         }
 
         .icon-login-btn.kick:hover {
-            background: #53fc18;
+            background: rgba(83, 252, 24, 0.3);
             box-shadow: 0 0 15px rgba(83, 252, 24, 0.6);
             transform: scale(1.1);
         }
@@ -695,12 +702,6 @@
         .meta-tag.category { color: #eab308; }
         .meta-tag.players { color: #3b82f6; }
 
-        .color-option, .color-picker, .color-box, [class*="color-"] {
-            pointer-events: none !important;
-            cursor: default !important;
-            user-select: none !important;
-        }
-
         .about-row {
             display: flex;
             align-items: center;
@@ -1086,13 +1087,13 @@
             <li><a href="#socials" class="nav-item">حسابات زلف</a></li>
         </ul>
 
-        <!-- منطقة تسجيل الدخول الجديدة المعدلة برابط إلى logintab بدون .html -->
+        <!-- منطقة تسجيل الدخول بتأثير الإشعاع الأزرق وشعار كيك الأصلي -->
         <div id="auth-area" class="auth-area">
             <a href="logintab" class="login-multi-container">
                 <span class="login-label">تسجيل الدخول</span>
                 <span class="login-separator">|</span>
                 <div class="social-login-icons">
-                    <!-- زر Kick الأخضر المخصص -->
+                    <!-- تم إرجاع صورة Kick إلى المسار الأصلي src="/images/4.png" -->
                     <span class="icon-login-btn kick" title="Kick">
                         <img src="/images/4.png" alt="Kick">
                     </span>
@@ -1483,7 +1484,7 @@
         })();
     </script>
 
-    <!-- المودال المعدل بالألوان والنصوص الجديدة -->
+    <!-- المودال المعدل -->
     <div id="loginRequiredModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center; padding:20px;">
       <div style="background:#0f1420; border:1.5px solid #3b82f6; border-radius:24px; padding:38px; text-align:center; max-width:380px; width:100%; box-shadow:0 0 30px rgba(59, 130, 246, 0.3);">
         <div style="font-size:1.3rem; font-weight:900; color:#fff; margin-bottom:10px;">🔒 لازم تسجل دخول أول</div>
@@ -1509,7 +1510,7 @@
         if (!isLoggedIn) {
           e.preventDefault();
           e.stopPropagation();
-          document.getElementById('loginRequiredModal').style.display = 'flex';
+          document.getElementById('loginRequiredModal').style.display='flex';
         }
       }, true);
     })();
