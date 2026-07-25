@@ -278,7 +278,7 @@ app.get('/login/twitch', (req, res) => {
   const twitchAuthUrl = new URL('https://id.twitch.tv/oauth2/authorize');
   twitchAuthUrl.searchParams.set('response_type', 'code');
   twitchAuthUrl.searchParams.set('client_id', TWITCH_CLIENT_ID);
-  twitchAuthUrl.searchParams.set('redirect_uri', TWITCH_REDIRECT_URI || 'https://zlfgamees.onrender.com/auth/twitch/callback');
+  twitchAuthUrl.searchParams.set('redirect_uri', TWITCH_REDIRECT_URI || 'http://localhost:3000/auth/twitch/callback');
   twitchAuthUrl.searchParams.set('scope', scopes);
   twitchAuthUrl.searchParams.set('state', state);
 
@@ -293,13 +293,12 @@ app.get('/auth/twitch/callback', async (req, res) => {
     return res.status(400).send('لم يتم استلام كود التفويض من Twitch.');
   }
 
-  // تنبيه بسيط بدلاً من الحظر القاطع للـ State لمنع أخطاء الجلسات المتغيرة
-  if (req.session.twitchState && state !== req.session.twitchState) {
-    console.warn('تنبيه: حالة الطلب (state) مختلفة قليلاً، يتم الاستمرار بأمان.');
+  if (!state || state !== req.session.twitchState) {
+    return res.status(400).send('حالة الطلب (state) غير متطابقة. حاول تسجيل الدخول من جديد.');
   }
 
   try {
-    const redirectUri = TWITCH_REDIRECT_URI || 'https://zlfgamees.onrender.com/auth/twitch/callback';
+    const redirectUri = TWITCH_REDIRECT_URI || 'http://localhost:3000/auth/twitch/callback';
     
     // استبدال الكود بـ Access Token
     const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
@@ -336,7 +335,7 @@ app.get('/auth/twitch/callback', async (req, res) => {
       return res.status(400).send('لم يتم العثور على بيانات المستخدم في تويتش.');
     }
 
-    // توحيد هيكلة بيانات المستخدم مع Kick للعمل المباشر بالواجهة الأمامية
+    // توحيد هيكلة بيانات المستخدم مع Kick للعمل المباشر بالأمامية
     const profile = {
       id: rawTwitchUser.id,
       user_id: rawTwitchUser.id,
@@ -354,10 +353,6 @@ app.get('/auth/twitch/callback', async (req, res) => {
 
     req.session.accessToken = tokenData.access_token;
     req.session.user = profile;
-
-    if (profile) {
-      store.upsertUser(profile, tokenData);
-    }
 
     res.redirect('/zlf');
   } catch (err) {
