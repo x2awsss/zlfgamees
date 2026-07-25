@@ -1318,7 +1318,7 @@
             <div>
                 <h4 class="footer-section-title">تواصل معنا | Contact Us</h4>
                 <div class="contact-box">
-                    <a href="auss3636@gmail.com" class="contact-item" title="راسلنا عبر البريد">
+                    <a href="mailto:auss3636@gmail.com" class="contact-item" title="راسلنا عبر البريد">
                         <span class="label">البريد الإلكتروني:</span>
                         <span class="val">auss3636@gmail.com</span>
                     </a>
@@ -1430,26 +1430,6 @@
                 })
                 .catch(() => {});
         })();
-    </script>
-
-    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-    <script>
-      const pusher = new Pusher('32cbd69e0618063f2536', {
-        cluster: 'mt1'
-      });
-
-      const channel = pusher.subscribe('chatrooms.CHANNEL_ID.v2');
-      
-      channel.bind('App\\Events\\ChatMessageEvent', function(data) {
-        const message = data.data.content;
-        const username = data.sender.username;
-        
-        console.log(`${username}: ${message}`);
-        
-        if (message.toLowerCase() === 'join') {
-          console.log('هذا المستخدم يبي يدخل اللعبة!');
-        }
-      });
     </script>
 
     <div id="loginRequiredModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center; padding:20px;">
