@@ -1557,5 +1557,57 @@
           } catch (e) {}
         }, 3000);
     </script>
+    <!-- استدعاء مكتبة TMI.js الخاصة بشات تويتش -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tmi.js/1.8.5/tmi.min.js"></script>
+<script>
+    // 1. جلب اسم المستخدم أو القناة التي تم تسجيل الدخول بها من السيرفر
+    fetch('/api/me')
+        .then(res => res.json())
+        .then(data => {
+            if (data.loggedIn && data.user) {
+                const username = data.user.username; // اسم حساب الشخص المسجل
+                const provider = data.user.provider; // التأكد هل هو تويتش أو كيك
+
+                if (provider === 'twitch') {
+                    console.log("جاري الاتصال بشات تويتش لقناة: " + username);
+                    initTwitchChat(username);
+                } else {
+                    console.log("المستخدم مسجل عبر منصة Kick وليس Twitch");
+                    // هنا تقدر تشغل كود شات كيك الخاص بك
+                }
+            } else {
+                console.log("الرجاء تسجيل الدخول أولاً");
+            }
+        });
+
+    // 2. دالة تشغيل واختبار شات تويتش
+    function initTwitchChat(channelName) {
+        const client = new tmi.Client({
+            channels: [ channelName ]
+        });
+
+        client.connect().catch(console.error);
+
+        // الاستماع لأي رسالة تكتب في الشات
+        client.on('message', (channel, tags, message, self) => {
+            if (self) return; // تجاهل رسائل البوت نفسه
+
+            const sender = tags['display-name']; // اسم المشاهد اللي كتب الرسالة
+            const text = message.trim();
+
+            console.log(`[شات تويتش] ${sender}: ${text}`);
+
+            // 3. هنا تحط الأوامر البرمجية الخاصة باللعبة (مثلاً لو كتب !join يدخل اللعبة)
+            if (text.startsWith('!join')) {
+                // تنفيذ دخول اللاعب هنا
+                console.log(sender + " انضم للعبة عبر الشات!");
+            }
+
+            if (text.startsWith('!play')) {
+                // تنفيذ أمر الحركة أو اللعب
+            }
+        });
+    }
+</script>
 </body>
 </html>
