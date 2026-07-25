@@ -36,9 +36,9 @@
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 32px;
-            padding: 60px 50px; /* مساحة واسعة ومريحة للعين */
+            padding: 60px 50px;
             width: 92%;
-            max-width: 520px; /* تم تكبير العرض لإعطاء فخامة أسر للكرت */
+            max-width: 520px;
             text-align: center;
             z-index: 1;
             box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85),
@@ -93,14 +93,6 @@
             color: rgba(255, 255, 255, 0.15);
             font-weight: 300;
             user-select: none;
-        }
-
-        .coming-soon-tag {
-            font-size: 0.85rem;
-            color: #a970ff;
-            font-weight: 800;
-            margin-top: 8px;
-            letter-spacing: 0.5px;
         }
 
         .welcome-title { 
@@ -199,12 +191,11 @@
                 <svg class="twitch-logo-svg" viewBox="0 0 24 24" fill="#9146FF">
                     <path d="M11.571 4.714h1.715v5.143h-1.715zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
                 </svg>
-                <span class="coming-soon-tag">( قريبًا )</span>
             </div>
         </div>
 
         <h1 class="welcome-title">دخول عالم زلف</h1>
-        <p class="welcome-desc">اربط حسابك في Kick عشان تقدر تلعب.</p>
+        <p class="welcome-desc">اختر منصتك المفضلة لتسجيل الدخول واللعب.</p>
 
         <!-- الأزرار الشفافة والمكبرة -->
         <div class="auth-buttons">
@@ -239,18 +230,17 @@
             const btn = document.getElementById('kick-auth-trigger');
             btn.disabled = true;
             btn.querySelector('span').textContent = 'جارٍ التوجيه...';
-            window.location.href = '/login';
+            window.location.href = '/login'; // مسار تسجيل دخول Kick
         });
 
-        // زر Twitch
+        // زر Twitch للتحويل الفعلي
         document.getElementById('twitch-auth-trigger').addEventListener('click', () => {
             const btn = document.getElementById('twitch-auth-trigger');
             btn.disabled = true;
-            btn.querySelector('span').textContent = 'قريبًا...';
-            setTimeout(() => { 
-                btn.disabled = false; 
-                btn.querySelector('span').textContent = 'تسجيل الدخول عبر Twitch'; 
-            }, 1500);
+            btn.querySelector('span').textContent = 'جارٍ التوجيه...';
+            
+            // استبدل '/login/twitch' بالمسار الخاص بك في السيرفر أو رابط OAuth المباشر
+            window.location.href = '/login/twitch'; 
         });
 
         // فحص البان الدوري
