@@ -15,7 +15,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* عشان تأثيرات الخلفية */
+            overflow: hidden;
             position: relative;
         }
 
@@ -29,56 +29,153 @@
             z-index: 0;
         }
 
-        /* كرت الدخول */
+        /* كرت الدخول الفخم والمكبر */
         .login-card {
-            background: rgba(10, 17, 40, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 30px;
-            padding: 50px;
-            width: 90%;
-            max-width: 420px;
+            background: rgba(10, 17, 40, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 32px;
+            padding: 60px 50px; /* مساحة واسعة ومريحة للعين */
+            width: 92%;
+            max-width: 520px; /* تم تكبير العرض لإعطاء فخامة أسر للكرت */
             text-align: center;
             z-index: 1;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-            transition: transform 0.3s ease;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85),
+                        0 0 50px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
         }
 
-        .brand-logo { margin-bottom: 25px; }
-        .brand-logo img { 
+        /* قسم الشعارات العلوي */
+        .logos-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 35px;
+            margin-bottom: 35px;
+        }
+
+        .logo-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* شعار Kick وتأثير التوهج */
+        .kick-logo-img { 
             width: 80px; 
             height: 80px; 
-            filter: drop-shadow(0 0 15px rgba(83, 252, 24, 0.4));
+            object-fit: contain;
+            filter: drop-shadow(0 0 18px rgba(83, 252, 24, 0.5));
+            transition: filter 0.3s ease;
         }
 
-        .welcome-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; }
-        .welcome-desc { font-size: 0.9rem; color: #929dae; margin-bottom: 40px; }
+        .kick-logo-img:hover {
+            filter: drop-shadow(0 0 25px rgba(83, 252, 24, 0.85));
+        }
 
-        .kick-login-btn {
+        /* شعار Twitch وتأثير التوهج */
+        .twitch-logo-svg {
+            width: 70px;
+            height: 70px;
+            filter: drop-shadow(0 0 18px rgba(145, 70, 255, 0.6));
+            transition: filter 0.3s ease;
+        }
+
+        .twitch-logo-svg:hover {
+            filter: drop-shadow(0 0 25px rgba(145, 70, 255, 0.95));
+        }
+
+        .separator {
+            font-size: 2.4rem;
+            color: rgba(255, 255, 255, 0.15);
+            font-weight: 300;
+            user-select: none;
+        }
+
+        .coming-soon-tag {
+            font-size: 0.85rem;
+            color: #a970ff;
+            font-weight: 800;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .welcome-title { 
+            font-size: 2.1rem; 
+            font-weight: 900; 
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-desc { 
+            font-size: 1.05rem; 
+            color: #8f9cae; 
+            margin-bottom: 40px; 
+        }
+
+        /* حاوية الأزرار */
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .btn-login {
             width: 100%;
-            background: #53fc18;
-            color: #000;
-            border: none;
-            padding: 16px;
-            border-radius: 15px;
-            font-size: 1.1rem;
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 1.15rem;
             font-weight: 900;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .kick-login-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(83, 252, 24, 0.4);
+        /* زر Twitch الشفاف */
+        .twitch-btn {
+            background: rgba(145, 70, 255, 0.12);
+            border: 1px solid rgba(145, 70, 255, 0.35);
+            color: #e2cbff;
         }
 
-        .kick-login-btn:disabled {
-            opacity: 0.6;
+        .twitch-btn:hover {
+            background: #9146FF;
+            border-color: #9146FF;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -5px rgba(145, 70, 255, 0.55),
+                        0 0 20px rgba(145, 70, 255, 0.4);
+        }
+
+        /* زر Kick الشفاف */
+        .kick-btn {
+            background: rgba(83, 252, 24, 0.1);
+            border: 1px solid rgba(83, 252, 24, 0.3);
+            color: #bbfca2;
+        }
+
+        .kick-btn:hover {
+            background: #53fc18;
+            border-color: #53fc18;
+            color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -5px rgba(83, 252, 24, 0.55),
+                        0 0 20px rgba(83, 252, 24, 0.4);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
             cursor: wait;
+            transform: none !important;
+            box-shadow: none !important;
         }
     </style>
 </head>
@@ -88,15 +185,37 @@
     <div id="particles-js"></div>
 
     <div class="login-card">
-        <div class="brand-logo">
-            <img src="/images/4.png" alt="Kick Logo">
+        <!-- الشعارات الفوقية -->
+        <div class="logos-container">
+            <!-- شعار Kick يمين -->
+            <div class="logo-box">
+                <img src="/images/4.png" alt="Kick Logo" class="kick-logo-img">
+            </div>
+
+            <span class="separator">|</span>
+
+            <!-- شعار Twitch يسار -->
+            <div class="logo-box">
+                <svg class="twitch-logo-svg" viewBox="0 0 24 24" fill="#9146FF">
+                    <path d="M11.571 4.714h1.715v5.143h-1.715zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                </svg>
+                <span class="coming-soon-tag">( قريبًا )</span>
+            </div>
         </div>
+
         <h1 class="welcome-title">دخول عالم زلف</h1>
         <p class="welcome-desc">اربط حسابك في Kick عشان تقدر تلعب.</p>
 
-        <button id="kick-auth-trigger" class="kick-login-btn">
-            <span>تسجيل الدخول عبر Kick</span>
-        </button>
+        <!-- الأزرار الشفافة والمكبرة -->
+        <div class="auth-buttons">
+            <button id="twitch-auth-trigger" class="btn-login twitch-btn">
+                <span>تسجيل الدخول عبر Twitch</span>
+            </button>
+
+            <button id="kick-auth-trigger" class="btn-login kick-btn">
+                <span>تسجيل الدخول عبر Kick</span>
+            </button>
+        </div>
     </div>
 
     <!-- مكتبة Particle.js للخلفية المتحركة -->
@@ -115,22 +234,35 @@
             "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } }
         });
 
-        // التوجيه الفعلي لمسار /login بالسيرفر، اللي يبدأ تدفق OAuth الحقيقي مع Kick
+        // زر Kick للتحويل الفعلي
         document.getElementById('kick-auth-trigger').addEventListener('click', () => {
             const btn = document.getElementById('kick-auth-trigger');
             btn.disabled = true;
             btn.querySelector('span').textContent = 'جارٍ التوجيه...';
             window.location.href = '/login';
         });
+
+        // زر Twitch
+        document.getElementById('twitch-auth-trigger').addEventListener('click', () => {
+            const btn = document.getElementById('twitch-auth-trigger');
+            btn.disabled = true;
+            btn.querySelector('span').textContent = 'قريبًا...';
+            setTimeout(() => { 
+                btn.disabled = false; 
+                btn.querySelector('span').textContent = 'تسجيل الدخول عبر Twitch'; 
+            }, 1500);
+        });
+
+        // فحص البان الدوري
         setInterval(async () => {
-  try {
-    const res = await fetch('/api/check-ban-status');
-    const data = await res.json();
-    if (data.banned) {
-      window.location.reload(); 
-    }
-  } catch (e) {}
-}, 3000);
+            try {
+                const res = await fetch('/api/check-ban-status');
+                const data = await res.json();
+                if (data.banned) {
+                    window.location.reload(); 
+                }
+            } catch (e) {}
+        }, 3000);
     </script>
 </body>
 </html>
