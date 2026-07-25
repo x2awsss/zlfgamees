@@ -155,18 +155,6 @@
         }
         .pending-empty { grid-column: 1 / -1; color: #6b7280; font-size: 0.8rem; padding: 10px 0; }
 
-        .test-spawn-row {
-            display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-        .test-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-            color: #cbd5e1; padding: 8px 14px; border-radius: 12px;
-            font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer;
-            transition: 0.2s;
-        }
-        .test-btn:hover { border-color: #3b82f6; color: #fff; }
-
         .start-game-btn {
             width: 100%;
             background: linear-gradient(135deg, #f2b632, #d9932a);
@@ -178,7 +166,7 @@
 
         /* ===================== شاشة اللعب ===================== */
         #gameScreen {
-            display: none; width: 100%; max-width: 1100px;
+            display: none; width: 100%; max-width: 1220px;
             max-height: calc(100vh - 60px);
             z-index: 2; flex-direction: column; align-items: center; gap: 10px;
             padding-bottom: 10px; flex: 1 1 auto; min-height: 0;
@@ -206,23 +194,24 @@
         .stat-pill b { color: #fff; }
 
         .game-columns {
-            display: flex; gap: clamp(14px, 3vw, 40px); width: 100%;
+            display: flex; gap: clamp(14px, 2.5vw, 32px); width: 100%;
             align-items: flex-start; justify-content: center; flex-wrap: nowrap;
             overflow-x: hidden; margin-top: 4px;
         }
 
         .arena-col { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1 1 680px; min-width: 0; }
 
+        /* ⭐ توسيع صندوق قائمة المشاركين (اليسار) ⭐ */
         .players-panel {
             background: rgba(15, 20, 32, 0.5);
             border: 1.5px solid rgba(83,252,24,0.35);
             border-radius: 20px; padding: 14px;
-            flex: 0 0 240px; max-width: 260px;
-            min-height: min(420px, 54vh);
-            max-height: min(420px, 54vh);
+            flex: 0 0 300px; max-width: 320px;
+            min-height: min(440px, 56vh);
+            max-height: min(440px, 56vh);
             display: flex; flex-direction: column;
         }
-        .players-panel-title { font-size: 0.8rem; color: #929dae; margin-bottom: 8px; font-weight: 800; text-align: center; }
+        .players-panel-title { font-size: 0.85rem; color: #929dae; margin-bottom: 10px; font-weight: 800; text-align: center; }
         .fancy-grid {
             display: grid !important; grid-template-columns: repeat(2, 1fr) !important;
             gap: 8px !important; width: 100% !important; overflow-y: auto; align-content: start;
@@ -230,37 +219,37 @@
         .fancy-chip {
             background: rgba(15, 20, 32, 0.8) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 14px !important; padding: 10px 6px !important;
-            display: flex !important; flex-direction: column !important;
-            align-items: center !important; justify-content: center !important;
+            border-radius: 12px !important; padding: 8px 10px !important;
+            display: flex !important; flex-direction: row !important;
+            align-items: center !important; justify-content: space-between !important;
             gap: 6px !important; transition: 0.3s !important; position: relative !important;
         }
-        .fancy-chip.dead { opacity: 0.32 !important; }
+        /* ⭐ جعل الشفافية على الاسم والكرت عند الموت ⭐ */
+        .fancy-chip.dead { opacity: 0.25 !important; border-color: rgba(255,255,255,0.03) !important; }
         .fancy-chip.picked { border-color: #f2b632 !important; box-shadow: 0 0 10px rgba(242,182,50,0.35) !important; }
-        .fancy-chip .persona-row { display: flex; align-items: center; justify-content: center; gap: 6px; direction: ltr; }
+        .fancy-chip .persona-row { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
         .fancy-chip .k-icon {
             background: #53fc18; color: #000; width: 14px; height: 14px; border-radius: 4px;
             font-size: 0.55rem; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .fancy-chip.dead .k-icon { background: #4b5563; }
+        .fancy-chip.dead .k-icon { background: #374151; color: #9ca3af; }
         .fancy-chip .live-dot {
-            width: 8px; height: 8px; border-radius: 50%; background: #53fc18;
-            box-shadow: 0 0 8px #53fc18, 0 0 14px rgba(83,252,24,0.6); flex-shrink: 0;
+            width: 7px; height: 7px; border-radius: 50%; background: #53fc18;
+            box-shadow: 0 0 8px #53fc18; flex-shrink: 0;
         }
-        .fancy-chip.dead .live-dot { background: #4b5563; box-shadow: none; }
+        .fancy-chip.dead .live-dot { display: none; }
         .fancy-chip .chip-name-under {
             font-size: 0.78rem !important; font-weight: 800 !important; color: #fff !important;
-            text-align: center !important; width: 100% !important; overflow: hidden;
+            text-align: right !important; width: 100% !important; overflow: hidden;
             text-overflow: ellipsis; white-space: nowrap;
         }
-        .fancy-chip .num-badge-mini { position: absolute !important; top: 4px !important; right: 6px !important; color: rgba(255,255,255,0.35) !important; font-size: 0.65rem !important; font-weight: 700 !important; }
+        .fancy-chip .num-badge-mini { color: rgba(255,255,255,0.35) !important; font-size: 0.65rem !important; font-weight: 700 !important; }
         .fancy-chip .pick-badge {
-            position: absolute; top: 4px; left: 6px;
-            background: rgba(242,182,50,0.18); color: #f2b632;
-            font-size: 0.62rem; font-weight: 900; padding: 1px 6px; border-radius: 8px;
+            background: rgba(242,182,50,0.2); color: #f2b632;
+            font-size: 0.65rem; font-weight: 900; padding: 1px 6px; border-radius: 6px;
         }
 
-        /* ===================== الأرينا والتعديلات الجديدة للألوان ===================== */
+        /* ===================== الأرينا والتعديلات الألوان ===================== */
         .arena {
             position: relative; width: 100%;
             background: rgba(15,20,32,0.55);
@@ -359,90 +348,79 @@
         .overlay.show { display: flex; }
         .modal-card {
             background: #0f1420; border: 1.5px solid #f2b632; border-radius: 24px;
-            padding: 34px 36px; text-align: center; max-width: 560px; width: 100%;
+            padding: 28px 32px; text-align: center; max-width: 560px; width: 100%;
             max-height: 88vh; overflow-y: auto;
             box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 40px rgba(242,182,50,0.15);
             animation: popIn 0.35s ease;
         }
         @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* ⭐ عد تنازلي متطور للجولة ⭐ */
         #countdownOverlay {
             background: rgba(5, 8, 22, 0.88);
             backdrop-filter: blur(8px);
             z-index: 150;
         }
-        .countdown-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        .round-announce {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #f2b632;
-            margin-bottom: 15px;
-            text-shadow: 0 0 20px rgba(242,182,50,0.5);
-            letter-spacing: 1px;
-        }
+        .countdown-box { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .round-announce { font-size: 2.2rem; font-weight: 900; color: #f2b632; margin-bottom: 15px; text-shadow: 0 0 20px rgba(242,182,50,0.5); }
         .countdown-number {
-            font-size: 7rem;
-            font-weight: 900;
-            color: #fff;
+            font-size: 7rem; font-weight: 900; color: #fff;
             text-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 50px rgba(83,252,24,0.6);
-            animation: pulseScale 0.8s ease-in-out infinite alternate;
-            line-height: 1;
+            animation: pulseScale 0.8s ease-in-out infinite alternate; line-height: 1;
         }
-        @keyframes pulseScale {
-            0% { transform: scale(0.8); opacity: 0.6; }
-            100% { transform: scale(1.15); opacity: 1; }
-        }
+        @keyframes pulseScale { 0% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(1.15); opacity: 1; } }
 
-        .modal-eyebrow { color: #f2b632; font-size: 0.95rem; margin-bottom: 10px; opacity: 0.85; }
-        .modal-big-name { font-size: 1.7rem; font-weight: 900; color: #fff; margin-bottom: 14px; }
-        .modal-instr { color: #929dae; font-size: 0.88rem; margin-bottom: 18px; line-height: 1.7; }
-        .result-summary { display: flex; justify-content: center; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
-        .result-chip { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px 18px; }
-        .result-chip .num { font-size: 1.4rem; font-weight: 900; }
+        .modal-eyebrow { color: #f2b632; font-size: 0.95rem; margin-bottom: 8px; opacity: 0.85; }
+        .modal-big-name { font-size: 1.6rem; font-weight: 900; color: #fff; margin-bottom: 14px; }
+        .result-summary { display: flex; justify-content: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+        .result-chip { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 8px 16px; }
+        .result-chip .num { font-size: 1.3rem; font-weight: 900; }
         .result-chip.ok .num { color: #53fc18; }
         .result-chip.out .num { color: #f87171; }
         .result-chip .lbl { font-size: 0.72rem; color: #929dae; }
 
-        .modal-close-btn {
-            background: linear-gradient(135deg, #7c3aed, #4c1d95);
-            border: none; color: #fff; padding: 12px 40px; border-radius: 50px;
-            font-family: inherit; font-weight: 700; cursor: pointer; font-size: 0.92rem;
+        /* ⭐ ترتيب وتنسيق أسر الموتى والناجين في قائمة النتائج ⭐ */
+        .modal-next-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border: none; color: #fff; padding: 12px; border-radius: 50px;
+            font-family: inherit; font-weight: 900; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 0 20px rgba(124,58,237,0.4); margin-bottom: 20px; transition: 0.3s;
         }
-        .modal-close-btn.secondary { background: rgba(255,255,255,0.06); }
+        .modal-next-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(124,58,237,0.6); }
+
+        .round-lists-wrapper {
+            display: flex; flex-direction: column; gap: 12px; text-align: right;
+            max-height: 220px; overflow-y: auto; padding-right: 4px;
+        }
+        .list-section { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 12px; }
+        .list-title { font-size: 0.8rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .list-title.survived { color: #53fc18; }
+        .list-title.eliminated { color: #f87171; }
+        
+        .names-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag-item {
+            font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+        }
+        .tag-item.ok { color: #fff; border-color: rgba(83,252,24,0.3); }
+        .tag-item.dead { color: #9ca3af; opacity: 0.7; border-color: rgba(248,113,113,0.3); }
+
+        .modal-close-btn {
+            background: rgba(255,255,255,0.08); border: none; color: #fff;
+            padding: 10px 30px; border-radius: 50px; font-family: inherit; font-weight: 700; cursor: pointer;
+        }
 
         .winner-avatar {
-            width: 130px; height: 130px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 4rem;
+            width: 120px; height: 120px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 3.5rem;
             box-shadow: 0 0 30px rgba(242,182,50,0.5); border: 4px solid rgba(242,182,50,0.4);
             margin: 6px auto 16px; background: linear-gradient(135deg, #f2b632, #d9932a);
         }
-
-        .picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .picker-btn {
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: #fff; padding: 10px; border-radius: 12px; font-family: inherit;
-            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.25s;
-        }
-        .picker-btn:hover { border-color: #f2b632; background: rgba(242,182,50,0.1); transform: translateY(-2px); }
 
         @media (max-width: 860px) {
             .game-columns { flex-wrap: wrap; }
             .players-panel { flex: 1 1 100%; max-width: 100%; order: 3; min-height: 160px; max-height: 22vh; }
             .arena-col { flex: 1 1 100%; }
-        }
-        @media (max-width: 560px) {
-            .picker-grid, .pending-grid { grid-template-columns: repeat(2, 1fr); }
-            .fancy-grid { grid-template-columns: repeat(3, 1fr); }
-            .modal-big-name { font-size: 1.3rem; }
-            .tile .num { font-size: 11px !important; }
         }
 
         html, body, * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
@@ -530,9 +508,9 @@
                         <div class="floor-base"></div>
                     </div>
                 </div>
-                <button class="action-btn next" id="nextRoundBtn" onclick="startCountdownSequence()" disabled>▶️ الجولة التالية</button>
             </div>
 
+            <!-- ⭐ القائمة الجانبية الموّسعة جهة اليسار ⭐ -->
             <div class="players-panel">
                 <div class="players-panel-title">المشاركون</div>
                 <div class="fancy-grid" id="fancyGrid"></div>
@@ -548,17 +526,31 @@
         </div>
     </div>
 
-    <!-- ===================== نافذة نتيجة الجولة ===================== -->
+    <!-- ===================== نافذة نتيجة الجولة المحدثة بالكامل ===================== -->
     <div class="overlay" id="roundResultOverlay">
         <div class="modal-card">
             <div class="modal-eyebrow">⚡ نتيجة الجولة</div>
             <div class="modal-big-name" id="roundResultTitle">—</div>
+            
             <div class="result-summary">
                 <div class="result-chip ok"><div class="num" id="survivedNum">0</div><div class="lbl">نجوا</div></div>
                 <div class="result-chip out"><div class="num" id="eliminatedNum">0</div><div class="lbl">طاحوا</div></div>
             </div>
-            <div class="modal-instr" id="roundResultDetail">—</div>
-            <button class="modal-close-btn" id="continueBtn" onclick="closeRoundResult()">متابعة</button>
+
+            <!-- ⭐ زر الجولة التالية في الأعلى ⭐ -->
+            <button class="modal-next-btn" id="continueBtn" onclick="closeRoundResult()">▶️ الجولة التالية</button>
+
+            <!-- ⭐ أسماء الناجين والمستبعدين مرتبة ومفصلة تحت الزر ⭐ -->
+            <div class="round-lists-wrapper">
+                <div class="list-section">
+                    <div class="list-title survived">🟢 الناجون في هذه الجولة:</div>
+                    <div class="names-tags" id="survivedNamesList"></div>
+                </div>
+                <div class="list-section">
+                    <div class="list-title eliminated">🔴 الذين طاحوا واستُبعدوا:</div>
+                    <div class="names-tags" id="eliminatedNamesList"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -568,7 +560,7 @@
             <div class="modal-eyebrow">🏆 انتهت اللعبة</div>
             <div class="winner-avatar" id="winnerAvatar">🥇</div>
             <div class="modal-big-name" id="winnerName">—</div>
-            <div class="modal-instr" id="winnerDetail">—</div>
+            <div class="modal-instr" id="winnerDetail" style="color: #929dae; margin-bottom:15px; font-size:0.9rem;">—</div>
             <button class="modal-close-btn" onclick="closeWinnerOverlay()">إغلاق</button>
         </div>
     </div>
@@ -578,7 +570,7 @@
         <div class="modal-card">
             <div class="modal-eyebrow">إدارة المشاركين</div>
             <div class="pending-grid" id="manageGrid" style="margin-top: 10px;"></div>
-            <button class="modal-close-btn secondary" onclick="closeManage()" style="margin-top: 16px;">إغلاق</button>
+            <button class="modal-close-btn" onclick="closeManage()" style="margin-top: 16px;">إغلاق</button>
         </div>
     </div>
 
@@ -597,12 +589,8 @@
 
         // ===================== نظام إعدادات الجولات =====================
         function getRoundConfig(r) {
-            if (r === 1) {
-                return { tileCount: 6, cols: 6, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 20000 };
-            }
-            if (r === 2) {
-                return { tileCount: 12, cols: 6, hueSpread: 260, satRange: [60, 78], lightRange: [45, 58], timeMs: 15000 };
-            }
+            if (r === 1) return { tileCount: 6, cols: 6, hueSpread: 360, satRange: [65, 75], lightRange: [48, 55], timeMs: 20000 };
+            if (r === 2) return { tileCount: 12, cols: 6, hueSpread: 260, satRange: [60, 78], lightRange: [45, 58], timeMs: 15000 };
             
             const extraRounds = r - 3;
             const hueSpread = Math.max(12, 120 - extraRounds * 18);
@@ -663,13 +651,13 @@
         const statusLine = document.getElementById('statusLine');
         const floorEl = document.getElementById('floor');
         const laser = document.getElementById('laser');
-        const nextRoundBtn = document.getElementById('nextRoundBtn');
 
         const roundResultOverlay = document.getElementById('roundResultOverlay');
         const roundResultTitle = document.getElementById('roundResultTitle');
         const survivedNum = document.getElementById('survivedNum');
         const eliminatedNum = document.getElementById('eliminatedNum');
-        const roundResultDetail = document.getElementById('roundResultDetail');
+        const survivedNamesList = document.getElementById('survivedNamesList');
+        const eliminatedNamesList = document.getElementById('eliminatedNamesList');
 
         const winnerOverlay = document.getElementById('winnerOverlay');
         const winnerName = document.getElementById('winnerName');
@@ -712,13 +700,6 @@
             if (gameStarted) { renderFancyGrid(); updateCounters(); }
         }
 
-        function clearPlayers() {
-            if (gameStarted) return;
-            players = [];
-            nextNumber = 1;
-            renderPendingGrid();
-        }
-
         function addPlayer(name, id, opts) {
             opts = opts || {};
             if (gameStarted) return;
@@ -729,19 +710,7 @@
             renderPendingGrid();
         }
 
-        function spawnTestBot(count) {
-            for (let i = 0; i < count; i++) {
-                const id = 'bot_' + Math.random().toString(36).slice(2, 9);
-                addPlayer('بوت ' + nextNumber, id, { isBot: true });
-            }
-        }
-
-        function spawnStreamer() {
-            if (players.some(p => p.isTest)) return;
-            addPlayer('أنت (اختبار)', 'test_streamer', { isTest: true });
-        }
-
-        // ===================== بدء اللعبة المباشر والتلقائي =====================
+        // ===================== بدء اللعبة المباشر =====================
         function startGame() {
             if (players.length < 2) return;
             gameStarted = true;
@@ -755,7 +724,6 @@
             prepareRound();
             addLog('🎨 بدأت اللعبة');
             
-            // ⭐ يبدأ العد التنازلي التلقائي للجولة الأولى مباشرة
             startCountdownSequence();
         }
 
@@ -773,10 +741,9 @@
             addLog('🆕 بدأت جولة جديدة');
         }
 
-        // ===================== تسلسل العد التنازلي التلقائي (3.. 2.. 1) =====================
+        // ===================== تسلسل العد التنازلي التلقائي =====================
         function startCountdownSequence() {
             if (gameOver) return;
-            nextRoundBtn.disabled = true;
             roundAnnounceTitle.textContent = `راوند ${round}`;
             countdownOverlay.classList.add('show');
             
@@ -792,12 +759,12 @@
                 } else {
                     clearInterval(cdInterval);
                     countdownOverlay.classList.remove('show');
-                    beginRoundGame(); // بداية التايمر والألوان فوراً!
+                    beginRoundGame();
                 }
             }, 900);
         }
 
-        // ===================== شبكة المشاركين =====================
+        // ===================== شبكة المشاركين المعدلة (بدون جمجمة) =====================
         function renderFancyGrid() {
             fancyGrid.innerHTML = '';
             players.forEach(p => {
@@ -810,14 +777,15 @@
                 const pickBadge = (waitingForPicks && picks[p.id] !== undefined)
                     ? `<span class="pick-badge">${picks[p.id]}</span>` : '';
 
+                /* ⭐ بدون جمجمة، فقط الشفافية للـ dead وإلغاء النقطة الخضراء ⭐ */
                 chip.innerHTML = `
-                    <span class="num-badge-mini">#${p.number}</span>
-                    ${pickBadge}
                     <div class="persona-row">
                         <span class="k-icon">${p.isBot ? '🤖' : (p.isTest ? '🎥' : 'K')}</span>
-                        <span class="chip-name-under">${!p.alive ? '💀 ' : ''}${p.name}</span>
-                        <span class="live-dot"></span>
+                        <span class="chip-name-under">${p.name}</span>
                     </div>
+                    ${pickBadge}
+                    <span class="live-dot"></span>
+                    <span class="num-badge-mini">#${p.number}</span>
                 `;
                 fancyGrid.appendChild(chip);
             });
@@ -841,7 +809,7 @@
                 chip.innerHTML = `
                     <span class="remove-x" onclick="removePlayer('${p.id}'); openManage();">✕</span>
                     <span class="k-icon">K</span>
-                    <span>#${p.number} ${p.name}${!p.alive ? ' 💀' : ''}</span>
+                    <span style="${!p.alive ? 'opacity:0.4;' : ''}">#${p.number} ${p.name}</span>
                 `;
                 manageGrid.appendChild(chip);
             });
@@ -885,7 +853,6 @@
         // ===================== بدء الجولة الفعلي والتايمر =====================
         function beginRoundGame() {
             if (gameOver) return;
-            nextRoundBtn.disabled = true;
             waitingForPicks = true;
             picks = {};
             statusLine.textContent = 'اكتبوا رقم اللون الصح الحين!';
@@ -943,7 +910,7 @@
             registerPick(testPlayer.id, parseInt(tile.dataset.num, 10));
         });
 
-        // ===================== حل الجولة =====================
+        // ===================== حل الجولة وعرض نتائج مرتبة =====================
         function resolveRound() {
             waitingForPicks = false;
             statusLine.textContent = 'الليزر ينزل...!';
@@ -960,18 +927,22 @@
                     else t.classList.add('zapped');
                 });
 
-                let survivedCount = 0, eliminatedCount = 0;
+                let survivedList = [];
+                let eliminatedList = [];
+
                 players.forEach(p => {
-                    if (!p.alive) return;
-                    if (picks[p.id] === correctNumber) {
-                        survivedCount++;
+                    if (!p.alive) return; // تم استبعاده سابقاً
+                    
+                    const userPick = picks[p.id];
+                    if (userPick === correctNumber) {
+                        survivedList.push(p);
                     } else {
                         p.alive = false;
-                        eliminatedCount++;
+                        eliminatedList.push({ player: p, pick: userPick });
                     }
                 });
 
-                if (eliminatedCount > 0) playEliminationSound();
+                if (eliminatedList.length > 0) playEliminationSound();
                 renderFancyGrid();
                 updateCounters();
 
@@ -982,10 +953,19 @@
                     return;
                 }
 
+                /* ⭐ تعبئة قوائم النتائج بأسلوب مرتب وشيك ⭐ */
                 roundResultTitle.textContent = `نهاية الجولة ${round}`;
-                survivedNum.textContent = survivedCount;
-                eliminatedNum.textContent = eliminatedCount;
-                roundResultDetail.textContent = `باقي ${aliveNow.length} مشارك من أصل ${players.length}. استعدوا للجولة الجاية!`;
+                survivedNum.textContent = survivedList.length;
+                eliminatedNum.textContent = eliminatedList.length;
+
+                survivedNamesList.innerHTML = survivedList.length > 0 
+                    ? survivedList.map(p => `<span class="tag-item ok">${p.name}</span>`).join('')
+                    : '<span style="font-size:0.75rem; color:#6b7280;">لا يوجد أجهزة ناجية</span>';
+
+                eliminatedNamesList.innerHTML = eliminatedList.length > 0 
+                    ? eliminatedList.map(item => `<span class="tag-item dead">${item.player.name} ${item.pick ? `(اختارت ${item.pick})` : '(لم يختار)'}</span>`).join('')
+                    : '<span style="font-size:0.75rem; color:#6b7280;">لا أحد طاح بهذه الجولة</span>';
+
                 roundResultOverlay.classList.add('show');
             }, 650);
         }
@@ -995,8 +975,6 @@
             round += 1;
             roundNumEl.textContent = round;
             prepareRound();
-            
-            // ⭐ يبدأ العد التنازلي التلقائي للجولة الجديدة بمجرد إغلاق النتيجة
             startCountdownSequence();
         }
 
@@ -1022,9 +1000,7 @@
             winnerOverlay.classList.add('show');
         }
 
-        function closeWinnerOverlay() {
-            winnerOverlay.classList.remove('show');
-        }
+        function closeWinnerOverlay() { winnerOverlay.classList.remove('show'); }
 
         // ===== أصوات =====
         function playEliminationSound() {
