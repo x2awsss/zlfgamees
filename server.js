@@ -19,10 +19,13 @@ const {
   CLIENT_ID,
   CLIENT_SECRET,
   REDIRECT_URI,
+  TWITCH_CLIENT_ID,
+  TWITCH_CLIENT_SECRET,
+  TWITCH_REDIRECT_URI,
   PORT = 3000,
   SESSION_SECRET = 'change-this-secret',
   ADMIN_PASSWORD_HASH,
-  ALLOWED_USERS = '' // أسماء حسابات Kick المسموح لها بدخول الألعاب
+  ALLOWED_USERS = '' // أسماء حسابات Kick / Twitch المسموح لها بدخول الألعاب
 } = process.env;
 
 // ===== إدارة الوايت لست (الدمج بين الـ .env والتحكم الديناميكي من الأدمن) =====
@@ -90,14 +93,14 @@ app.use((req, res, next) => {
     return res.redirect('/logintab.html');
   }
 
-  const username = (req.session.user.name || '').toString();
+  const username = (req.session.user.name || req.session.user.username || '').toString();
 
   if (!isUserWhitelisted(username)) {
     return res.status(403).send(`
       <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
         <div>
           <h1 style="color:#f87171; font-size:2rem; margin-bottom:12px;">🚫 غير مصرح لك بالدخول</h1>
-          <p style="color:#929dae; font-size:1.1rem; margin-bottom:20px;">حسابك (${req.session.user.name}) غير مسموح له بالوصول لهذه اللعبة.</p>
+          <p style="color:#929dae; font-size:1.1rem; margin-bottom:20px;">حسابك (${username}) غير مسموح له بالوصول لهذه اللعبة.</p>
           <a href="/logout" style="color:#3b82f6; text-decoration:none; background:rgba(59,130,246,0.1); padding:10px 20px; border-radius:50px; border:1px solid rgba(59,130,246,0.3);">تسجيل خروج وتجربة حساب آخر</a>
         </div>
       </div>
@@ -157,7 +160,11 @@ function generateCodeChallenge(verifier) {
   return base64url(hash);
 }
 
-// 1) صفحة تبدأ تسجيل الدخول
+// =====================================================
+// ==================== KICK AUTH =====================
+// =====================================================
+
+// 1) صفحة تبدأ تسجيل الدخول بـ Kick
 app.get('/login', (req, res) => {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = generateCodeChallenge(codeVerifier);
@@ -187,7 +194,7 @@ app.get('/login', (req, res) => {
   res.redirect(authUrl.toString());
 });
 
-// 2) نقطة الرجوع (Callback)
+// 2) نقطة الرجوع (Callback) لـ Kick
 app.get('/callback', async (req, res) => {
   const { code, state } = req.query;
 
@@ -238,6 +245,11 @@ app.get('/callback', async (req, res) => {
       if (bannedUsers.has(pId)) {
         return res.status(403).send('🚫 حسابك محظور من دخول هذه المنصة.');
       }
+      
+      // توحيد الحقول لتعمل مع الواجهة الرئيسية بنفس الطريقة
+      profile.provider = 'kick';
+      profile.name = profile.name || profile.username;
+      profile.profile_picture = profile.profile_picture || profile.avatar;
     }
 
     req.session.user = profile;
@@ -249,11 +261,110 @@ app.get('/callback', async (req, res) => {
     res.redirect('/zlf');
   } catch (err) {
     console.error(err);
-    res.status(500).send('حدث خطأ أثناء تسجيل الدخول.');
+    res.status(500).send('حدث خطأ أثناء تسجيل الدخول عبر Kick.');
   }
 });
 
-// 3) APIs جلب البيانات
+// =====================================================
+// =================== TWITCH AUTH ====================
+// =====================================================
+
+// 1) صفحة تبدأ تسجيل الدخول بـ Twitch
+app.get('/login/twitch', (req, res) => {
+  const state = base64url(crypto.randomBytes(16));
+  req.session.twitchState = state;
+
+  const scopes = 'user:read:email';
+  const twitchAuthUrl = new URL('https://id.twitch.tv/oauth2/authorize');
+  twitchAuthUrl.searchParams.set('response_type', 'code');
+  twitchAuthUrl.searchParams.set('client_id', TWITCH_CLIENT_ID);
+  twitchAuthUrl.searchParams.set('redirect_uri', TWITCH_REDIRECT_URI || 'http://localhost:3000/auth/twitch/callback');
+  twitchAuthUrl.searchParams.set('scope', scopes);
+  twitchAuthUrl.searchParams.set('state', state);
+
+  res.redirect(twitchAuthUrl.toString());
+});
+
+// 2) نقطة الرجوع (Callback) لـ Twitch
+app.get('/auth/twitch/callback', async (req, res) => {
+  const { code, state } = req.query;
+
+  if (!code) {
+    return res.status(400).send('لم يتم استلام كود التفويض من Twitch.');
+  }
+
+  if (!state || state !== req.session.twitchState) {
+    return res.status(400).send('حالة الطلب (state) غير متطابقة. حاول تسجيل الدخول من جديد.');
+  }
+
+  try {
+    const redirectUri = TWITCH_REDIRECT_URI || 'http://localhost:3000/auth/twitch/callback';
+    
+    // استبدال الكود بـ Access Token
+    const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: TWITCH_CLIENT_ID,
+        client_secret: TWITCH_CLIENT_SECRET,
+        code,
+        grant_type: 'authorization_code',
+        redirect_uri: redirectUri
+      })
+    });
+
+    const tokenData = await tokenRes.json();
+
+    if (!tokenRes.ok) {
+      console.error('Twitch Token Exchange Failed:', tokenData);
+      return res.status(400).send('فشل استبدال الكود بتوكن مع تويتش.');
+    }
+
+    // جلب بيانات المستخدم من Twitch API
+    const userRes = await fetch('https://api.twitch.tv/helix/users', {
+      headers: {
+        'Client-ID': TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${tokenData.access_token}`
+      }
+    });
+
+    const userData = await userRes.json();
+    const rawTwitchUser = userData?.data?.[0];
+
+    if (!rawTwitchUser) {
+      return res.status(400).send('لم يتم العثور على بيانات المستخدم في تويتش.');
+    }
+
+    // توحيد هيكلة بيانات المستخدم مع Kick للعمل المباشر بالأمامية
+    const profile = {
+      id: rawTwitchUser.id,
+      user_id: rawTwitchUser.id,
+      name: rawTwitchUser.display_name || rawTwitchUser.login,
+      username: rawTwitchUser.login,
+      profile_picture: rawTwitchUser.profile_image_url,
+      email: rawTwitchUser.email,
+      provider: 'twitch'
+    };
+
+    // التحقق من الحظر
+    if (bannedUsers.has(String(profile.id))) {
+      return res.status(403).send('🚫 حسابك محظور من دخول هذه المنصة.');
+    }
+
+    req.session.accessToken = tokenData.access_token;
+    req.session.user = profile;
+
+    res.redirect('/zlf');
+  } catch (err) {
+    console.error('Twitch Login Error:', err);
+    res.status(500).send('حدث خطأ أثناء تسجيل الدخول عبر Twitch.');
+  }
+});
+
+// =====================================================
+// ==================== APIs البيانات ==================
+// =====================================================
+
 app.get('/api/chatroom', async (req, res) => {
   if (!req.session.user || !req.session.accessToken) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً' });
