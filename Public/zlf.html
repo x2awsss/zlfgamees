@@ -117,30 +117,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* زر التواصل بالبريد العالي اليمين بالنافبار */
-        .btn-nav-email {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(234, 179, 8, 0.12);
-            color: #eab308;
-            border: 1px solid #eab308;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(234, 179, 8, 0.15);
-        }
-
-        .btn-nav-email:hover {
-            background: #eab308;
-            color: #050816;
-            box-shadow: 0 0 18px rgba(234, 179, 8, 0.5);
-            transform: scale(1.04);
-        }
-
         .nav-links {
             display: flex;
             list-style: none;
@@ -260,33 +236,91 @@
             transform: translateY(-3px);
         }
 
+        /* ===== تعديلات منطقة تسجيل الدخول الجديدة ===== */
         .auth-area {
             display: flex;
             align-items: center;
         }
 
-        .btn-login-kick {
-            text-decoration: none;
-            background: rgba(83, 252, 24, 0.1); 
-            color: #53fc18;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border: 1px solid #53fc18;
-            transition: all 0.4s ease;
-            box-shadow: 0 0 10px rgba(83, 252, 24, 0.2);
-            white-space: nowrap;
-            display: inline-flex;
+        .login-multi-container {
+            display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 6px 16px;
+            border-radius: 50px;
+            backdrop-filter: blur(8px);
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
 
-        .btn-login-kick:hover {
+        .login-multi-container:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+        }
+
+        .login-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #d1d5db;
+            white-space: nowrap;
+        }
+
+        .login-separator {
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 300;
+            margin: 0 2px;
+        }
+
+        .social-login-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .icon-login-btn.kick {
+            background: rgba(83, 252, 24, 0.15);
+            color: #53fc18;
+            border: 1px solid rgba(83, 252, 24, 0.5);
+            overflow: hidden;
+        }
+
+        .icon-login-btn.kick img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .icon-login-btn.kick:hover {
             background: #53fc18;
-            color: #000;
-            box-shadow: 0 0 20px rgba(83, 252, 24, 0.6);
-            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(83, 252, 24, 0.6);
+            transform: scale(1.1);
+        }
+
+        .icon-login-btn.twitch {
+            background: rgba(145, 70, 255, 0.15);
+            color: #9146ff;
+            border: 1px solid rgba(145, 70, 255, 0.5);
+        }
+
+        .icon-login-btn.twitch:hover {
+            background: #9146ff;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(145, 70, 255, 0.6);
+            transform: scale(1.1);
         }
 
         .user-menu {
@@ -661,7 +695,6 @@
         .meta-tag.category { color: #eab308; }
         .meta-tag.players { color: #3b82f6; }
 
-        /* تجميد التفاعل مع خيارات أو أزرار الألوان ليصبح للعرض فقط */
         .color-option, .color-picker, .color-box, [class*="color-"] {
             pointer-events: none !important;
             cursor: default !important;
@@ -823,7 +856,6 @@
         .social-card.discord .social-icon-wrapper { background: rgba(88, 101, 242, 0.1); color: #5865f2; }
         .social-card.discord:hover .social-icon-wrapper { background: #5865f2; color: white; box-shadow: 0 0 15px rgba(88, 101, 242, 0.5); }
 
-        /* ===== تصميم الفوتر الفخم والمعصرن ===== */
         .site-footer {
             position: relative;
             z-index: 2;
@@ -1041,9 +1073,6 @@
 
     <nav class="navbar">
         <div class="nav-right">
-            <!-- زر التواصل بالبريد في جهة اليمين داخل النافبار -->
-
-
             <div class="nav-logo-icon">
                 <img src="https://files.kick.com/images/user/1120744/profile_image/conversion/a86dc276-5226-4cae-89a3-bd7c3389f7f2-fullsize.webp" alt="ZLF Logo">
             </div>
@@ -1057,9 +1086,24 @@
             <li><a href="#socials" class="nav-item">حسابات زلف</a></li>
         </ul>
 
-        <!-- منطقة تسجيل الدخول -->
+        <!-- منطقة تسجيل الدخول الجديدة المعدلة برابط إلى logintab بدون .html -->
         <div id="auth-area" class="auth-area">
-            <a href="/login" id="kick-login-btn" class="btn-login-kick">تسجيل الدخول عبر Kick</a>
+            <a href="logintab" class="login-multi-container">
+                <span class="login-label">تسجيل الدخول</span>
+                <span class="login-separator">|</span>
+                <div class="social-login-icons">
+                    <!-- زر Kick الأخضر المخصص -->
+                    <span class="icon-login-btn kick" title="Kick">
+                        <img src="/images/4.png" alt="Kick">
+                    </span>
+                    <!-- زر Twitch -->
+                    <span class="icon-login-btn twitch" title="Twitch">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.571 4.714h1.715v5.143h-1.715zm4.715 0h1.714v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
         </div>
     </nav>
 
@@ -1399,7 +1443,7 @@
             });
         });
 
-        // ===== التحقق من حالة تسجيل الدخول عبر Kick وتحديث النافبار =====
+        // ===== التحقق من حالة تسجيل الدخول وتحديث النافبار =====
         (function checkKickLogin() {
             const authArea = document.getElementById('auth-area');
 
@@ -1439,11 +1483,12 @@
         })();
     </script>
 
+    <!-- المودال المعدل بالألوان والنصوص الجديدة -->
     <div id="loginRequiredModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:999; align-items:center; justify-content:center; padding:20px;">
-      <div style="background:#0f1420; border:1.5px solid #53fc18; border-radius:24px; padding:38px; text-align:center; max-width:380px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.6);">
+      <div style="background:#0f1420; border:1.5px solid #3b82f6; border-radius:24px; padding:38px; text-align:center; max-width:380px; width:100%; box-shadow:0 0 30px rgba(59, 130, 246, 0.3);">
         <div style="font-size:1.3rem; font-weight:900; color:#fff; margin-bottom:10px;">🔒 لازم تسجل دخول أول</div>
-        <p style="color:#929dae; font-size:0.9rem; margin-bottom:24px;">لازم تربط حسابك في Kick عشان تقدر تلعب أي لعبة بالموقع.</p>
-        <a href="/logintab.html" style="display:inline-block; width:100%; background:#53fc18; color:#000; font-weight:900; padding:13px; border-radius:14px; text-decoration:none;">تسجيل الدخول عبر Kick</a>
+        <p style="color:#929dae; font-size:0.9rem; margin-bottom:24px;">لازم تربط حسابك في عالم زلف عشان تقدر تلعب أي لعبة بالموقع.</p>
+        <a href="logintab" style="display:inline-block; width:100%; background:#3b82f6; color:#fff; font-weight:900; padding:13px; border-radius:14px; text-decoration:none; box-shadow:0 4px 15px rgba(59, 130, 246, 0.4); transition:all 0.3s ease;">تسجيل دخول</a>
         <div onclick="document.getElementById('loginRequiredModal').style.display='none'" style="margin-top:14px; color:#6b7280; font-size:0.8rem; cursor:pointer;">إغلاق</div>
       </div>
     </div>
