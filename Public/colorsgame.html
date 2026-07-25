@@ -752,9 +752,6 @@
             gameScreen.classList.remove('show');
             setupScreen.style.display = 'block';
             
-            // إعادة إضافة الستريمر تلقائياً
-            addPlayer('الستريمر 🎥', 'streamer_main', { isStreamer: true });
-            
             renderPendingGrid();
             addLog('🆕 بدأت جولة جديدة');
         }
@@ -1182,8 +1179,6 @@
             registerPick(userId, num);
         }
 
-        // ===================== البدء التلقائي وإضافة حساب الستريمر =====================
-        addPlayer('الستريمر 👑', 'streamer_main', { isStreamer: true });
         renderPendingGrid();
 
         try {
