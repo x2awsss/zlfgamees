@@ -790,13 +790,24 @@
                 return;
             }
 
+            // 1. خلط قائمة اللاعبين عشوائيًا لمنع ربط أول من ينضم برقم 1
+            const shuffledPlayers = shuffleArray(players);
+
+            // 2. خلط قائمة الدول
             const shuffledCountries = shuffleArray(COUNTRY_POOL).slice(0, players.length);
-            flags = players.map((p, i) => ({
+
+            // 3. ربط كل دولة بملكية لاعب عشوائي بعد الخلط
+            flags = shuffledPlayers.map((p, i) => ({
                 code: shuffledCountries[i].code,
                 name: shuffledCountries[i].name,
                 number: i + 1,
                 ownerId: p.id
             }));
+
+            // 4. تحديث رقم اللاعبين للترتيب العشوائي الجديد
+            shuffledPlayers.forEach((p, i) => {
+                p.number = i + 1;
+            });
 
             gameStarted = true;
             gameOver = false;
@@ -804,7 +815,7 @@
             gameScreen.classList.add('show');
             renderFancyGrid();
             drawWheel();
-            addLog('🌍 تم توزيع الدول سرياً على جميع المشاركين');
+            addLog('🌍 تم توزيع الدول سرياً وعشوائياً على جميع المشاركين');
         }
 
         function newGame() {
