@@ -371,9 +371,10 @@
             display: flex; flex-direction: column; gap: 16px; text-align: center;
         }
         .picker-header { font-size: 1.1rem; font-weight: 900; color: #f3ecdd; }
-        .picker-header b { color: #c9a227; }
-        .picker-timer-big { font-size: 3rem; font-weight: 900; color: #c9a227; line-height: 1; }
-        .picker-timer-label { font-size: 0.8rem; color: #a89c85; margin-top: -12px; }
+        .picker-header b { color: #b5586b; }
+        .picker-timer-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+        .picker-timer-big { font-size: 2.6rem; font-weight: 900; color: #f3ecdd; line-height: 1; }
+        .picker-timer-label { font-size: 1rem; color: #a89c85; font-weight: 800; }
 
         .action-icons-row { display: flex; justify-content: center; gap: 22px; }
         .action-icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -384,6 +385,13 @@
         .action-icon-item.kill .action-icon-circle { border-color: rgba(181,88,107,0.5); color: #b5586b; }
         .action-icon-item.revive .action-icon-circle { border-color: rgba(76,175,125,0.5); color: #4caf7d; }
         .action-icon-item .label { font-size: 0.75rem; font-weight: 800; color: #c9bfae; }
+
+        .method-badges-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .method-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(138,99,184,0.15); border: 1px solid rgba(138,99,184,0.4);
+            color: #d9cfe8; font-size: 0.78rem; font-weight: 800; padding: 8px 18px; border-radius: 50px;
+        }
 
         .chooser-card {
             background: rgba(226,212,178,0.05); border: 1px solid rgba(226,212,178,0.1); border-radius: 16px; padding: 16px;
@@ -402,7 +410,7 @@
             font-size: 0.78rem; cursor: pointer; transition: 0.2s;
         }
         .skip-btn.no-kick { background: rgba(76,175,125,0.15); color: #4caf7d; border: 1px solid rgba(76,175,125,0.35); }
-        .skip-btn.with-kick { background: rgba(181,88,107,0.15); color: #b5586b; border: 1px solid rgba(181,88,107,0.35); }
+        .skip-btn.with-kick { background: rgba(184,127,64,0.18); color: #c98a4b; border: 1px solid rgba(184,127,64,0.4); }
         .skip-btn:hover { transform: translateY(-2px); }
 
         .modal-card {
@@ -729,13 +737,20 @@
     <div class="overlay" id="pickerOverlay">
         <div class="picker-panel">
             <div class="picker-header">دور <b id="pickerChooserName">—</b></div>
-            <div class="picker-timer-big" id="decisionTimerBig" style="display:none;">30</div>
-            <div class="picker-timer-label" id="decisionTimerLabel" style="display:none;">ثانية</div>
-            <div class="modal-instr" id="pickerInstr" style="margin-bottom:0;">يمكنك اختيار طرد أو إنعاش، بعدها اكتب رقم اللاعب أو اسمه بالشات</div>
+            <div class="picker-timer-row">
+                <span class="picker-timer-big" id="decisionTimerBig" style="display:none;">30</span>
+                <span class="picker-timer-label" id="decisionTimerLabel" style="display:none;">ثانية</span>
+            </div>
+            <div class="modal-instr" id="pickerInstr" style="margin-bottom:0;">يمكنك اختيار طرد أو إنعاش، بعدها اكتب رقم اللاعب أو اسمه بالشات أو المنشن الخاص به</div>
 
             <div class="action-icons-row">
                 <div class="action-icon-item kill"><div class="action-icon-circle">⚔️</div><span class="label">طرد</span></div>
                 <div class="action-icon-item revive"><div class="action-icon-circle">🩹</div><span class="label">إنعاش</span></div>
+            </div>
+
+            <div class="method-badges-row">
+                <span class="method-badge">#️⃣ رقم اللاعب</span>
+                <span class="method-badge">🔤 اسم اللاعب</span>
             </div>
 
             <div class="picker-grid" id="pickerGrid"></div>
