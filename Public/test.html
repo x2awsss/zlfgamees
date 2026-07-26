@@ -377,14 +377,20 @@
         .picker-timer-label { font-size: 1rem; color: #a89c85; font-weight: 800; }
 
         .action-icons-row { display: flex; justify-content: center; gap: 22px; }
-        .action-icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .action-icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
+        .action-icon-item.disabled { opacity: 0.35; pointer-events: none; }
         .action-icon-circle {
             width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; border: 2px solid rgba(226,212,178,0.15); background: rgba(226,212,178,0.04);
+            font-size: 1.5rem; border: 2px solid rgba(226,212,178,0.15); background: rgba(226,212,178,0.04); transition: 0.2s;
         }
         .action-icon-item.kill .action-icon-circle { border-color: rgba(181,88,107,0.5); color: #b5586b; }
         .action-icon-item.revive .action-icon-circle { border-color: rgba(76,175,125,0.5); color: #4caf7d; }
+        .action-icon-item.kill.active .action-icon-circle { background: rgba(181,88,107,0.18); box-shadow: 0 0 0 3px rgba(181,88,107,0.3); transform: scale(1.06); }
+        .action-icon-item.revive.active .action-icon-circle { background: rgba(76,175,125,0.18); box-shadow: 0 0 0 3px rgba(76,175,125,0.3); transform: scale(1.06); }
         .action-icon-item .label { font-size: 0.75rem; font-weight: 800; color: #c9bfae; }
+
+        .picker-grid { display: none !important; }
+        #reviveToggleWrap { display: none !important; }
 
         .method-badges-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .method-badge {
@@ -744,8 +750,8 @@
             <div class="modal-instr" id="pickerInstr" style="margin-bottom:0;">يمكنك اختيار طرد أو إنعاش، بعدها اكتب رقم اللاعب أو اسمه بالشات أو المنشن الخاص به</div>
 
             <div class="action-icons-row">
-                <div class="action-icon-item kill"><div class="action-icon-circle">⚔️</div><span class="label">طرد</span></div>
-                <div class="action-icon-item revive"><div class="action-icon-circle">🩹</div><span class="label">إنعاش</span></div>
+                <div class="action-icon-item kill" id="actionIconKill" onclick="selectPickMode('kill')"><div class="action-icon-circle">⚔️</div><span class="label">طرد</span></div>
+                <div class="action-icon-item revive" id="actionIconRevive" onclick="selectPickMode('revive')"><div class="action-icon-circle">🩹</div><span class="label">إنعاش</span></div>
             </div>
 
             <div class="method-badges-row">
@@ -1240,8 +1246,23 @@
             openActionOverlay('kill', randomPick);
         }
 
+        function selectPickMode(mode) {
+            if (!waitingForPick) return;
+            if (mode === 'revive' && getReviveCandidates().length === 0) return;
+            pickMode = mode;
+            renderPickerGrid();
+        }
+
         function renderPickerGrid() {
             pickerGrid.innerHTML = '';
+            const killIconEl = document.getElementById('actionIconKill');
+            const reviveIconEl = document.getElementById('actionIconRevive');
+            const hasRevive = getReviveCandidates().length > 0;
+            if (killIconEl) killIconEl.classList.toggle('active', pickMode === 'kill');
+            if (reviveIconEl) {
+                reviveIconEl.classList.toggle('active', pickMode === 'revive');
+                reviveIconEl.classList.toggle('disabled', !hasRevive);
+            }
             if (pickMode === 'kill') {
                 const candidates = getKillCandidates();
                 candidates.forEach(p => {
