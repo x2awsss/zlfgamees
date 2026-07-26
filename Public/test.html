@@ -109,49 +109,49 @@
 
         /* ===== السايدبار ===== */
         .side-panel {
-            width: 300px; flex-shrink: 0;
-            display: flex; flex-direction: column; gap: 10px;
+            width: 380px; flex-shrink: 0;
+            display: flex; flex-direction: column; gap: 12px;
             overflow-y: auto; padding-bottom: 6px;
         }
         .side-toggle-pill {
             display: flex; background: rgba(15,20,32,0.7); border: 1px solid rgba(226,212,178,0.08);
-            border-radius: 50px; padding: 4px; flex-shrink: 0;
+            border-radius: 50px; padding: 5px; flex-shrink: 0;
         }
         .side-toggle-pill button {
             flex: 1; border: none; background: transparent; color: #a89c85;
-            font-family: inherit; font-weight: 800; font-size: 0.82rem; padding: 9px 10px;
+            font-family: inherit; font-weight: 800; font-size: 0.92rem; padding: 11px 12px;
             border-radius: 50px; cursor: pointer; transition: 0.25s;
         }
         .side-toggle-pill button.active { background: linear-gradient(135deg, #8a63b8, #5c3d82); color: #f3ecdd; }
 
         .side-section {
             background: rgba(14, 24, 20, 0.55); border: 1px solid rgba(226,212,178,0.08);
-            border-radius: 16px; overflow: hidden; flex-shrink: 0;
+            border-radius: 18px; overflow: hidden; flex-shrink: 0;
         }
         .side-section-head {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 14px; cursor: pointer; font-weight: 900; font-size: 0.85rem;
+            padding: 15px 18px; cursor: pointer; font-weight: 900; font-size: 1rem;
         }
         .side-section-head .chev { transition: 0.25s; color: #a89c85; }
         .side-section.collapsed .chev { transform: rotate(180deg); }
-        .side-section-body { padding: 0 14px 14px; max-height: 220px; overflow-y: auto; }
+        .side-section-body { padding: 0 18px 18px; max-height: 220px; overflow-y: auto; }
         .side-section.collapsed .side-section-body { display: none; }
-        #sidePlayersList { max-height: 480px; }
-        #gameLogList { max-height: 260px; }
+        #sidePlayersList { max-height: 560px; }
+        #gameLogList { max-height: 190px; }
 
-        .empty-note { color: #7a7062; font-size: 0.78rem; text-align: center; padding: 14px 0; }
+        .empty-note { color: #7a7062; font-size: 0.85rem; text-align: center; padding: 16px 0; }
 
         .side-player-row {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(226,212,178,0.04); border-radius: 10px; padding: 8px 10px;
-            margin-bottom: 6px; font-size: 0.82rem; font-weight: 700;
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(226,212,178,0.04); border-radius: 12px; padding: 11px 14px;
+            margin-bottom: 8px; font-size: 0.92rem; font-weight: 700;
         }
-        .side-player-row .team-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .side-player-row .team-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
         .side-player-row .p-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .side-player-row .remove-x {
-            background: rgba(181,88,107,0.15); color: #b5586b; width: 18px; height: 18px;
-            border-radius: 6px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 0.68rem; flex-shrink: 0;
+            background: rgba(181,88,107,0.15); color: #b5586b; width: 22px; height: 22px;
+            border-radius: 7px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.75rem; flex-shrink: 0;
         }
         .mini-team-btn {
             width: 18px; height: 18px; border-radius: 6px; display: flex; align-items: center;
@@ -160,7 +160,7 @@
         }
         .mini-team-btn:hover { opacity: 0.7; }
         .mini-team-btn.active-red, .mini-team-btn.active-blue { opacity: 1; transform: scale(1.15); }
-        .log-line, .chat-line { font-size: 0.76rem; color: #c9bfae; margin-bottom: 6px; line-height: 1.5; }
+        .log-line, .chat-line { font-size: 0.84rem; color: #c9bfae; margin-bottom: 8px; line-height: 1.6; }
         .chat-line b { color: #4caf7d; }
 
         /* ===== نموذج الإعدادات ===== */
@@ -1420,7 +1420,6 @@
                 const rawMessage = (data.content || '').trim();
                 const username = data.sender ? data.sender.username : 'مجهول';
                 const userId = data.sender ? data.sender.id : username;
-                addLog(`💬 [${username}]: ${rawMessage}`);
 
                 const normalized = rawMessage.trim().toLowerCase();
 
