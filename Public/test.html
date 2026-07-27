@@ -390,19 +390,26 @@
         .action-icon-item .label { font-size: 0.92rem; font-weight: 800; color: #c9bfae; }
 
         .candidates-panel {
-            padding: 28px; width: 100%; max-width: 340px; max-height: 92vh; overflow-y: auto;
+            padding: 28px; width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto;
             display: flex; flex-direction: column; gap: 12px;
         }
         .candidates-panel .cp-title { font-size: 1.1rem; font-weight: 900; color: #c9a227; text-align: center; margin-bottom: 6px; }
         .candidate-row {
-            display: flex; align-items: center; justify-content: space-between; gap: 10px;
-            background: rgba(226,212,178,0.05); border: 1px solid rgba(226,212,178,0.1); border-radius: 14px;
-            padding: 15px 18px; cursor: pointer; font-weight: 800; font-size: 1.12rem; color: #f3ecdd; transition: 0.2s;
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            background: linear-gradient(135deg, rgba(226,212,178,0.07), rgba(226,212,178,0.03));
+            border: 1px solid rgba(226,212,178,0.12); border-radius: 16px;
+            padding: 16px 22px; cursor: pointer; font-weight: 800; font-size: 1.15rem; color: #f3ecdd;
+            transition: 0.2s; width: 100%;
         }
-        .candidate-row:hover { border-color: #c9a227; background: rgba(201,162,39,0.08); transform: translateY(-1px); }
-        .candidate-row .cr-num { color: #a89c85; font-size: 0.9rem; }
+        .candidate-row:hover { border-color: #c9a227; background: rgba(201,162,39,0.1); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(201,162,39,0.15); }
+        .candidate-row .cr-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .candidate-row .cr-num {
+            color: #c9a227; font-size: 0.85rem; font-weight: 900; flex-shrink: 0;
+            background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.3);
+            padding: 4px 12px; border-radius: 50px;
+        }
         .candidate-row.revive-mode { color: #4caf7d; border-color: rgba(76,175,125,0.25); }
-        .candidate-row.revive-mode .cr-num { color: #4caf7d; opacity: 0.75; }
+        .candidate-row.revive-mode .cr-num { color: #4caf7d; opacity: 0.9; background: rgba(76,175,125,0.12); border-color: rgba(76,175,125,0.3); }
         .candidate-empty { color: #7a7062; font-size: 0.9rem; text-align: center; padding: 24px 0; }
 
         .timeout-banner {
@@ -1311,7 +1318,7 @@
                 candidates.forEach(p => {
                     const row = document.createElement('div');
                     row.className = 'candidate-row';
-                    row.innerHTML = `${p.name} <span class="cr-num">#${p.number}</span>`;
+                    row.innerHTML = `<span class="cr-name">${p.name}</span> <span class="cr-num">#${p.number}</span>`;
                     row.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
                     pickerGrid.appendChild(row);
                 });
@@ -1336,7 +1343,7 @@
                 eligibleDead.forEach(p => {
                     const row = document.createElement('div');
                     row.className = 'candidate-row revive-mode';
-                    row.innerHTML = `${p.name} <span class="cr-num">#${p.number}</span>`;
+                    row.innerHTML = `<span class="cr-name">${p.name}</span> <span class="cr-num">#${p.number}</span>`;
                     row.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
                     pickerGrid.appendChild(row);
                 });
