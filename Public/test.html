@@ -363,41 +363,44 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .overlay.show { display: flex; }
 
-        #pickerOverlay { background: rgba(10,18,15,0.4); backdrop-filter: blur(10px); justify-content: flex-end; align-items: center; }
+        #pickerOverlay { background: rgba(4,8,6,0.82); backdrop-filter: blur(3px); justify-content: flex-start; align-items: center; gap: 14px; }
         .picker-panel {
             background: rgba(14,24,20,0.92); border: 1.5px solid rgba(201,162,39,0.4); border-radius: 24px;
             padding: 30px 28px; width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.65); animation: popIn 0.35s ease;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.65);
             display: flex; flex-direction: column; gap: 16px; text-align: center;
         }
         .picker-header { font-size: 1.1rem; font-weight: 900; color: #f3ecdd; }
-        .picker-header b { color: #b5586b; }
-        .picker-timer-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
-        .picker-timer-big { font-size: 2.6rem; font-weight: 900; color: #f3ecdd; line-height: 1; }
-        .picker-timer-label { font-size: 1rem; color: #a89c85; font-weight: 800; }
+        .picker-header b { color: #c9a227; }
+        .picker-timer-big { font-size: 3rem; font-weight: 900; color: #c9a227; line-height: 1; }
+        .picker-timer-label { font-size: 0.8rem; color: #a89c85; margin-top: -12px; }
 
         .action-icons-row { display: flex; justify-content: center; gap: 22px; }
-        .action-icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
-        .action-icon-item.disabled { opacity: 0.35; pointer-events: none; }
+        .action-icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .action-icon-circle {
             width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; border: 2px solid rgba(226,212,178,0.15); background: rgba(226,212,178,0.04); transition: 0.2s;
+            font-size: 1.5rem; border: 2px solid rgba(226,212,178,0.15); background: rgba(226,212,178,0.04);
         }
         .action-icon-item.kill .action-icon-circle { border-color: rgba(181,88,107,0.5); color: #b5586b; }
         .action-icon-item.revive .action-icon-circle { border-color: rgba(76,175,125,0.5); color: #4caf7d; }
-        .action-icon-item.kill.active .action-icon-circle { background: rgba(181,88,107,0.18); box-shadow: 0 0 0 3px rgba(181,88,107,0.3); transform: scale(1.06); }
-        .action-icon-item.revive.active .action-icon-circle { background: rgba(76,175,125,0.18); box-shadow: 0 0 0 3px rgba(76,175,125,0.3); transform: scale(1.06); }
         .action-icon-item .label { font-size: 0.75rem; font-weight: 800; color: #c9bfae; }
 
-        .picker-grid { display: none !important; }
-        #reviveToggleWrap { display: none !important; }
-
-        .method-badges-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .method-badge {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(138,99,184,0.15); border: 1px solid rgba(138,99,184,0.4);
-            color: #d9cfe8; font-size: 0.78rem; font-weight: 800; padding: 8px 18px; border-radius: 50px;
+        .candidates-panel {
+            background: rgba(14,24,20,0.92); border: 1.5px solid rgba(201,162,39,0.3); border-radius: 24px;
+            padding: 22px; width: 100%; max-width: 260px; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.65); display: flex; flex-direction: column; gap: 10px;
         }
+        .candidates-panel .cp-title { font-size: 0.88rem; font-weight: 900; color: #c9a227; text-align: center; margin-bottom: 4px; }
+        .candidate-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            background: rgba(226,212,178,0.05); border: 1px solid rgba(226,212,178,0.1); border-radius: 12px;
+            padding: 11px 14px; cursor: pointer; font-weight: 800; font-size: 0.9rem; color: #f3ecdd; transition: 0.2s;
+        }
+        .candidate-row:hover { border-color: #c9a227; background: rgba(201,162,39,0.08); transform: translateY(-1px); }
+        .candidate-row .cr-num { color: #a89c85; font-size: 0.78rem; }
+        .candidate-row.revive-mode { color: #4caf7d; border-color: rgba(76,175,125,0.25); }
+        .candidate-row.revive-mode .cr-num { color: #4caf7d; opacity: 0.75; }
+        .candidate-empty { color: #7a7062; font-size: 0.8rem; text-align: center; padding: 20px 0; }
 
         .chooser-card {
             background: rgba(226,212,178,0.05); border: 1px solid rgba(226,212,178,0.1); border-radius: 16px; padding: 16px;
@@ -416,7 +419,7 @@
             font-size: 0.78rem; cursor: pointer; transition: 0.2s;
         }
         .skip-btn.no-kick { background: rgba(76,175,125,0.15); color: #4caf7d; border: 1px solid rgba(76,175,125,0.35); }
-        .skip-btn.with-kick { background: rgba(184,127,64,0.18); color: #c98a4b; border: 1px solid rgba(184,127,64,0.4); }
+        .skip-btn.with-kick { background: rgba(181,88,107,0.15); color: #b5586b; border: 1px solid rgba(181,88,107,0.35); }
         .skip-btn:hover { transform: translateY(-2px); }
 
         .modal-card {
@@ -743,23 +746,15 @@
     <div class="overlay" id="pickerOverlay">
         <div class="picker-panel">
             <div class="picker-header">دور <b id="pickerChooserName">—</b></div>
-            <div class="picker-timer-row">
-                <span class="picker-timer-big" id="decisionTimerBig" style="display:none;">30</span>
-                <span class="picker-timer-label" id="decisionTimerLabel" style="display:none;">ثانية</span>
-            </div>
-            <div class="modal-instr" id="pickerInstr" style="margin-bottom:0;">يمكنك اختيار طرد أو إنعاش، بعدها اكتب رقم اللاعب أو اسمه بالشات أو المنشن الخاص به</div>
+            <div class="picker-timer-big" id="decisionTimerBig" style="display:none;">30</div>
+            <div class="picker-timer-label" id="decisionTimerLabel" style="display:none;">ثانية</div>
+            <div class="modal-instr" id="pickerInstr" style="margin-bottom:0;">يمكنك اختيار طرد أو إنعاش، بعدها اكتب رقم اللاعب أو اسمه بالشات</div>
 
             <div class="action-icons-row">
-                <div class="action-icon-item kill" id="actionIconKill" onclick="selectPickMode('kill')"><div class="action-icon-circle">⚔️</div><span class="label">طرد</span></div>
-                <div class="action-icon-item revive" id="actionIconRevive" onclick="selectPickMode('revive')"><div class="action-icon-circle">🩹</div><span class="label">إنعاش</span></div>
+                <div class="action-icon-item kill"><div class="action-icon-circle">⚔️</div><span class="label">طرد</span></div>
+                <div class="action-icon-item revive"><div class="action-icon-circle">🩹</div><span class="label">إنعاش</span></div>
             </div>
 
-            <div class="method-badges-row">
-                <span class="method-badge">#️⃣ رقم اللاعب</span>
-                <span class="method-badge">🔤 اسم اللاعب</span>
-            </div>
-
-            <div class="picker-grid" id="pickerGrid"></div>
             <div id="reviveToggleWrap" style="display:none;">
                 <button class="revive-btn" id="reviveToggleBtn">🩹 إنعاش</button>
             </div>
@@ -774,6 +769,11 @@
                 <button class="skip-btn no-kick" onclick="skipWithoutKick()">⏭️ تخطي (بدون طرد)</button>
                 <button class="skip-btn with-kick" onclick="skipWithKick()">⏭️ تخطي (مع طرد)</button>
             </div>
+        </div>
+
+        <div class="candidates-panel">
+            <div class="cp-title" id="candidatesTitle">قائمة الطرد</div>
+            <div id="pickerGrid"></div>
         </div>
     </div>
 
@@ -1246,31 +1246,21 @@
             openActionOverlay('kill', randomPick);
         }
 
-        function selectPickMode(mode) {
-            if (!waitingForPick) return;
-            if (mode === 'revive' && getReviveCandidates().length === 0) return;
-            pickMode = mode;
-            renderPickerGrid();
-        }
-
         function renderPickerGrid() {
             pickerGrid.innerHTML = '';
-            const killIconEl = document.getElementById('actionIconKill');
-            const reviveIconEl = document.getElementById('actionIconRevive');
-            const hasRevive = getReviveCandidates().length > 0;
-            if (killIconEl) killIconEl.classList.toggle('active', pickMode === 'kill');
-            if (reviveIconEl) {
-                reviveIconEl.classList.toggle('active', pickMode === 'revive');
-                reviveIconEl.classList.toggle('disabled', !hasRevive);
-            }
+            const candidatesTitle = document.getElementById('candidatesTitle');
             if (pickMode === 'kill') {
+                candidatesTitle.textContent = 'قائمة الطرد';
                 const candidates = getKillCandidates();
+                if (candidates.length === 0) {
+                    pickerGrid.innerHTML = '<div class="candidate-empty">ما فيه أهداف متاحة</div>';
+                }
                 candidates.forEach(p => {
-                    const btn = document.createElement('button');
-                    btn.className = 'picker-btn';
-                    btn.innerHTML = `<span class="num-badge">${p.number}</span> ${p.name}`;
-                    btn.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
-                    pickerGrid.appendChild(btn);
+                    const row = document.createElement('div');
+                    row.className = 'candidate-row';
+                    row.innerHTML = `${p.name} <span class="cr-num">#${p.number}</span>`;
+                    row.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
+                    pickerGrid.appendChild(row);
                 });
                 pickerInstr.textContent = settings.joinMode === 'teams'
                     ? 'اختر شخص من الفريق الآخر تطرده، اكتب رقمه أو اسمه بالشات — أو اكتب "انعاش" لتنعش أحد بفريقك'
@@ -1285,13 +1275,17 @@
                     reviveToggleWrap.style.display = 'none';
                 }
             } else {
+                candidatesTitle.textContent = 'قائمة الإنعاش';
                 const eligibleDead = getReviveCandidates();
+                if (eligibleDead.length === 0) {
+                    pickerGrid.innerHTML = '<div class="candidate-empty">ما فيه أهداف متاحة</div>';
+                }
                 eligibleDead.forEach(p => {
-                    const btn = document.createElement('button');
-                    btn.className = 'picker-btn';
-                    btn.innerHTML = `<span class="num-badge">${p.number}</span> ${p.name}`;
-                    btn.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
-                    pickerGrid.appendChild(btn);
+                    const row = document.createElement('div');
+                    row.className = 'candidate-row revive-mode';
+                    row.innerHTML = `${p.name} <span class="cr-num">#${p.number}</span>`;
+                    row.onclick = () => { if (!waitingForPick) return; handleChatPick(chooser.id, chooser.name, String(p.number)); };
+                    pickerGrid.appendChild(row);
                 });
                 pickerInstr.textContent = settings.joinMode === 'teams'
                     ? 'اختر شخص من فريقك تنعشه، اكتب رقمه بالشات — أو اكتب "طرد" لو تبي ترجع لقائمة الطرد'
