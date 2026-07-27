@@ -367,11 +367,12 @@
         .picker-combined {
             display: flex; background: rgba(14,24,20,0.92); border: 1.5px solid rgba(201,162,39,0.4);
             border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,0.65); overflow: hidden; max-height: 92vh;
+            width: 100%; max-width: 1080px;
         }
         .picker-panel {
             padding: 40px 38px; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto;
             display: flex; flex-direction: column; gap: 20px; text-align: center;
-            border-left: 1px solid rgba(226,212,178,0.12);
+            border-left: 1px solid rgba(226,212,178,0.12); flex-shrink: 0;
         }
         .picker-header { font-size: 1.4rem; font-weight: 900; color: #f3ecdd; }
         .picker-header b { color: #c9a227; }
@@ -390,15 +391,20 @@
         .action-icon-item .label { font-size: 0.92rem; font-weight: 800; color: #c9bfae; }
 
         .candidates-panel {
-            padding: 28px; width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto;
+            padding: 28px; width: 100%; max-width: 600px; flex: 1; max-height: 92vh; overflow-y: auto;
             display: flex; flex-direction: column; gap: 12px;
         }
         .candidates-panel .cp-title { font-size: 1.1rem; font-weight: 900; color: #c9a227; text-align: center; margin-bottom: 6px; }
+        #pickerGrid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
         .candidate-row {
             display: flex; align-items: center; justify-content: space-between; gap: 14px;
             background: linear-gradient(135deg, rgba(226,212,178,0.07), rgba(226,212,178,0.03));
             border: 1px solid rgba(226,212,178,0.12); border-radius: 16px;
-            padding: 16px 22px; cursor: pointer; font-weight: 800; font-size: 1.15rem; color: #f3ecdd;
+            padding: 16px 22px; cursor: pointer; font-weight: 800; font-size: 1.1rem; color: #f3ecdd;
             transition: 0.2s; width: 100%;
         }
         .candidate-row:hover { border-color: #c9a227; background: rgba(201,162,39,0.1); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(201,162,39,0.15); }
@@ -410,7 +416,11 @@
         }
         .candidate-row.revive-mode { color: #4caf7d; border-color: rgba(76,175,125,0.25); }
         .candidate-row.revive-mode .cr-num { color: #4caf7d; opacity: 0.9; background: rgba(76,175,125,0.12); border-color: rgba(76,175,125,0.3); }
-        .candidate-empty { color: #7a7062; font-size: 0.9rem; text-align: center; padding: 24px 0; }
+        .candidate-empty { color: #7a7062; font-size: 0.9rem; text-align: center; padding: 24px 0; grid-column: 1 / -1; }
+
+        @media (max-width: 720px) {
+            #pickerGrid { grid-template-columns: 1fr; }
+        }
 
         .timeout-banner {
             position: fixed; top: 90px; left: 50%; transform: translateX(-50%) translateY(-20px);
