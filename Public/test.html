@@ -367,7 +367,7 @@
         .picker-combined {
             display: flex; background: rgba(14,24,20,0.92); border: 1.5px solid rgba(201,162,39,0.4);
             border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,0.65); overflow: hidden; max-height: 92vh;
-            width: 100%; max-width: 1080px;
+            width: 100%; max-width: 1690px;
         }
         .picker-panel {
             padding: 40px 38px; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto;
@@ -391,13 +391,13 @@
         .action-icon-item .label { font-size: 0.92rem; font-weight: 800; color: #c9bfae; }
 
         .candidates-panel {
-            padding: 28px; width: 100%; max-width: 600px; flex: 1; max-height: 92vh; overflow-y: auto;
+            padding: 28px; width: 100%; max-width: 1200px; flex: 1; max-height: 92vh; overflow-y: auto;
             display: flex; flex-direction: column; gap: 12px;
         }
         .candidates-panel .cp-title { font-size: 1.1rem; font-weight: 900; color: #c9a227; text-align: center; margin-bottom: 6px; }
         #pickerGrid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
         }
         .candidate-row {
@@ -603,7 +603,7 @@
                         <div class="toggle-row">
                             <div class="settings-label" style="margin-bottom:0;">دوران تلقائي</div>
                             <label class="toggle-switch">
-                                <input type="checkbox" id="autoSpinToggle" onchange="settings.autoSpin = this.checked;">
+                                <input type="checkbox" id="autoSpinToggle" onchange="settings.autoSpin = this.checked; saveSettings();">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
@@ -870,7 +870,57 @@
             centerImage: 'none'
         };
 
-        // ===================== حالة اللعبة =====================
+        // ===================== حفظ واسترجاع إعدادات البثّاث (تبقى محفوظة بين الزيارات) =====================
+        const SETTINGS_STORAGE_KEY = 'zlf_persona_settings';
+
+        function saveSettings() {
+            try {
+                localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+            } catch (e) {}
+        }
+
+        function loadSettings() {
+            try {
+                const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+                if (!raw) return;
+                const saved = JSON.parse(raw);
+                Object.assign(settings, saved);
+            } catch (e) {}
+        }
+
+        function applySettingsToUI() {
+            document.getElementById('valMaxPlayers').textContent = settings.maxPlayers;
+
+            const autoSpinToggle = document.getElementById('autoSpinToggle');
+            if (autoSpinToggle) autoSpinToggle.checked = settings.autoSpin;
+
+            const decisionTimeRange = document.getElementById('decisionTimeRange');
+            if (decisionTimeRange) decisionTimeRange.value = settings.decisionTime;
+            document.getElementById('decisionTimeVal').textContent = settings.decisionTime === 0 ? 'غير محدود' : settings.decisionTime + ' ثانية';
+
+            const spinDurationRange = document.getElementById('spinDurationRange');
+            if (spinDurationRange) spinDurationRange.value = settings.spinDuration;
+            document.getElementById('spinDurationVal').textContent = settings.spinDuration + ' ثواني';
+
+            const reviveToggle = document.getElementById('reviveToggle');
+            if (reviveToggle) reviveToggle.checked = settings.reviveEnabled;
+            document.getElementById('reviveLimitGroup').style.display = settings.reviveEnabled ? 'block' : 'none';
+            document.getElementById('valReviveLimit').textContent = settings.reviveLimit;
+
+            const borderColorInput = document.getElementById('borderColorInput');
+            if (borderColorInput) borderColorInput.value = settings.borderColor;
+            wheelCanvas.style.borderColor = settings.borderColor;
+
+            document.querySelectorAll('.center-img-opt').forEach(el => el.classList.toggle('active', el.dataset.val === settings.centerImage));
+            wheelCenterImg.classList.toggle('show', settings.centerImage === 'logo');
+
+            document.getElementById('cardCommand').classList.toggle('active', settings.joinMode === 'command');
+            document.getElementById('cardTeams').classList.toggle('active', settings.joinMode === 'teams');
+            document.getElementById('teamHint').classList.toggle('show', settings.joinMode === 'teams');
+            document.getElementById('commandHint').style.display = settings.joinMode === 'teams' ? 'none' : 'block';
+        }
+
+
         let players = [];        // { id, name, number, dead, revived, reviveCount, team }
         let chooser = null;
         let currentTarget = null;
@@ -947,27 +997,33 @@
         function adjustSetting(key, delta) {
             if (key === 'maxPlayers') { settings.maxPlayers = Math.max(2, settings.maxPlayers + delta); document.getElementById('valMaxPlayers').textContent = settings.maxPlayers; }
             if (key === 'reviveLimit') { settings.reviveLimit = Math.max(0, settings.reviveLimit + delta); document.getElementById('valReviveLimit').textContent = settings.reviveLimit; }
+            saveSettings();
         }
         function onDecisionTimeChange(v) {
             settings.decisionTime = parseInt(v, 10);
             document.getElementById('decisionTimeVal').textContent = settings.decisionTime === 0 ? 'غير محدود' : settings.decisionTime + ' ثانية';
+            saveSettings();
         }
         function onSpinDurationChange(v) {
             settings.spinDuration = parseInt(v, 10);
             document.getElementById('spinDurationVal').textContent = settings.spinDuration + ' ثواني';
+            saveSettings();
         }
         function onReviveToggle(checked) {
             settings.reviveEnabled = checked;
             document.getElementById('reviveLimitGroup').style.display = checked ? 'block' : 'none';
+            saveSettings();
         }
         function onBorderColorChange(v) {
             settings.borderColor = v;
             wheelCanvas.style.borderColor = v;
+            saveSettings();
         }
         function setCenterImage(val) {
             settings.centerImage = val;
             document.querySelectorAll('.center-img-opt').forEach(el => el.classList.toggle('active', el.dataset.val === val));
             wheelCenterImg.classList.toggle('show', val === 'logo');
+            saveSettings();
         }
         function renderThemeGrid() {
             const grid = document.getElementById('themeGrid');
@@ -977,11 +1033,13 @@
                 const el = document.createElement('div');
                 el.className = 'theme-swatch' + (settings.wheelTheme === key ? ' active' : '');
                 el.innerHTML = `<div class="dot-ring" style="background:conic-gradient(${t.colors.join(',')});"></div>${t.name}`;
-                el.onclick = () => { settings.wheelTheme = key; renderThemeGrid(); drawWheel(); };
+                el.onclick = () => { settings.wheelTheme = key; renderThemeGrid(); drawWheel(); saveSettings(); };
                 grid.appendChild(el);
             });
         }
+        loadSettings();
         renderThemeGrid();
+        applySettingsToUI();
 
         // ===================== طريقة الانضمام =====================
         function setJoinMode(mode) {
@@ -1001,6 +1059,7 @@
                 players.forEach(p => { p.team = null; });
             }
             renderSidePlayers();
+            saveSettings();
         }
 
         function openRules() { document.getElementById('rulesOverlay').classList.add('show'); }
