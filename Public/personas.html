@@ -1797,14 +1797,7 @@
             }
         } catch (e) {}
 
-        // ===== كود الحظر اللحظي الذكي التابع للمنصة الشاملة =====
-        setInterval(async () => {
-          try {
-            const res = await fetch('/api/check-ban-status');
-            const data = await res.json();
-            if (data.banned) window.location.reload();
-          } catch (e) {}
-        }, 3000);
+
     </script>
 </body>
 </html>
