@@ -136,7 +136,7 @@
         .side-section.collapsed .chev { transform: rotate(180deg); }
         .side-section-body { padding: 0 18px 18px; max-height: 220px; overflow-y: auto; }
         .side-section.collapsed .side-section-body { display: none; }
-        #sidePlayersList { max-height: 560px; }
+        #sidePlayersList { max-height: 320px; }
         #gameLogList { max-height: 190px; }
 
         .empty-note { color: #7a7062; font-size: 0.85rem; text-align: center; padding: 16px 0; }
@@ -576,7 +576,7 @@
             <!-- تبويب اللاعبين -->
             <div class="side-section" id="playersSection">
                 <div class="side-section-head" onclick="toggleSection('playersSection')">
-                    <span>👥 اللاعبين</span><span class="chev">▾</span>
+                    <span>👥 اللاعبين <b id="sidebarPlayerCount" style="color:#c9a227;">0</b></span><span class="chev">▾</span>
                 </div>
                 <div class="side-section-body" id="sidePlayersList">
                     <div class="empty-note">في انتظار اللاعبين...</div>
@@ -1069,6 +1069,7 @@
         function renderSidePlayers() {
             const list = document.getElementById('sidePlayersList');
             document.getElementById('setupPlayerCount').textContent = players.length;
+            document.getElementById('sidebarPlayerCount').textContent = players.length;
             if (players.length === 0) { list.innerHTML = '<div class="empty-note">في انتظار اللاعبين...</div>'; return; }
             list.innerHTML = '';
             players.forEach(p => {
