@@ -490,18 +490,31 @@
         .shoot-scene .persona-avatar-big.revived-pop { animation: revivedPop 0.6s ease; }
         @keyframes revivedPop { 0% { transform: scale(1); } 40% { transform: scale(1.25); filter: drop-shadow(0 0 20px #4caf7d); } 100% { transform: scale(1); } }
 
-        .boot-kick {
-            position: absolute; top: 50%; left: 50%; width: 76px; height: auto; opacity: 0; pointer-events: none; z-index: 6;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); transform: translate(140px, -20px) rotate(15deg) scale(0.8);
-        }
-        .boot-kick.kick-anim { animation: bootKickMove 0.65s cubic-bezier(0.34, 1.5, 0.5, 1) forwards; }
-        @keyframes bootKickMove {
-            0% { transform: translate(140px, -20px) rotate(15deg) scale(0.8); opacity: 0; }
-            18% { opacity: 1; }
-            45% { transform: translate(10px, -10px) rotate(-15deg) scale(1.15); opacity: 1; }
-            58% { transform: translate(-16px, -18px) rotate(-40deg) scale(1.05); opacity: 1; }
-            100% { transform: translate(-150px, -46px) rotate(-65deg) scale(0.7); opacity: 0; }
-        }
+.boot-kick {
+    position: absolute; top: 50%; left: 50%; width: 76px; height: auto; opacity: 0; pointer-events: none; z-index: 6;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); transform: translate(220px, -10px) rotate(20deg) scale(0.8);
+}
+.boot-kick.kick-anim { animation: bootKickMove 0.6s cubic-bezier(0.34, 1.5, 0.5, 1) forwards; }
+@keyframes bootKickMove {
+    0% { transform: translate(220px, -10px) rotate(20deg) scale(0.8); opacity: 0; }
+    18% { opacity: 1; }
+    48% { transform: translate(20px, 4px) rotate(-15deg) scale(1.18); opacity: 1; }
+    60% { transform: translate(4px, -6px) rotate(-35deg) scale(1.08); opacity: 1; }
+    100% { transform: translate(200px, -30px) rotate(25deg) scale(0.75); opacity: 0; }
+}
+
+.shoot-scene.kill-mode { justify-content: center; }
+.shoot-scene.kill-mode .scene-avatar-wrap:first-child { display: none; }
+
+.shoot-scene .persona-avatar-big.fly-up {
+    animation: targetFlyAway 0.85s cubic-bezier(0.45, 0, 0.65, 1) forwards;
+}
+@keyframes targetFlyAway {
+    0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+    15%  { transform: scale(1.08) rotate(-6deg); opacity: 1; }
+    100% { transform: translateY(-520px) rotate(340deg) scale(0.25); opacity: 0; }
+}
+
         .syringe-inject {
             position: absolute; top: 50%; left: 50%; width: 54px; height: auto; opacity: 0; pointer-events: none; z-index: 6;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); transform: translate(110px, -150px) rotate(15deg) scale(0.8);
@@ -815,7 +828,7 @@
             <div class="modal-eyebrow" id="shootEyebrow">⚔️ جارٍ التنفيذ</div>
             <div class="modal-big-name" id="shootTargetName">—</div>
             <div class="modal-instr" id="shootSubtitle">جارٍ التنفيذ...</div>
-            <div class="shoot-scene">
+<div class="shoot-scene" id="shootScene">
                 <div class="scene-avatar-wrap">
                     <div id="chooserPersonaElement" class="persona-avatar-big"></div>
                     <div class="scene-name" id="chooserNameLabel">—</div>
@@ -1500,13 +1513,16 @@
             impactSparkEl.classList.remove('spark-anim');
             void bootKickEl.offsetWidth;
 
-            if (type === 'kill') {
-                addLog(`⚔️ #${chooser.number} ${chooser.name} اختار يطرد ${targetPlayer.name}`);
-                shootEyebrow.textContent = '⚔️ جارٍ الطرد';
-                shootSubtitle.textContent = 'جارٍ تنفيذ الطرد...';
-                bootKickEl.classList.add('kick-anim');
-                setTimeout(() => { impactSparkEl.classList.remove('spark-anim'); void impactSparkEl.offsetWidth; impactSparkEl.classList.add('spark-anim'); }, 300);
-                setTimeout(() => resolveKill(targetPlayer), 1400);
+if (type === 'kill') {
+    document.getElementById('shootScene').classList.add('kill-mode');
+    addLog(`⚔️ #${chooser.number} ${chooser.name} اختار يطرد ${targetPlayer.name}`);
+    shootEyebrow.textContent = '⚔️ جارٍ الطرد';
+    shootSubtitle.textContent = 'جارٍ تنفيذ الطرد...';
+    bootKickEl.classList.add('kick-anim');
+    setTimeout(() => { impactSparkEl.classList.remove('spark-anim'); void impactSparkEl.offsetWidth; impactSparkEl.classList.add('spark-anim'); }, 300);
+    setTimeout(() => resolveKill(targetPlayer), 420);
+} else {
+    document.getElementById('shootScene').classList.remove('kill-mode');
             } else {
                 addLog(`💚 #${chooser.number} ${chooser.name} اختار ينعش ${targetPlayer.name}`);
                 shootEyebrow.textContent = '✨ جارٍ الإنعاش';
@@ -1519,10 +1535,9 @@
         }
 
         function resolveKill(target) {
-            playEliminationSound();
-            targetPersonaElement.textContent = '';
-            targetPersonaElement.classList.add('fallen');
-            target.dead = true;
+    playEliminationSound();
+    targetPersonaElement.classList.add('fly-up');
+    target.dead = true;
             const isSelfElim = chooser && String(target.id) === String(chooser.id);
 
             setTimeout(() => {
