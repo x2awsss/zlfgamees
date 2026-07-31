@@ -915,7 +915,7 @@
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#050816';
                 ctx.font = 'bold 19px Cairo, sans-serif';
-                const label = `#${p.number} ${p.name}`;
+const label = `${p.name}`;
                 const shortLabel = label.length > 16 ? label.slice(0, 15) + '…' : label;
                 ctx.fillText(shortLabel, radius - 16, 6);
                 ctx.restore();
