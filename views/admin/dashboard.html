@@ -174,6 +174,28 @@
   button.send-btn { background:#53fc18; color:#000; border:none; padding:8px 16px; border-radius:8px; font-weight:900; cursor:pointer; font-size:0.85rem; transition: transform 0.2s, opacity 0.2s; }
   button.send-btn:hover { transform: translateY(-1px); }
   button.send-btn:disabled { opacity:0.5; cursor:wait; }
+
+  button.popout-btn {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.82rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+  }
+  button.popout-btn:hover {
+    background: linear-gradient(135deg, #0369a1, #075985);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+  }
   
   .msg-input { padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.25); color:#fff; width:220px; font-size:0.85rem; }
   .msg-input:focus { border-color: rgba(255,255,255,0.25); outline: none; }
@@ -258,6 +280,7 @@
         <th>المستخدم</th>
         <th>تاريخ الربط</th>
         <th>آخر دخول</th>
+        <th>الشات المباشر</th>
         <th>إرسال رسالة بالشات</th>
         <th>حظر / فك حظر</th>
         <th>تعديل القناة</th>
@@ -289,6 +312,12 @@ function insertMacro(userId, text) {
     input.value = text;
     input.focus();
   }
+}
+
+// دالة فتح نافذة Popout الشات المستقلة
+function openKickPopoutChat(username) {
+  const chatUrl = `https://kick.com/popout/${username}/chat`;
+  window.open(chatUrl, `Chat_${username}`, 'width=420,height=650,scrollbars=yes,resizable=yes');
 }
 
 // ===== 1) جلب وإدارة الوايت لست =====
@@ -398,6 +427,11 @@ async function loadUsers() {
       </td>
       <td>${fmtDate(u.linked_at)}</td>
       <td>${fmtDate(u.last_login_at)}</td>
+      <td>
+        <button class="popout-btn" onclick="openKickPopoutChat('${u.username}')">
+          فتح الشات 💬
+        </button>
+      </td>
       <td>
         <input class="msg-input" placeholder="اكتب رسالتك هنا..." data-userid="${u.user_id}">
         
