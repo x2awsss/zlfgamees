@@ -419,7 +419,7 @@ app.post('/api/welcome', async (req, res) => {
 
   try {
     await getValidKickAccessToken(userId);
-    const welcomeMessage = `يا هلا ومسهلا بـ ${username} في منصة زلف! 🚀✨`;
+    const welcomeMessage = `ياهلا ومسهلا في منصة زلف الخمس نجوم جدًا`;
     const result = await sendChatMessage(userId, welcomeMessage, { asBot: true });
     res.json({ ok: true, result });
   } catch (err) {
