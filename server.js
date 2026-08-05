@@ -404,6 +404,30 @@ app.get('/auth/twitch/callback', async (req, res) => {
 // ==================== APIs البيانات ==================
 // =====================================================
 
+// 🚀 مسار الترحيب التلقائي المستدعى من zlf.html مباشرة
+app.post('/api/welcome', async (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ error: 'غير مسجل الدخول' });
+  }
+
+  const userId = String(req.session.user.id || req.session.user.user_id || '');
+  const username = req.session.user.name || req.session.user.username || '';
+
+  if (!userId) {
+    return res.status(400).json({ error: 'تعذر تحديد معرّف المستخدم' });
+  }
+
+  try {
+    await getValidKickAccessToken(userId);
+    const welcomeMessage = `يا هلا ومسهلا بـ ${username} في منصة زلف! 🚀✨`;
+    const result = await sendChatMessage(userId, welcomeMessage, { asBot: true });
+    res.json({ ok: true, result });
+  } catch (err) {
+    console.error('خطأ في إرسال الترحيب تلقائياً:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/chatroom', async (req, res) => {
   if (!req.session.user || !req.session.accessToken) {
     return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً' });
