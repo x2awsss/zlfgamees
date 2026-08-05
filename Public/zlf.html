@@ -1569,5 +1569,8 @@
     }, 3000);
     </script>
     <script src="/ban-checker.js"></script>
+    <script>
+  if (!localStorage.getItem('welcomed')) fetch('/api/welcome', { method: 'POST' }).then(r => r.ok && localStorage.setItem('welcomed', 'true'));
+</script>
 </body>
 </html>
