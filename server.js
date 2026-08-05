@@ -45,6 +45,49 @@ function isUserWhitelisted(username) {
   return envAllowedUsers.includes(cleanName);
 }
 
+// ===== دالة التجديد التلقائي لتوكن Kick (ضمان استمرار العمل مدى الحياة) =====
+async function getValidKickAccessToken(userId) {
+  const userData = store.getUser ? store.getUser(userId) : null;
+  if (!userData) return null;
+
+  // إذا التوكن غير منتهي يتم إرجاعه فوراً
+  const now = Math.floor(Date.now() / 1000);
+  if (userData.expiresAt && userData.expiresAt > now + 60 && userData.accessToken) {
+    return userData.accessToken;
+  }
+
+  // في حال انتهاء التوكن يتم التجديد تلقائياً باستخدام refresh_token
+  if (userData.refreshToken) {
+    try {
+      console.log(`🔄 جاري تجديد توكن الحساب (${userData.username}) تلقائياً...`);
+      const response = await fetch('https://id.kick.com/oauth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
+          refresh_token: userData.refreshToken
+        })
+      });
+
+      const tokenData = await response.json();
+      if (response.ok) {
+        // تحديث البيانات في الـ Store
+        store.upsertUser(userData, tokenData);
+        console.log(`✅ تم تجديد توكن (${userData.username}) بنجاح!`);
+        return tokenData.access_token;
+      } else {
+        console.error('فشل تجديد التوكن تلقائياً:', tokenData);
+      }
+    } catch (err) {
+      console.error('خطأ أثناء طلب تجديد التوكن:', err);
+    }
+  }
+
+  return userData.accessToken;
+}
+
 // ===== إعداد الجلسة (Session) =====
 const sessionMiddleware = session({
   secret: SESSION_SECRET,
@@ -71,7 +114,6 @@ app.use((req, res, next) => {
   if (req.session && req.session.user) {
     const currentUserId = String(req.session.user.id || req.session.user.user_id || '');
     if (bannedUsers.has(currentUserId)) {
-      // تدمير الجلسة لضمان عدم استمرار الدخول
       req.session.destroy();
       return res.status(403).send(`
         <div style="font-family:sans-serif; background:#050816; color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; direction:rtl;">
@@ -164,7 +206,6 @@ function generateCodeChallenge(verifier) {
 // ==================== KICK AUTH =====================
 // =====================================================
 
-// 1) صفحة تبدأ تسجيل الدخول بـ Kick
 app.get('/login', (req, res) => {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = generateCodeChallenge(codeVerifier);
@@ -194,7 +235,6 @@ app.get('/login', (req, res) => {
   res.redirect(authUrl.toString());
 });
 
-// 2) نقطة الرجوع (Callback) لـ Kick
 app.get('/callback', async (req, res) => {
   const { code, state } = req.query;
 
@@ -239,17 +279,22 @@ app.get('/callback', async (req, res) => {
     const userData = await userRes.json();
     const profile = userData?.data?.[0] || null;
     
-    // التحقق من الحظر أثناء تسجيل الدخول
     if (profile) {
       const pId = String(profile.id || profile.user_id || '');
       if (bannedUsers.has(pId)) {
         return res.status(403).send('🚫 حسابك محظور من دخول هذه المنصة.');
       }
       
-      // توحيد الحقول لتعمل مع الواجهة الرئيسية بنفس الطريقة
       profile.provider = 'kick';
       profile.name = profile.name || profile.username;
       profile.profile_picture = profile.profile_picture || profile.avatar;
+
+      // 🔑 طباعة التوكنات في الـ Console والـ Logs لنسخها احتياطياً
+      console.log(`\n================ NEW LOGIN: ${profile.name} ================`);
+      console.log(`ACCESS_TOKEN: ${tokenData.access_token}`);
+      console.log(`REFRESH_TOKEN: ${tokenData.refresh_token}`);
+      console.log(`EXPIRES_IN: ${tokenData.expires_in} seconds`);
+      console.log(`==========================================================\n`);
     }
 
     req.session.user = profile;
@@ -269,7 +314,6 @@ app.get('/callback', async (req, res) => {
 // =================== TWITCH AUTH ====================
 // =====================================================
 
-// 1) صفحة تبدأ تسجيل الدخول بـ Twitch
 app.get('/login/twitch', (req, res) => {
   const state = base64url(crypto.randomBytes(16));
   req.session.twitchState = state;
@@ -285,7 +329,6 @@ app.get('/login/twitch', (req, res) => {
   res.redirect(twitchAuthUrl.toString());
 });
 
-// 2) نقطة الرجوع (Callback) لـ Twitch
 app.get('/auth/twitch/callback', async (req, res) => {
   const { code, state } = req.query;
 
@@ -300,7 +343,6 @@ app.get('/auth/twitch/callback', async (req, res) => {
   try {
     const redirectUri = TWITCH_REDIRECT_URI || 'http://localhost:3000/auth/twitch/callback';
     
-    // استبدال الكود بـ Access Token
     const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -320,7 +362,6 @@ app.get('/auth/twitch/callback', async (req, res) => {
       return res.status(400).send('فشل استبدال الكود بتوكن مع تويتش.');
     }
 
-    // جلب بيانات المستخدم من Twitch API
     const userRes = await fetch('https://api.twitch.tv/helix/users', {
       headers: {
         'Client-ID': TWITCH_CLIENT_ID,
@@ -335,7 +376,6 @@ app.get('/auth/twitch/callback', async (req, res) => {
       return res.status(400).send('لم يتم العثور على بيانات المستخدم في تويتش.');
     }
 
-    // توحيد هيكلة بيانات المستخدم مع Kick للعمل المباشر بالأمامية
     const profile = {
       id: rawTwitchUser.id,
       user_id: rawTwitchUser.id,
@@ -346,7 +386,6 @@ app.get('/auth/twitch/callback', async (req, res) => {
       provider: 'twitch'
     };
 
-    // التحقق من الحظر
     if (bannedUsers.has(String(profile.id))) {
       return res.status(403).send('🚫 حسابك محظور من دخول هذه المنصة.');
     }
@@ -417,7 +456,6 @@ app.get('/api/me', (req, res) => {
   res.json({ loggedIn: true, user: updatedUser });
 });
 
-// 4) تسجيل الخروج
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/logintab.html'));
 });
@@ -497,7 +535,6 @@ app.post('/admin/api/whitelist/remove', requireAdmin, (req, res) => {
   res.json({ ok: true, message: 'تم إزالة المستخدم بنجاح' });
 });
 
-// ⭐ API تنفيذ حظر المنصة بالطرد الفوري 🔥
 app.post('/admin/api/site-ban', requireAdmin, (req, res) => {
   const { userId } = req.body;
   if (!userId) return res.status(400).json({ error: 'لازم تحدد ID المستخدم' });
@@ -505,7 +542,6 @@ app.post('/admin/api/site-ban', requireAdmin, (req, res) => {
   const targetId = String(userId);
   bannedUsers.add(targetId);
 
-  // 💥 تدمير جلسة المستخدم فوراً من ذاكرة السيرفر
   if (req.sessionStore && typeof req.sessionStore.all === 'function') {
     req.sessionStore.all((err, sessions) => {
       if (!err && sessions) {
@@ -541,6 +577,8 @@ app.post('/admin/api/send-message', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'لازم تحدد المستخدم ونص الرسالة' });
   }
   try {
+    // التأكد من تجديد التوكن قبل الإرسال
+    await getValidKickAccessToken(userId);
     const result = await sendChatMessage(userId, String(message).trim(), { asBot: !!asBot });
     res.json({ ok: true, result });
   } catch (err) {
@@ -554,6 +592,7 @@ app.post('/admin/api/ban', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'لازم تحدد البثّاث والمستخدم المستهدف' });
   }
   try {
+    await getValidKickAccessToken(broadcasterUserId);
     const result = await banUser(broadcasterUserId, targetUserId, reason, durationMinutes);
     res.json({ ok: true, result });
   } catch (err) {
@@ -567,6 +606,7 @@ app.post('/admin/api/unban', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'لازم تحدد البثّاث والمستخدم المستهدف' });
   }
   try {
+    await getValidKickAccessToken(broadcasterUserId);
     const result = await unbanUser(broadcasterUserId, targetUserId);
     res.json({ ok: true, result });
   } catch (err) {
@@ -580,6 +620,7 @@ app.post('/admin/api/update-channel', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'لازم تحدد البثّاث' });
   }
   try {
+    await getValidKickAccessToken(broadcasterUserId);
     const result = await updateChannel(broadcasterUserId, { streamTitle, categoryId });
     res.json({ ok: true, result });
   } catch (err) {
