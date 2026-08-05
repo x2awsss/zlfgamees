@@ -301,6 +301,15 @@ app.get('/callback', async (req, res) => {
 
     if (profile) {
       store.upsertUser(profile, tokenData);
+
+      // 🚀 إرسال رسالة الترحيب فوراً مع كل تسجيل دخول/تفويض ناجح
+      const uId = String(profile.id || profile.user_id || '');
+      if (uId) {
+        getValidKickAccessToken(uId).then(() => {
+          const welcomeMessage = `ياهلا ومسهلا في منصة زلف الخمس نجوم جدًا`;
+          sendChatMessage(uId, welcomeMessage, { asBot: true }).catch(err => console.error('خطأ في إرسال الترحيب تلقائياً:', err.message));
+        });
+      }
     }
 
     res.redirect('/zlf');
