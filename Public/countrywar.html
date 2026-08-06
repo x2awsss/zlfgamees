@@ -213,7 +213,7 @@
 
         .setup-title { font-size: 1rem; font-weight: 900; color: #eab308; margin-bottom: 16px; }
 
-        .join-hint { font-size: 0.8rem; color: #929dae; margin-bottom: 14px; }
+        .join-hint { font-size: 0.85rem; color: #929dae; margin-bottom: 14px; }
         .join-hint b { color: #53fc18; }
 
         .pending-grid {
@@ -592,7 +592,7 @@
 
         <div class="join-hint" style="margin-bottom:20px; font-size:0.85rem;">
             🌍 كل مشارك بياخذ دولة عشوائية سرية عند بدء اللعبة.<br>
-            اكتب <b>"join"</b> في الشات للانضمام
+            اكتب <b>"دخول"</b> أو <b>"join"</b> في الشات للانضمام
         </div>
 
         <div class="pending-grid" id="pendingGrid">
@@ -915,7 +915,7 @@
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#050816';
                 ctx.font = 'bold 19px Cairo, sans-serif';
-const label = `${p.name}`;
+                const label = `${p.name}`;
                 const shortLabel = label.length > 16 ? label.slice(0, 15) + '…' : label;
                 ctx.fillText(shortLabel, radius - 16, 6);
                 ctx.restore();
@@ -1174,7 +1174,8 @@ const label = `${p.name}`;
 
                 addLog(`💬 [${username}]: ${rawMessage}`);
 
-                if (rawMessage.toLowerCase() === 'join') {
+                const lowerMsg = rawMessage.toLowerCase();
+                if (lowerMsg === 'join' || lowerMsg === 'دخول') {
                     addPlayer(username, userId);
                 } else {
                     handleChatPick(userId, username, rawMessage);
